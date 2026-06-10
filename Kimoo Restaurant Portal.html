@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kimoo — Restoran Portalı</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--neutral-50);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .portal-stage { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 32px 20px 48px; }
+  .portal-head { text-align: center; }
+  .portal-head h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; color: var(--neutral-900); display: flex; align-items: center; gap: 10px; justify-content: center; }
+  .portal-head .badge-k { width: 34px; height: 34px; border-radius: 10px; background: var(--coral-500); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 19px; box-shadow: var(--shadow-brand); }
+  .portal-head p { font-size: 14px; color: var(--neutral-500); margin: 0; }
+  .portal-head a { color: var(--coral-600); font-weight: 600; text-decoration: none; }
+  .nav-chips { display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+  .nav-chip { padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; border: 1.5px solid #E5E0DA; background: #fff; color: #5D554E; cursor: pointer; font-family: var(--font-sans); }
+  .nav-chip:hover { border-color: #ABA299; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  #root { width: 100%; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="browser-window.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="kimoo-shared.jsx"></script>
+<script type="text/babel" src="resto-data.jsx"></script>
+<script type="text/babel" src="resto-views.jsx"></script>
+<script type="text/babel" src="resto-views2.jsx"></script>
+
+<script type="text/babel">
+const { useState } = React;
+const {
+  ChromeWindow, Icon, SideNav,
+  DashboardView, OrdersView, MenuView, AnalyticsView, CampaignsView, ReviewsView, SettingsView,
+  useTweaks, TweaksPanel, TweakSection, TweakToggle, TweakSlider,
+} = window;
+
+const TWEAK_DEFAULTS = {
+  dark: false,
+  radius: 1,
+  collapsed: false,
+};
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [page, setPage] = useState('dashboard');
+
+  const rootVars = {
+    '--radius-scale': t.radius,
+    width: '100%',
+  };
+
+  let view;
+  switch (page) {
+    case 'dashboard': view = <DashboardView />; break;
+    case 'orders': view = <OrdersView />; break;
+    case 'menu': view = <MenuView />; break;
+    case 'analytics': view = <AnalyticsView />; break;
+    case 'campaigns': view = <CampaignsView />; break;
+    case 'reviews': view = <ReviewsView />; break;
+    case 'settings': view = <SettingsView />; break;
+    default: view = <DashboardView />;
+  }
+
+  const urlMap = {
+    dashboard: 'isletme.kimoo.com/dashboard',
+    orders: 'isletme.kimoo.com/orders',
+    menu: 'isletme.kimoo.com/menu',
+    analytics: 'isletme.kimoo.com/analytics',
+    campaigns: 'isletme.kimoo.com/campaigns',
+    reviews: 'isletme.kimoo.com/reviews',
+    settings: 'isletme.kimoo.com/settings',
+  };
+
+  return (
+    <div className="portal-stage">
+      <div className="portal-head">
+        <h1><span className="badge-k">k</span> Kimoo · Restoran Portalı</h1>
+        <p>Sipariş yönetimi, menü, kampanya, analitik · <a href="Design System.html">Design System</a> · <a href="index.html">Genel bakış</a></p>
+        <div className="nav-chips">
+          {[['dashboard','Genel Bakış'],['orders','Siparişler'],['menu','Menü'],['analytics','Raporlar'],['campaigns','Kampanyalar'],['reviews','Yorumlar'],['settings','Ayarlar']].map(([s,l]) => (
+            <button key={s} className="nav-chip" onClick={() => setPage(s)}>{l}</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={rootVars} data-theme={t.dark ? 'dark' : 'light'}>
+        <ChromeWindow width={1200} height={720} url={urlMap[page] || 'isletme.kimoo.com'}>
+          <div style={{ display: 'flex', height: '100%', background: 'var(--bg-app)' }}>
+            <SideNav active={page} onNav={setPage} collapsed={t.collapsed} />
+            <div style={{ flex: 1, overflow: 'auto' }}>
+              {view}
+            </div>
+          </div>
+        </ChromeWindow>
+      </div>
+
+      <TweaksPanel>
+        <TweakSection label="Görünüm" />
+        <TweakToggle label="Koyu mod" value={t.dark} onChange={v => setTweak('dark', v)} />
+        <TweakSlider label="Köşe yuvarlaklığı" value={t.radius} min={0} max={1.7} step={0.1} onChange={v => setTweak('radius', v)} />
+        <TweakToggle label="Dar kenar çubuğu" value={t.collapsed} onChange={v => setTweak('collapsed', v)} />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
