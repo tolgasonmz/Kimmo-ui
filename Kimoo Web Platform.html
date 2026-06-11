@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kimoo — Web Platform</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-app);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+  }
+  #root { min-height: 100vh; display: flex; flex-direction: column; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  @keyframes kpulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  /* ---- Responsive restaurant grid ---- */
+  .resto-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+  .resto-card:hover { border-color: var(--coral-300) !important; box-shadow: var(--shadow-md) !important; transform: translateY(-3px); }
+
+  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+
+  /* Desktop scroll hide */
+  .web-scroll::-webkit-scrollbar { display: none; }
+  .web-scroll { scrollbar-width: none; }
+
+  /* Mobile helpers */
+  .show-mobile { display: none; }
+
+  /* ---- 1280px laptop ---- */
+  @media (max-width: 1280px) {
+    .resto-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* ---- 768px tablet ---- */
+  @media (max-width: 768px) {
+    .resto-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .menu-grid { grid-template-columns: 1fr; }
+    .web-search { display: none !important; }
+    .hide-mobile { display: none !important; }
+    .show-mobile { display: inline !important; }
+  }
+
+  /* ---- 480px small mobile ---- */
+  @media (max-width: 480px) {
+    .resto-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Stage wrapper for prototype presentation */
+  .web-stage { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 28px 20px 48px; }
+  .web-stage-head { text-align: center; }
+  .web-stage-head h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; color: var(--neutral-900); display: flex; align-items: center; gap: 10px; justify-content: center; }
+  .web-stage-head .badge-k { width: 34px; height: 34px; border-radius: 10px; background: var(--coral-500); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 19px; box-shadow: var(--shadow-brand); }
+  .web-stage-head p { font-size: 14px; color: var(--neutral-500); margin: 0; }
+  .web-stage-head a { color: var(--coral-600); font-weight: 600; text-decoration: none; }
+  .breakpoint-pills { display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+  .bp-pill { padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; border: 1.5px solid #E5E0DA; background: #fff; color: #5D554E; cursor: pointer; font-family: var(--font-sans); transition: all .12s ease; }
+  .bp-pill:hover { border-color: #ABA299; }
+  .bp-pill.active { background: var(--coral-500); color: #fff; border-color: var(--coral-500); }
+  .browser-wrap {
+    width: 100%; max-width: 1440px;
+    border: 1px solid var(--neutral-200);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    background: var(--bg-app);
+    transition: max-width .3s ease;
+  }
+  .browser-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; background: var(--neutral-100);
+    border-bottom: 1px solid var(--neutral-200);
+  }
+  .browser-dots { display: flex; gap: 6px; }
+  .browser-dots span { width: 11px; height: 11px; border-radius: 999px; }
+  .browser-url {
+    flex: 1; background: #fff; border-radius: 6px; padding: 6px 14px;
+    font-size: 12px; color: var(--neutral-500); font-family: var(--font-sans);
+    border: 1px solid var(--neutral-200);
+  }
+  .browser-content { height: 720px; overflow: auto; background: var(--bg-app); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="kimoo-shared.jsx"></script>
+<script type="text/babel" src="web-data.jsx"></script>
+<script type="text/babel" src="web-views.jsx"></script>
+
+<script type="text/babel">
+const { useState, useCallback } = React;
+const {
+  WebHeader, WebHome, WebRestaurantDetail, WebCartSidebar, WebTracking, WebFooter,
+  useTweaks, TweaksPanel, TweakSection, TweakToggle, TweakSlider, TweakRadio,
+} = window;
+
+const TWEAK_DEFAULTS = { dark: false, radius: 1, breakpoint: '1440' };
+const BPS = [
+  { id: '1440', label: 'Desktop', w: 1440 },
+  { id: '1280', label: 'Laptop', w: 1280 },
+  { id: '768', label: 'Tablet', w: 768 },
+  { id: '390', label: 'Mobile', w: 390 },
+];
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [page, setPage] = useState('home');
+  const [restaurant, setRestaurant] = useState(null);
+  const [cart, setCart] = useState([]);
+  const [showCart, setShowCart] = useState(false);
+
+  const bp = BPS.find(b => b.id === t.breakpoint) || BPS[0];
+
+  const rootVars = { '--radius-scale': t.radius };
+
+  const addToCart = useCallback((item) => {
+    setCart(c => {
+      const idx = c.findIndex(x => x.name === item.name);
+      if (idx >= 0) { const n = [...c]; n[idx] = { ...n[idx], qty: n[idx].qty + 1 }; return n; }
+      return [...c, { ...item, qty: 1 }];
+    });
+  }, []);
+
+  const updateQty = useCallback((idx, delta) => {
+    setCart(c => {
+      const n = [...c];
+      n[idx] = { ...n[idx], qty: n[idx].qty + delta };
+      return n.filter(x => x.qty > 0);
+    });
+  }, []);
+
+  const openRestaurant = (r) => { setRestaurant(r); setPage('restaurant'); };
+
+  let view;
+  switch (page) {
+    case 'home': view = <><WebHome onRestaurant={openRestaurant} /><WebFooter /></>; break;
+    case 'restaurant': view = <WebRestaurantDetail restaurant={restaurant} onBack={() => setPage('home')} onAddToCart={addToCart} />; break;
+    case 'tracking': view = <WebTracking onBack={() => setPage('home')} />; break;
+    default: view = <><WebHome onRestaurant={openRestaurant} /><WebFooter /></>;
+  }
+
+  const cartCount = cart.reduce((s, c) => s + c.qty, 0);
+
+  return (
+    <div className="web-stage">
+      <div className="web-stage-head">
+        <h1><span className="badge-k">k</span> Kimoo · Web Platform</h1>
+        <p>Responsive masaüstü deneyimi · <a href="Design System.html">Design System</a> · <a href="index.html">Genel bakış</a></p>
+        <div className="breakpoint-pills">
+          {BPS.map(b => (
+            <button key={b.id} className={'bp-pill' + (t.breakpoint === b.id ? ' active' : '')} onClick={() => setTweak('breakpoint', b.id)}>
+              {b.label} ({b.w}px)
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ ...rootVars, width: '100%', maxWidth: bp.w, transition: 'max-width .3s ease' }} data-theme={t.dark ? 'dark' : 'light'}>
+        <div className="browser-wrap" style={{ maxWidth: bp.w }}>
+          <div className="browser-bar">
+            <div className="browser-dots">
+              <span style={{ background: '#FF5F56' }}></span>
+              <span style={{ background: '#FFBD2E' }}></span>
+              <span style={{ background: '#27C93F' }}></span>
+            </div>
+            <div className="browser-url">
+              🔒 kimoo.com{page === 'restaurant' && restaurant ? '/' + restaurant.name.toLowerCase().replace(/\s/g, '-') : page === 'tracking' ? '/siparis/KM-4835' : ''}
+            </div>
+          </div>
+          <div className="browser-content">
+            <WebHeader cartCount={cartCount} onCartClick={() => setShowCart(true)} onLogoClick={() => setPage('home')} />
+            {view}
+            {showCart && (
+              <WebCartSidebar
+                cart={cart} onClose={() => setShowCart(false)}
+                onCheckout={() => { setShowCart(false); setCart([]); setPage('tracking'); }}
+                updateQty={updateQty}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      <TweaksPanel>
+        <TweakSection label="Görünüm" />
+        <TweakToggle label="Koyu mod" value={t.dark} onChange={v => setTweak('dark', v)} />
+        <TweakSlider label="Köşe yuvarlaklığı" value={t.radius} min={0} max={1.7} step={0.1} onChange={v => setTweak('radius', v)} />
+        <TweakSection label="Responsive" />
+        <TweakRadio label="Breakpoint" value={t.breakpoint} options={BPS.map(b => b.id)} labels={BPS.map(b => b.label)} onChange={v => setTweak('breakpoint', v)} />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kimoo — Restoran Portalı</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--neutral-100);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 32px 20px 56px; }
+  .stage-head { text-align: center; }
+  .stage-head h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; color: var(--neutral-900); display: flex; align-items: center; gap: 10px; justify-content: center; }
+  .badge-k { width: 34px; height: 34px; border-radius: 10px; background: var(--coral-500); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 19px; box-shadow: var(--shadow-brand); }
+  .stage-head p { font-size: 14px; color: var(--neutral-500); margin: 0; }
+  .stage-head a { color: var(--coral-600); font-weight: 600; text-decoration: none; }
+  .nav-chips { display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+  .nav-chip { padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; border: 1.5px solid #E5E0DA; background: #fff; color: #5D554E; cursor: pointer; font-family: var(--font-sans); transition: border-color .12s ease; }
+  .nav-chip:hover { border-color: #ABA299; }
+  .nav-chip.active { background: var(--coral-500); color: #fff; border-color: var(--coral-500); }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  #root { width: 100%; }
+  @keyframes kpulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="browser-window.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="kimoo-shared.jsx"></script>
+<script type="text/babel" src="resto-data.jsx"></script>
+<script type="text/babel" src="resto-views.jsx"></script>
+<script type="text/babel" src="resto-views2.jsx"></script>
+<script type="text/babel" src="resto-rewards.jsx"></script>
+<script type="text/babel" src="resto-messages.jsx"></script>
+<script type="text/babel" src="resto-integrations.jsx"></script>
+
+<script type="text/babel">
+const { useState } = React;
+const {
+  ChromeWindow, Icon, SideNav,
+  DashboardView, OrdersView, MenuView,
+  AnalyticsView, CampaignsView, ReviewsView, SettingsView,
+  RestaurantRewardsView, MessagesView, IntegrationsView,
+  useTweaks, TweaksPanel, TweakSection, TweakToggle, TweakSlider,
+} = window;
+
+const TWEAK_DEFAULTS = { dark: false, radius: 1 };
+
+const URL_MAP = {
+  dashboard:  'panel.kimoo.com/dashboard',
+  orders:     'panel.kimoo.com/siparisler',
+  menu:       'panel.kimoo.com/menu',
+  analytics:  'panel.kimoo.com/raporlar',
+  campaigns:  'panel.kimoo.com/kampanyalar',
+  reviews:    'panel.kimoo.com/yorumlar',
+  rewards:    'panel.kimoo.com/oduller',
+  messages:    'panel.kimoo.com/mesajlar',
+  integrations:'panel.kimoo.com/entegrasyonlar',
+  settings:    'panel.kimoo.com/ayarlar',
+};
+
+const NAV_PAGES = [
+  ['dashboard',    'Genel Bakış'],
+  ['orders',        'Siparişler'],
+  ['menu',          'Menü'],
+  ['integrations',  'Entegrasyonlar'],
+  ['messages',      'Mesajlar'],
+  ['analytics',     'Raporlar'],
+  ['campaigns',     'Kampanyalar'],
+  ['rewards',       'Ödüller'],
+  ['settings',      'Ayarlar'],
+];
+
+function TopBar({ page }) {
+  const titles = {
+    dashboard: 'Genel Bakış',
+    orders: 'Siparişler',
+    menu: 'Menü Yönetimi',
+    analytics: 'Raporlar & Analitik',
+    campaigns: 'Kampanyalar',
+    reviews: 'Yorumlar',
+    rewards: 'Ödüller & Meydan Okumalar',
+    messages:     'Müşteri Mesajları',
+    integrations: 'Platform Entegrasyonları',
+    settings:     'Ayarlar',
+  };
+  return (
+    <div style={{
+      height: 52, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '0 24px', borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-surface)',
+    }}>
+      <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{titles[page] || ''}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* Live orders badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: 'var(--success-50)', borderRadius: 999, cursor: 'pointer' }}>
+          <span style={{ width: 7, height: 7, borderRadius: 999, background: 'var(--success-500)', animation: 'kpulse 1.2s infinite' }}></span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--success-600)' }}>Restoran açık</span>
+        </div>
+        {/* Notifications */}
+        <div style={{ width: 36, height: 36, borderRadius: 999, background: 'var(--bg-sunken)', display: 'grid', placeItems: 'center', cursor: 'pointer', position: 'relative' }}>
+          <Icon name="msg" size={17} color="var(--text-secondary)" />
+          <span style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: 999, background: 'var(--brand-500)', border: '2px solid var(--bg-surface)' }}></span>
+        </div>
+        {/* Avatar */}
+        <div style={{ width: 32, height: 32, borderRadius: 999, background: 'var(--brand-500)', display: 'grid', placeItems: 'center', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>KO</div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [page, setPage] = useState('dashboard');
+  const [collapsed, setCollapsed] = useState(false);
+
+  const rootVars = { '--radius-scale': t.radius, width: '100%' };
+
+  let view;
+  switch (page) {
+    case 'dashboard':  view = <DashboardView />;           break;
+    case 'orders':     view = <OrdersView />;              break;
+    case 'menu':       view = <MenuView />;                break;
+    case 'analytics':  view = <AnalyticsView />;           break;
+    case 'campaigns':  view = <CampaignsView />;           break;
+    case 'reviews':    view = <ReviewsView />;             break;
+    case 'rewards':       view = <RestaurantRewardsView />;  break;
+    case 'messages':      view = <MessagesView />;           break;
+    case 'integrations':  view = <IntegrationsView />;       break;
+    case 'settings':   view = <SettingsView />;            break;
+    default:           view = <DashboardView />;
+  }
+
+  return (
+    <div className="stage">
+      <div className="stage-head">
+        <h1><span className="badge-k">k</span> Kimoo · Restoran Portalı</h1>
+        <p>Sipariş yönetimi · Menü · Kampanyalar · Ödüller · <a href="index.html">Genel bakış</a> · <a href="Kimoo Courier App.html">Kurye App</a></p>
+        <div className="nav-chips">
+          {NAV_PAGES.map(([id, label]) => (
+            <button key={id} className={'nav-chip' + (page === id ? ' active' : '')} onClick={() => setPage(id)}>{label}</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={rootVars} data-theme={t.dark ? 'dark' : 'light'}>
+        <ChromeWindow width={1280} height={760} url={URL_MAP[page] || 'panel.kimoo.com'}>
+          <div style={{ display: 'flex', height: '100%', background: 'var(--bg-app)' }}>
+            {/* Sidebar */}
+            <SideNav active={page} onNav={setPage} collapsed={collapsed} />
+
+            {/* Main content */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
+              <TopBar page={page} />
+              <div key={page} style={{ flex: 1, overflow: 'auto' }}>
+                {view}
+              </div>
+            </div>
+          </div>
+        </ChromeWindow>
+      </div>
+
+      <TweaksPanel>
+        <TweakSection label="Görünüm" />
+        <TweakToggle label="Koyu mod"           value={t.dark}   onChange={v => setTweak('dark', v)} />
+        <TweakSlider  label="Köşe yuvarlaklığı" value={t.radius} min={0} max={1.7} step={0.1} onChange={v => setTweak('radius', v)} />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
