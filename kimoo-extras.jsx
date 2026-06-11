@@ -180,110 +180,151 @@ function RestaurantReviewsScreen({ go, restaurant }) {
   );
 }
 
-// ============ LIVE CHAT ============
-function ChatScreen({ go }) {
-  const [msgs, setMsgs] = React.useState([
-    { from: 'bot', text: 'Merhaba! Kimoo destek ekibine hoş geldiniz. Size nasıl yardımcı olabilirim?', time: '20:30' },
-  ]);
-  const [input, setInput] = React.useState('');
-  const [typing, setTyping] = React.useState(false);
-  const bottomRef = React.useRef(null);
+// ============ REPORT SCREEN ============
+function ReportScreen({ go }) {
+  const [type, setType] = React.useState(null); // 'courier' | 'restaurant'
+  const [reason, setReason] = React.useState(null);
+  const [detail, setDetail] = React.useState('');
+  const [submitted, setSubmitted] = React.useState(false);
 
-  const BOT_REPLIES = [
-    'Anladım, hemen kontrol ediyorum.',
-    'Siparişinizle ilgili bilgi güncellendi. Başka bir konuda yardımcı olabilir miyim?',
-    'Tabii ki! Restoran ile iletişime geçtim, en kısa sürede dönüş yapılacaktır.',
-    'İade talebiniz oluşturuldu. 24 saat içinde cüzdanınıza yansıyacaktır.',
+  const REPORT_TYPES = [
+    { id: 'courier', icon: 'scooter', label: 'Kurye hakkında', desc: 'Teslimat sorunu, davranış, hasar' },
+    { id: 'restaurant', icon: 'flame', label: 'Restoran hakkında', desc: 'Yemek kalitesi, eksik ürün, hijyen' },
+    { id: 'order', icon: 'bag', label: 'Sipariş sorunu', desc: 'Yanlış ürün, gecikme, iptal' },
   ];
-  const [replyIdx, setReplyIdx] = React.useState(0);
 
-  React.useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs, typing]);
+  const COURIER_REASONS = ['Kaba davranış', 'Geç teslimat', 'Paket hasarlı geldi', 'Yanlış adrese bıraktı', 'Güvenlik endişesi', 'Diğer'];
+  const RESTAURANT_REASONS = ['Eksik ürün', 'Yanlış sipariş', 'Yemek kalitesi düşük', 'Hijyen sorunu', 'Paketleme kötü', 'Diğer'];
+  const ORDER_REASONS = ['Sipariş gelmedi', 'Çok geç geldi', 'İade istiyorum', 'Ödeme sorunu', 'Diğer'];
 
-  const send = () => {
-    if (!input.trim()) return;
-    const now = new Date(); const t = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    setMsgs(m => [...m, { from: 'user', text: input, time: t }]);
-    setInput('');
-    setTyping(true);
-    setTimeout(() => {
-      setTyping(false);
-      setMsgs(m => [...m, { from: 'bot', text: BOT_REPLIES[replyIdx % BOT_REPLIES.length], time: t }]);
-      setReplyIdx(i => i + 1);
-    }, 1400);
-  };
+  const reasons = type === 'courier' ? COURIER_REASONS : type === 'restaurant' ? RESTAURANT_REASONS : type === 'order' ? ORDER_REASONS : [];
 
-  const QUICK = ['Siparişim nerede?', 'İade istiyorum', 'Kurye ile iletişim'];
+  if (submitted) {
+    return (
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg-surface)' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, textAlign: 'center' }}>
+          <div style={{ width: 88, height: 88, borderRadius: 999, background: 'var(--success-50)', display: 'grid', placeItems: 'center', marginBottom: 20 }}>
+            <Icon name="check" size={40} color="var(--success-500)" />
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 8 }}>Bildirim gönderildi</div>
+          <div style={{ fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.5, maxWidth: '28ch' }}>Raporun yönetici ekibimize iletildi. En kısa sürede incelenecektir.</div>
+          <div style={{ marginTop: 16, padding: '8px 16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-sunken)', fontSize: 13, color: 'var(--text-tertiary)' }}>Takip numarası: #RPT-{Math.floor(1000 + Math.random() * 9000)}</div>
+        </div>
+        <div style={{ padding: '16px 24px 40px' }}>
+          <PrimaryBtn onClick={() => go('home')}>Anasayfaya dön</PrimaryBtn>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--bg-app)' }}>
-      <ScreenHeader title="Canlı Destek" onBack={() => go('profile')}
-        right={<Badge tone="success" style={{ fontSize: 11 }}><span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--success-500)' }}></span>Çevrimiçi</Badge>} />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <ScreenHeader title="Sorun Bildir" onBack={() => type && !reason ? setType(null) : reason ? setReason(null) : go('profile')} />
+      <div style={{ flex: 1, overflow: 'auto', padding: '8px 20px 20px' }}>
 
-      <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px' }}>
-        {msgs.map((m, i) => (
-          <div key={i} style={{ display: 'flex', justifyContent: m.from === 'user' ? 'flex-end' : 'flex-start', marginBottom: 10 }}>
-            {m.from === 'bot' && (
-              <div style={{ width: 30, height: 30, borderRadius: 999, background: 'var(--brand-500)', display: 'grid', placeItems: 'center', marginRight: 8, flex: 'none', alignSelf: 'flex-end' }}>
-                <span style={{ color: '#fff', fontSize: 14, fontWeight: 800 }}>k</span>
-              </div>
-            )}
-            <div style={{
-              maxWidth: '75%', padding: '12px 16px', borderRadius: 18,
-              background: m.from === 'user' ? 'var(--brand-500)' : 'var(--bg-surface)',
-              color: m.from === 'user' ? '#fff' : 'var(--text-primary)',
-              border: m.from === 'bot' ? '1px solid var(--border-subtle)' : 'none',
-              borderBottomRightRadius: m.from === 'user' ? 4 : 18,
-              borderBottomLeftRadius: m.from === 'bot' ? 4 : 18,
-            }}>
-              <div style={{ fontSize: 15, lineHeight: 1.45 }}>{m.text}</div>
-              <div style={{ fontSize: 11, marginTop: 4, opacity: 0.6, textAlign: 'right' }}>{m.time}</div>
+        {/* Step 1: Select type */}
+        {!type && (
+          <>
+            <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6, marginTop: 8 }}>Ne hakkında bildirim yapmak istiyorsun?</div>
+            <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 20, lineHeight: 1.5 }}>Bildirimin doğrudan yönetici ekibimize iletilecek ve en kısa sürede değerlendirilecektir.</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {REPORT_TYPES.map(t => (
+                <button key={t.id} onClick={() => setType(t.id)} style={{
+                  display: 'flex', alignItems: 'center', gap: 14, padding: 18, borderRadius: 'var(--radius-md)',
+                  border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', cursor: 'pointer',
+                  fontFamily: 'var(--font-sans)', textAlign: 'left', transition: 'all .12s ease',
+                }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 999, background: 'var(--brand-50)', display: 'grid', placeItems: 'center', flex: 'none' }}>
+                    <Icon name={t.icon} size={24} color="var(--brand-600)" />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{t.label}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 2 }}>{t.desc}</div>
+                  </div>
+                  <Icon name="chevR" size={18} color="var(--text-tertiary)" />
+                </button>
+              ))}
             </div>
-          </div>
-        ))}
-        {typing && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 999, background: 'var(--brand-500)', display: 'grid', placeItems: 'center', flex: 'none' }}>
-              <span style={{ color: '#fff', fontSize: 14, fontWeight: 800 }}>k</span>
+
+            {/* Recent orders for context */}
+            <div style={{ marginTop: 28 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 10 }}>Son siparişlerinle ilgili mi?</div>
+              {[
+                { id: '#KM-4821', restaurant: 'Köşe Ocakbaşı', date: 'Bugün, 19:30', items: '2 ürün' },
+                { id: '#KM-4818', restaurant: 'Napoli Pizzeria', date: 'Dün, 13:15', items: '1 ürün' },
+              ].map((o, i) => (
+                <div key={i} onClick={() => setType('order')} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer' }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-sm)', background: 'var(--bg-sunken)', display: 'grid', placeItems: 'center' }}>
+                    <Icon name="bag" size={18} color="var(--text-muted)" />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{o.restaurant}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{o.id} · {o.date} · {o.items}</div>
+                  </div>
+                  <Icon name="chevR" size={16} color="var(--text-tertiary)" />
+                </div>
+              ))}
             </div>
-            <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 18, padding: '12px 18px', display: 'flex', gap: 5 }}>
-              {[0,1,2].map(i => <span key={i} style={{ width: 8, height: 8, borderRadius: 999, background: 'var(--text-muted)', animation: `typeDot .9s ${i * 0.15}s infinite` }}></span>)}
-            </div>
-          </div>
+          </>
         )}
-        <div ref={bottomRef}></div>
+
+        {/* Step 2: Select reason */}
+        {type && !reason && (
+          <>
+            <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6, marginTop: 8 }}>Sorun ne ile ilgili?</div>
+            <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 20 }}>En uygun nedeni seç, detayları bir sonraki adımda ekleyebilirsin.</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {reasons.map((r, i) => (
+                <button key={i} onClick={() => setReason(r)} style={{
+                  display: 'flex', alignItems: 'center', gap: 12, padding: '16px 18px', borderRadius: 'var(--radius-md)',
+                  border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', cursor: 'pointer',
+                  fontFamily: 'var(--font-sans)', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)',
+                  textAlign: 'left', transition: 'all .12s ease',
+                }}>
+                  <span style={{ flex: 1 }}>{r}</span>
+                  <Icon name="chevR" size={16} color="var(--text-tertiary)" />
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Step 3: Detail + submit */}
+        {type && reason && (
+          <>
+            <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6, marginTop: 8 }}>Detayları ekle</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
+              <Badge tone="brand" style={{ fontSize: 12 }}>{REPORT_TYPES.find(t => t.id === type)?.label}</Badge>
+              <Badge tone="warning" style={{ fontSize: 12 }}>{reason}</Badge>
+            </div>
+
+            <textarea value={detail} onChange={e => setDetail(e.target.value)} placeholder="Yaşadığın sorunu detaylı olarak açıkla... (isteğe bağlı)" rows={5} style={{
+              width: '100%', border: '1.5px solid var(--border-default)', borderRadius: 'var(--radius-md)',
+              padding: 14, fontSize: 15, fontFamily: 'var(--font-sans)', resize: 'none', outline: 'none',
+              background: 'var(--bg-surface)', color: 'var(--text-primary)', boxSizing: 'border-box',
+            }} />
+
+            {/* Photo upload placeholder */}
+            <div style={{ marginTop: 16, border: '1.5px dashed var(--border-default)', borderRadius: 'var(--radius-md)', padding: 20, textAlign: 'center', cursor: 'pointer' }}>
+              <Icon name="plus" size={24} color="var(--text-muted)" style={{ margin: '0 auto 8px', display: 'block' }} />
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)' }}>Fotoğraf ekle</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Kanıt olarak ekran görüntüsü veya fotoğraf</div>
+            </div>
+
+            <div style={{ marginTop: 20, padding: 14, background: 'var(--info-50)', borderRadius: 'var(--radius-md)', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <Icon name="msg" size={18} color="var(--info-600)" style={{ flex: 'none', marginTop: 2 }} />
+              <div style={{ fontSize: 13, color: 'var(--info-600)', lineHeight: 1.5 }}>Raporun yönetici ekibine iletilecek ve <strong>24 saat içinde</strong> değerlendirilecektir. Sonucu bildirimler üzerinden takip edebilirsin.</div>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* quick replies */}
-      {msgs.length <= 2 && (
-        <div style={{ display: 'flex', gap: 8, padding: '0 16px 10px', overflow: 'auto' }}>
-          {QUICK.map(q => (
-            <button key={q} onClick={() => { setInput(q); setTimeout(send, 50); }} style={{
-              flex: 'none', padding: '9px 14px', borderRadius: 999, fontSize: 13, fontWeight: 600,
-              border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)',
-              color: 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap',
-            }}>{q}</button>
-          ))}
+      {/* Submit button */}
+      {type && reason && (
+        <div style={{ padding: '14px 20px 36px', borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-surface)' }}>
+          <PrimaryBtn onClick={() => setSubmitted(true)}>Rapor gönder</PrimaryBtn>
         </div>
       )}
-
-      {/* input */}
-      <div style={{ padding: '10px 16px 32px', borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', display: 'flex', gap: 10, alignItems: 'flex-end' }}>
-        <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()}
-          placeholder="Mesajınızı yazın..." style={{
-            flex: 1, border: '1.5px solid var(--border-default)', borderRadius: 999, padding: '13px 16px',
-            fontSize: 15, fontFamily: 'var(--font-sans)', outline: 'none', background: 'var(--bg-surface)',
-            color: 'var(--text-primary)',
-          }} />
-        <button onClick={send} disabled={!input.trim()} style={{
-          width: 46, height: 46, borderRadius: 999, border: 'none', flex: 'none',
-          background: input.trim() ? 'var(--brand-500)' : 'var(--bg-sunken)',
-          display: 'grid', placeItems: 'center', cursor: input.trim() ? 'pointer' : 'default',
-          transition: 'all .15s ease',
-        }}>
-          <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
-        </button>
-      </div>
-      <style>{`@keyframes typeDot{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}`}</style>
     </div>
   );
 }
@@ -375,4 +416,4 @@ function ReferralScreen({ go }) {
   );
 }
 
-Object.assign(window, { ReviewScreen, RestaurantReviewsScreen, ChatScreen, ReferralScreen, StarRow });
+Object.assign(window, { ReviewScreen, RestaurantReviewsScreen, ReportScreen, ReferralScreen, StarRow });

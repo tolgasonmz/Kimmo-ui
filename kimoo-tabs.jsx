@@ -113,7 +113,7 @@ function FavoritesScreen({ openRestaurant }) {
 
 function ProfileScreen({ go }) {
   const items = [
-    ['user', 'Hesap bilgilerim', null], ['pin', 'Adreslerim', null], ['wallet', 'Kimoo Cüzdan · ₺250', null], ['ticket', 'Kuponlarım', null], ['bag', 'Sipariş geçmişi', null], ['msg', 'Canlı destek', 'chat'], ['heart', 'Arkadaşını davet et', 'referral'],
+    ['user', 'Hesap bilgilerim', 'settings'], ['pin', 'Adreslerim', 'addresses'], ['wallet', 'Kimoo Cüzdan · ₺250', 'wallet'], ['ticket', 'Kuponlarım', 'coupons'], ['bag', 'Sipariş geçmişi', null], ['close', 'Sorun bildir', 'report'], ['heart', 'Arkadaşını davet et', 'referral'],
   ];
   return (
     <div style={{ paddingBottom: 120, background: 'var(--bg-app)', minHeight: '100%' }}>

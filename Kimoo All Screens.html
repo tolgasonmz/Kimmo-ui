@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kimoo — Tüm Ekranlar</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  html,body{margin:0;padding:0;background:var(--neutral-100);-webkit-font-smoothing:antialiased;font-family:var(--font-sans);}
+  ::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--neutral-300);border-radius:3px;}
+  .page{max-width:1600px;margin:0 auto;padding:40px 32px 80px;}
+  .page-head{margin-bottom:40px;}
+  .page-head h1{font-size:30px;font-weight:800;letter-spacing:-0.02em;color:var(--neutral-900);margin:0 0 6px;display:flex;align-items:center;gap:12px;}
+  .badge-k{width:38px;height:38px;border-radius:11px;background:var(--coral-500);color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px;box-shadow:var(--shadow-brand);}
+  .page-head p{font-size:15px;color:var(--neutral-500);margin:0;}
+  .page-head a{color:var(--coral-600);font-weight:600;text-decoration:none;}
+  .section-label{font-size:11px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;color:var(--neutral-500);margin:40px 0 16px;}
+  .screen-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px;}
+  .screen-card{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .screen-frame{width:200px;height:434px;border-radius:32px;overflow:hidden;position:relative;background:var(--neutral-50);flex:none;box-shadow:0 8px 32px rgba(0,0,0,0.14),0 0 0 1px rgba(0,0,0,0.06);cursor:pointer;transition:transform .2s ease,box-shadow .2s ease;}
+  .screen-frame:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,0.18),0 0 0 1px rgba(0,0,0,0.08);}
+  .screen-inner{width:390px;height:844px;transform:scale(0.513);transform-origin:top left;pointer-events:none;}
+  .screen-name{font-size:12px;font-weight:700;color:var(--neutral-600);text-align:center;}
+  .screen-tag{font-size:10px;color:var(--neutral-400);text-align:center;margin-top:-4px;}
+  .theme-toggle{position:fixed;top:20px;right:24px;z-index:100;display:flex;gap:8px;}
+  .tbtn{padding:8px 16px;border-radius:999px;border:1.5px solid var(--neutral-300);background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-sans);color:var(--neutral-700);transition:all .12s ease;}
+  .tbtn.active,.tbtn:hover{background:var(--coral-500);color:#fff;border-color:var(--coral-500);}
+  #root{width:100%;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- shared scripts -->
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="kimoo-shared.jsx"></script>
+<script type="text/babel" src="kimoo-screens.jsx"></script>
+<script type="text/babel" src="kimoo-screens2.jsx"></script>
+<script type="text/babel" src="kimoo-tabs.jsx"></script>
+<script type="text/babel" src="kimoo-onboarding.jsx"></script>
+<script type="text/babel" src="kimoo-extras.jsx"></script>
+<script type="text/babel" src="kimoo-detail-screens.jsx"></script>
+<script type="text/babel" src="courier-shared.jsx"></script>
+<script type="text/babel" src="courier-screens.jsx"></script>
+<script type="text/babel" src="courier-screens2.jsx"></script>
+
+<script type="text/babel">
+const { useState, useMemo } = React;
+const {
+  IOSDevice, Icon, RESTAURANTS, PRODUCT_OPTIONS,
+  HomeScreen, RestaurantScreen, ProductScreen, CartScreen, CheckoutScreen, TrackingScreen,
+  SearchScreen, OrdersScreen, FavoritesScreen, ProfileScreen,
+  SplashScreen, WelcomeScreen, LoginScreen, OTPScreen, LocationScreen,
+  ReviewScreen, RestaurantReviewsScreen, ReportScreen, ReferralScreen,
+  AddressScreen, WalletScreen, CouponsScreen, NotificationsScreen, AccountSettingsScreen,
+  CourierHome, IncomingOrderScreen, ActiveDeliveryScreen,
+  EarningsScreen, CourierProfileScreen, PerformanceScreen, CourierReportScreen,
+} = window;
+
+const noop = () => {};
+const R0 = RESTAURANTS[0];
+const SAMPLE_CART = [
+  { name: 'Adana Dürüm', unit: 145, qty: 2, optLabel: 'Acılı' },
+  { name: 'Ayran', unit: 35, qty: 2, optLabel: 'Standart' },
+];
+
+const ACCENT = {
+  '--brand-500': '#FF5A3C', '--brand-600': '#ED4422', '--brand-700': '#C8330F',
+  '--brand-50': '#FFF2ED', '--brand-100': '#FFE1D6',
+};
+
+// ---- Isolated screen wrapper ----
+function S({ label, tag, dark, children }) {
+  const vars = { ...ACCENT, '--radius-scale': 1, width: '100%' };
+  return (
+    <div className="screen-card">
+      <div className="screen-frame">
+        <div className="screen-inner" data-theme={dark ? 'dark' : 'light'} style={vars}>
+          <IOSDevice dark={dark} width={390} height={844}>
+            <div style={{ height: 844, overflowY: 'hidden', background: 'var(--bg-app)', position: 'relative' }}>
+              {children}
+            </div>
+          </IOSDevice>
+        </div>
+      </div>
+      <div className="screen-name">{label}</div>
+      {tag && <div className="screen-tag">{tag}</div>}
+    </div>
+  );
+}
+
+const SECTIONS = (dark) => [
+  {
+    label: '📱 Onboarding',
+    screens: [
+      { label: 'Splash', tag: 'Açılış ekranı', el: <SplashScreen onDone={noop} /> },
+      { label: 'Karşılama', tag: 'Hoş geldin slide', el: <WelcomeScreen onDone={noop} /> },
+      { label: 'Giriş Yap', tag: 'Telefon no + sosyal', el: <LoginScreen onSubmit={noop} /> },
+      { label: 'OTP Doğrulama', tag: '6 haneli kod', el: <OTPScreen phone="555 123 4567" onVerify={noop} onBack={noop} /> },
+      { label: 'Konum İzni', tag: 'İzin ekranı', el: <LocationScreen onAllow={noop} /> },
+    ]
+  },
+  {
+    label: '🏠 Ana Akış',
+    screens: [
+      { label: 'Anasayfa', tag: 'Keşif & kategoriler', el: <HomeScreen go={noop} openRestaurant={noop} cartCount={0} /> },
+      { label: 'Arama', tag: 'Anlık filtreleme', el: <SearchScreen openRestaurant={noop} /> },
+      { label: 'Restoran Detay', tag: 'Menü & bilgiler', el: <RestaurantScreen restaurant={R0} go={noop} openProduct={noop} addQuick={noop} openReviews={noop} /> },
+      { label: 'Ürün Detay', tag: 'Özelleştirme', el: <ProductScreen product={{ name: 'Adana Dürüm', price: 145, desc: 'El açması lavaş, acılı Adana kebap, közlenmiş biber' }} go={noop} addToCart={noop} /> },
+    ]
+  },
+  {
+    label: '🛒 Sipariş Akışı',
+    screens: [
+      { label: 'Sepet', tag: 'Ürünler & kupon', el: <CartScreen cart={SAMPLE_CART} go={noop} updateQty={noop} removeItem={noop} restaurant={R0} /> },
+      { label: 'Ödeme', tag: 'Adres & yöntem', el: <CheckoutScreen cart={SAMPLE_CART} go={noop} restaurant={R0} placeOrder={noop} /> },
+      { label: 'Canlı Takip', tag: 'Harita & durum', el: <TrackingScreen go={noop} restaurant={R0} /> },
+      { label: 'Siparişlerim', tag: 'Geçmiş & aktif', el: <OrdersScreen go={noop} hasActive={true} openTracking={noop} openReview={noop} /> },
+    ]
+  },
+  {
+    label: '❤️ Favoriler & Profil',
+    screens: [
+      { label: 'Favoriler', tag: 'Kayıtlı restoranlar', el: <FavoritesScreen openRestaurant={noop} /> },
+      { label: 'Profil', tag: 'Hesap menüsü', el: <ProfileScreen go={noop} /> },
+      { label: 'Adreslerim', tag: 'Kayıtlı adresler', el: <AddressScreen go={noop} /> },
+      { label: 'Cüzdan', tag: 'Bakiye & işlemler', el: <WalletScreen go={noop} /> },
+    ]
+  },
+  {
+    label: '🎟️ Detay Ekranları',
+    screens: [
+      { label: 'Kuponlarım', tag: 'Kod girme & liste', el: <CouponsScreen go={noop} /> },
+      { label: 'Bildirimler', tag: 'Okunmamış ler', el: <NotificationsScreen go={noop} /> },
+      { label: 'Hesap Ayarları', tag: 'Profil düzenleme', el: <AccountSettingsScreen go={noop} /> },
+      { label: 'Değerlendirme', tag: 'Yıldız & yorum', el: <ReviewScreen go={noop} /> },
+    ]
+  },
+  {
+    label: '⭐ Sosyal & Güvenlik',
+    screens: [
+      { label: 'Restoran Yorumları', tag: 'Ortalama & liste', el: <RestaurantReviewsScreen go={noop} restaurant={R0} /> },
+      { label: 'Sorun Bildir', tag: '3 adımlı rapor', el: <ReportScreen go={noop} /> },
+      { label: 'Arkadaş Davet', tag: 'Referral & kod', el: <ReferralScreen go={noop} /> },
+    ]
+  },
+  {
+    label: '🛵 Kurye Uygulaması',
+    screens: [
+      { label: 'Kurye Anasayfa', tag: 'Dashboard & istatistik', el: <CourierHomeWrap /> },
+      { label: 'Gelen Sipariş', tag: 'Kabul / reddet', el: <IncomingOrderScreen go={noop} onAccept={noop} onReject={noop} /> },
+      { label: 'Aktif Teslimat', tag: 'Harita & adımlar', el: <ActiveDeliveryScreen go={noop} /> },
+      { label: 'Kazançlarım', tag: 'Günlük / haftalık', el: <EarningsScreen go={noop} /> },
+      { label: 'Performans', tag: 'Puan & KPI', el: <PerformanceScreen go={noop} /> },
+      { label: 'Kurye Profili', tag: 'Hesap & istatistik', el: <CourierProfileScreen go={noop} /> },
+      { label: 'Sorun Bildir (Kurye)', tag: 'Rapor akışı', el: <CourierReportScreen go={noop} /> },
+    ]
+  },
+];
+
+function CourierHomeWrap() {
+  const [online, setOnline] = useState(true);
+  return <CourierHome go={noop} online={online} setOnline={setOnline} />;
+}
+
+function App() {
+  const [dark, setDark] = useState(false);
+  const sections = useMemo(() => SECTIONS(dark), [dark]);
+  const total = sections.reduce((s, sec) => s + sec.screens.length, 0);
+
+  return (
+    <div data-theme={dark ? 'dark' : 'light'} style={{ background: dark ? 'var(--neutral-950)' : 'var(--neutral-100)', minHeight: '100vh', transition: 'background .3s ease' }}>
+      <div className="theme-toggle">
+        <button className={'tbtn' + (!dark ? ' active' : '')} onClick={() => setDark(false)}>☀️ Açık</button>
+        <button className={'tbtn' + (dark ? ' active' : '')} onClick={() => setDark(true)}>🌙 Koyu</button>
+      </div>
+
+      <div className="page">
+        <div className="page-head">
+          <h1><span className="badge-k">k</span>Kimoo · Tüm Ekranlar</h1>
+          <p>{total} ekran · Müşteri uygulaması + Kurye uygulaması · <a href="Kimoo Customer App v2.html">Müşteri App</a> · <a href="Kimoo Courier App.html">Kurye App</a> · <a href="index.html">Genel bakış</a></p>
+        </div>
+
+        {sections.map((sec, si) => (
+          <div key={si}>
+            <div className="section-label">{sec.label} <span style={{ color: 'var(--neutral-400)', fontWeight: 500, fontSize: 11 }}>({sec.screens.length} ekran)</span></div>
+            <div className="screen-grid">
+              {sec.screens.map((scr, i) => (
+                <S key={i} label={scr.label} tag={scr.tag} dark={dark}>{scr.el}</S>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

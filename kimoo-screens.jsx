@@ -1,6 +1,6 @@
 // kimoo-screens.jsx — customer app screens. Depends on kimoo-shared.jsx globals.
 const { Icon, Pill, MediaBox, Badge, PrimaryBtn, ScreenHeader, money,
-  CATEGORIES, RESTAURANTS, MENU, PRODUCT_OPTIONS } = window;
+  CATEGORIES, RESTAURANTS, MENU, PRODUCT_OPTIONS, PAYMENT_LABELS } = window;
 
 const PAD = 16;
 const CONTENT_BOTTOM = 120; // clearance for tab bar / action bar
@@ -100,6 +100,13 @@ function RestaurantCard({ r, onClick }) {
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Icon name="clock" size={15} color="var(--text-tertiary)" />{r.eta}</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Icon name="scooter" size={15} color="var(--text-tertiary)" />{r.fee === 0 ? 'Ücretsiz' : money(r.fee)}</span>
         </div>
+        {r.payments && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 8, flexWrap: 'wrap' }}>
+            {r.payments.map(p => (
+              <span key={p} style={{ fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 999, background: 'var(--bg-sunken)', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)', whiteSpace: 'nowrap' }}>{PAYMENT_LABELS[p]}</span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -132,6 +139,17 @@ function RestaurantScreen({ restaurant, go, openProduct, addQuick, openReviews }
           ))}
         </div>
 
+        {restaurant.payments && (
+          <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid var(--border-subtle)' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 10 }}>Kabul edilen ödeme yöntemleri</div>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {restaurant.payments.map(p => (
+                <span key={p} style={{ fontSize: 12, fontWeight: 600, padding: '5px 11px', borderRadius: 999, background: 'var(--bg-sunken)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)' }}>{PAYMENT_LABELS[p]}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div style={{ fontSize: 19, fontWeight: 800, margin: '24px 0 4px', color: 'var(--text-primary)' }}>Popüler ürünler</div>
         <div>
           {menu.map(m => <FoodRow key={m.id} m={m} onClick={() => openProduct(m)} onAdd={() => addQuick(m)} />)}
@@ -150,7 +168,10 @@ function FoodRow({ m, onClick, onAdd }) {
           {m.popular && <Badge tone="brand" style={{ fontSize: 10, padding: '3px 7px' }}><Icon name="flame" size={11} color="var(--brand-700)" />Popüler</Badge>}
         </div>
         <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 5, lineHeight: 1.45, maxWidth: '92%' }}>{m.desc}</div>
-        <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--brand-600)', marginTop: 8 }}>{money(m.price)}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+          <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--brand-600)' }}>{money(m.price)}</span>
+          {m.cal && <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>· {m.cal} kcal</span>}
+        </div>
       </div>
       <div style={{ position: 'relative', flex: 'none' }}>
         <MediaBox h={92} radius="var(--radius-md)" style={{ width: 92 }} />

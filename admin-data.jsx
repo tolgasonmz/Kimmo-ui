@@ -63,10 +63,19 @@ const FINANCE_DATA = {
 
 const AUDIT_LOGS = [
   { time: '20:45', user: 'admin@kimoo.com', action: 'Restoran askıya alındı', target: 'Tatlıcı Hacı (R005)', level: 'warning' },
-  { time: '19:30', user: 'ops@kimoo.com', action: 'Kampanya oluşturuldu', target: '%20 indirim — Kadıköy', level: 'info' },
+  { time: '19:30', user: 'ops@kimoo.com', action: 'Rapor incelendi — çözüldü', target: '#RPT-3842', level: 'success' },
   { time: '18:15', user: 'admin@kimoo.com', action: 'Kurye hesabı askıya alındı', target: 'Hasan Koç (K005)', level: 'warning' },
   { time: '16:40', user: 'finance@kimoo.com', action: 'Toplu ödeme başlatıldı', target: '₺4.2M — 318 restoran', level: 'info' },
   { time: '14:20', user: 'admin@kimoo.com', action: 'Yeni restoran onaylandı', target: 'Deniz Balık (R006)', level: 'success' },
+];
+
+const USER_REPORTS = [
+  { id: 'RPT-3845', reporter: 'Elif Y.', reporterType: 'customer', target: 'Kurye — Hasan Koç', reason: 'Kaba davranış', detail: 'Kurye kapıda bağırdı ve paketi yere bırakıp gitti.', status: 'open', priority: 'high', date: '10 Haz', order: '#KM-4821' },
+  { id: 'RPT-3844', reporter: 'Mehmet Arslan', reporterType: 'courier', target: 'Restoran — Tatlıcı Hacı', reason: 'Uzun bekleme', detail: 'Restoranda 40 dk bekletildim, sipariş hâlâ hazır değildi.', status: 'open', priority: 'medium', date: '10 Haz', order: '#KM-4819' },
+  { id: 'RPT-3842', reporter: 'Can B.', reporterType: 'customer', target: 'Restoran — Burger Atölyesi', reason: 'Eksik ürün', detail: 'Siparişte 2 burger vardı ama sadece 1 tane geldi.', status: 'resolved', priority: 'medium', date: '9 Haz', order: '#KM-4815' },
+  { id: 'RPT-3840', reporter: 'Zeynep A.', reporterType: 'customer', target: 'Kurye — Burak Çelik', reason: 'Paket hasarlı geldi', detail: 'İçecek dökülmüş, yemek ezilmişti.', status: 'resolved', priority: 'low', date: '9 Haz', order: '#KM-4810' },
+  { id: 'RPT-3838', reporter: 'Ali Demir', reporterType: 'courier', target: 'Müşteri — Mehmet T.', reason: 'Müşteriye ulaşılamadı', detail: 'Telefon açılmadı, kapı zilini 5 kez çaldım, 20 dk bekledim.', status: 'open', priority: 'low', date: '8 Haz', order: '#KM-4805' },
+  { id: 'RPT-3835', reporter: 'Ayşe K.', reporterType: 'customer', target: 'Restoran — Napoli Pizzeria', reason: 'Hijyen sorunu', detail: 'Pizzanın üstünde saç teli vardı.', status: 'investigating', priority: 'high', date: '8 Haz', order: '#KM-4800' },
 ];
 
 const ROLES = [
@@ -87,6 +96,7 @@ function AdminSideNav({ active, onNav }) {
       { id: 'restaurants', icon: 'flame', label: 'Restoranlar', badge: '342' },
       { id: 'customers', icon: 'user', label: 'Müşteriler' },
       { id: 'couriers', icon: 'scooter', label: 'Kuryeler' },
+      { id: 'reports', icon: 'close', label: 'Raporlar', badge: '3' },
     ]},
     { label: 'FİNANS', items: [
       { id: 'finance', icon: 'wallet', label: 'Finans & Ödeme' },
@@ -147,5 +157,5 @@ function AdminSideNav({ active, onNav }) {
 
 Object.assign(window, {
   PLATFORM_STATS, HEALTH, MONTHLY_REVENUE, RESTAURANTS_LIST, CUSTOMERS_LIST, COURIERS_LIST,
-  FINANCE_DATA, AUDIT_LOGS, ROLES, AdminSideNav,
+  FINANCE_DATA, AUDIT_LOGS, ROLES, USER_REPORTS, AdminSideNav,
 });

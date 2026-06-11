@@ -41,13 +41,15 @@
 <script type="text/babel" src="courier-shared.jsx"></script>
 <script type="text/babel" src="courier-screens.jsx"></script>
 <script type="text/babel" src="courier-screens2.jsx"></script>
+<script type="text/babel" src="courier-rewards.jsx"></script>
 
 <script type="text/babel">
 const { useState } = React;
 const {
   IOSDevice, Icon,
   CourierHome, IncomingOrderScreen, ActiveDeliveryScreen,
-  EarningsScreen, CourierProfileScreen, PerformanceScreen, CourierSupportScreen,
+  EarningsScreen, CourierProfileScreen, PerformanceScreen, CourierReportScreen,
+  CourierRewardsScreen,
   useTweaks, TweaksPanel, TweakSection, TweakColor, TweakToggle, TweakSlider,
 } = window;
 
@@ -68,9 +70,10 @@ const TWEAK_DEFAULTS = {
 };
 
 const TABS = [
-  { id: 'home', icon: 'home', label: 'Anasayfa' },
-  { id: 'earnings', icon: 'wallet', label: 'Kazanç' },
-  { id: 'profile', icon: 'user', label: 'Profil' },
+  { id: 'home',    icon: 'home',    label: 'Anasayfa' },
+  { id: 'earnings',icon: 'wallet',  label: 'Kazanç'   },
+  { id: 'rewards', icon: 'trophy',  label: 'Ödüller'  },
+  { id: 'profile', icon: 'user',    label: 'Profil'   },
 ];
 const FLOW_SCREENS = ['incoming', 'active', 'performance', 'support'];
 
@@ -116,10 +119,11 @@ function App() {
     case 'home': view = <CourierHome go={go} online={online} setOnline={setOnline} />; break;
     case 'earnings': view = <EarningsScreen go={go} />; break;
     case 'profile': view = <CourierProfileScreen go={go} />; break;
+    case 'rewards': view = <CourierRewardsScreen go={go} />; break;
     case 'incoming': view = <IncomingOrderScreen go={go} onAccept={() => go('active')} onReject={() => go('home')} />; break;
     case 'active': view = <ActiveDeliveryScreen go={go} />; break;
     case 'performance': view = <PerformanceScreen go={go} />; break;
-    case 'support': view = <CourierSupportScreen go={go} />; break;
+    case 'support': view = <CourierReportScreen go={go} />; break;
     default: view = <CourierHome go={go} online={online} setOnline={setOnline} />;
   }
 
@@ -129,7 +133,7 @@ function App() {
         <h1><span className="badge-k">k</span> Kimoo · Kurye Uygulaması</h1>
         <p>Sipariş kabul → navigasyon → teslimat · <a href="Design System.html">Design System</a> · <a href="index.html">Genel bakış</a></p>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 10, flexWrap: 'wrap' }}>
-          {[['home','Anasayfa'],['incoming','Gelen Sipariş'],['active','Aktif Teslimat'],['earnings','Kazançlar'],['performance','Performans']].map(([s,l]) => (
+          {[['home','Anasayfa'],['incoming','Gelen Sipariş'],['active','Aktif Teslimat'],['earnings','Kazançlar'],['rewards','Ödüller'],['performance','Performans']].map(([s,l]) => (
             <button key={s} onClick={() => setScreen(s)} style={{ padding: '7px 14px', borderRadius: 999, fontSize: 13, fontWeight: 600, border: '1.5px solid #E5E0DA', background: '#fff', color: '#5D554E', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>{l}</button>
           ))}
         </div>

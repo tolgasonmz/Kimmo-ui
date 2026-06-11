@@ -36,21 +36,29 @@ const ORDER_STATUSES = {
 };
 
 const MENU_CATEGORIES = [
-  { id: 'kebap', name: 'Kebap & Izgara', count: 8, active: true },
-  { id: 'tatli', name: 'Tatlılar', count: 4, active: true },
-  { id: 'icecek', name: 'İçecekler', count: 6, active: true },
-  { id: 'meze', name: 'Mezeler', count: 5, active: false },
+  { id: 'kebap',  name: 'Kebap & Izgara',  count: 6, active: true },
+  { id: 'tatli',  name: 'Tatlılar',         count: 3, active: true },
+  { id: 'icecek', name: 'İçecekler',        count: 3, active: true },
+  { id: 'meze',   name: 'Mezeler',          count: 2, active: true },
 ];
 
+const ALLERGENS = ['gluten', 'süt', 'yumurta', 'fındık', 'balık', 'soya', 'susam'];
+
 const MENU_ITEMS = [
-  { id: 'p1', name: 'Adana Dürüm', cat: 'kebap', price: 145, active: true, popular: true, stock: true },
-  { id: 'p2', name: 'Urfa Kebap (1 porsiyon)', cat: 'kebap', price: 220, active: true, popular: true, stock: true },
-  { id: 'p3', name: 'Karışık Izgara', cat: 'kebap', price: 480, active: true, popular: false, stock: true },
-  { id: 'p4', name: 'İçli Köfte (3 adet)', cat: 'kebap', price: 95, active: true, popular: false, stock: true },
-  { id: 'p5', name: 'Künefe', cat: 'tatli', price: 110, active: true, popular: true, stock: true },
-  { id: 'p6', name: 'Sütlaç', cat: 'tatli', price: 65, active: true, popular: false, stock: false },
-  { id: 'p7', name: 'Ayran', cat: 'icecek', price: 35, active: true, popular: false, stock: true },
-  { id: 'p8', name: 'Şalgam', cat: 'icecek', price: 40, active: true, popular: false, stock: true },
+  { id:'p1',  name:'Adana Dürüm',        cat:'kebap',  price:145, active:true,  popular:true,  stock:true,  desc:'El açması ince lavaş, acılı Adana kebap, közlenmiş biber ve soğan',              calories:480, prepTime:12, allergens:['gluten'],           orderCount:156, revenue:22620, options:['Acılı','Acısız','Ekstra acı'] },
+  { id:'p2',  name:'Urfa Kebap',         cat:'kebap',  price:220, active:true,  popular:true,  stock:true,  desc:'Tatlı baharatlı Urfa kebap, pide üzerinde, közlenmiş domates ile',               calories:560, prepTime:15, allergens:['gluten'],           orderCount:98,  revenue:21560, options:['Tek porsiyon','Çift porsiyon'] },
+  { id:'p3',  name:'Karışık Izgara',     cat:'kebap',  price:480, active:true,  popular:false, stock:true,  desc:'Adana, tavuk şiş, kanat ve köfte; yanında pilav ve közlenmiş sebze',            calories:920, prepTime:20, allergens:['gluten'],           orderCount:72,  revenue:34560, options:['2 kişilik','4 kişilik'] },
+  { id:'p4',  name:'İçli Köfte (3 adet)',cat:'kebap',  price:95,  active:true,  popular:false, stock:true,  desc:'Bulgur hamurundan el yapımı, içi kıymalı ve fıstıklı köfte',                    calories:310, prepTime:8,  allergens:['gluten','fındık'],  orderCount:64,  revenue:6080,  options:['3 adet','6 adet'] },
+  { id:'p5',  name:'Patlıcan Kebap',     cat:'kebap',  price:195, active:true,  popular:false, stock:true,  desc:'Közlenmiş patlıcan üzerinde Adana kebap, sarımsaklı yoğurt ile',                 calories:520, prepTime:18, allergens:['gluten','süt'],     orderCount:45,  revenue:8775,  options:['Acılı','Acısız'] },
+  { id:'p6',  name:'Lahmacun (2 adet)',  cat:'kebap',  price:80,  active:true,  popular:true,  stock:true,  desc:'İnce hamur üzerinde kıymalı iç harç, limon ve maydanoz ile servis',              calories:380, prepTime:10, allergens:['gluten'],           orderCount:88,  revenue:7040,  options:['Kıymalı','Kıymasız'] },
+  { id:'p7',  name:'Künefe',             cat:'tatli',  price:110, active:true,  popular:true,  stock:true,  desc:'Tel kadayıf arasında Hatay peyniri, şeker şurubuna batırılmış',                 calories:420, prepTime:15, allergens:['gluten','süt'],     orderCount:89,  revenue:9790,  options:['Fıstıklı','Fıstıksız'] },
+  { id:'p8',  name:'Sütlaç',             cat:'tatli',  price:65,  active:true,  popular:false, stock:false, desc:'Fırında pişirilmiş geleneksel Türk sütlacı, tarçın tozu ile',                   calories:280, prepTime:5,  allergens:['süt'],              orderCount:34,  revenue:2210  },
+  { id:'p9',  name:'Baklava (3 adet)',   cat:'tatli',  price:85,  active:true,  popular:false, stock:true,  desc:'Tereyağlı yufka arasında antep fıstığı, şerbetlenmiş, soğuk servis',            calories:390, prepTime:3,  allergens:['gluten','fındık','süt'], orderCount:52, revenue:4420 },
+  { id:'p10', name:'Ayran',              cat:'icecek', price:35,  active:true,  popular:false, stock:true,  desc:'Ev yapımı taze yayık ayranı, tuzlu',                                            calories:60,  prepTime:2,  allergens:['süt'],              orderCount:210, revenue:7350  },
+  { id:'p11', name:'Şalgam',             cat:'icecek', price:40,  active:true,  popular:false, stock:true,  desc:'Doğal fermente şalgam suyu, acı veya tatlı seçeneği ile',                       calories:25,  prepTime:2,  allergens:[],                   orderCount:140, revenue:5600,  options:['Acı','Tatlı'] },
+  { id:'p12', name:'Limonata',           cat:'icecek', price:45,  active:true,  popular:true,  stock:true,  desc:'Taze sıkılmış limon, nane ve şeker şurubu, bol buz ile',                        calories:90,  prepTime:3,  allergens:[],                   orderCount:95,  revenue:4275  },
+  { id:'p13', name:'Cacık',              cat:'meze',   price:55,  active:true,  popular:false, stock:true,  desc:'Yoğurt, salatalık, sarımsak ve dereotu, zeytinyağı gezdirilmiş',                calories:120, prepTime:5,  allergens:['süt'],              orderCount:60,  revenue:3300  },
+  { id:'p14', name:'Humus',              cat:'meze',   price:65,  active:true,  popular:false, stock:true,  desc:'Nohut ezmesi, tahin, limon ve sarımsak, zeytinyağı ile',                        calories:160, prepTime:5,  allergens:['susam'],            orderCount:45,  revenue:2925  },
 ];
 
 const CAMPAIGNS = [
@@ -112,14 +120,21 @@ function TableRow({ children, onClick }) {
 function SideNav({ active, onNav, collapsed }) {
   const sections = [
     { label: 'ANA MENÜ', items: [
-      { id: 'dashboard', icon: 'home', label: 'Genel Bakış' },
-      { id: 'orders', icon: 'bag', label: 'Siparişler' },
-      { id: 'menu', icon: 'flame', label: 'Menü Yönetimi' },
+      { id: 'dashboard',    icon: 'home',    label: 'Genel Bakış' },
+      { id: 'orders',       icon: 'bag',     label: 'Siparişler' },
+      { id: 'menu',         icon: 'flame',   label: 'Menü Yönetimi' },
+      { id: 'integrations', icon: 'link',    label: 'Entegrasyonlar' },
+    ]},
+    { label: 'MÜŞTERİ', items: [
+      { id: 'messages',  icon: 'msg',   label: 'Müşteri Mesajları', badge: '3' },
     ]},
     { label: 'ANALİTİK', items: [
-      { id: 'analytics', icon: 'star', label: 'Raporlar' },
-      { id: 'campaigns', icon: 'tag', label: 'Kampanyalar' },
-      { id: 'reviews', icon: 'msg', label: 'Yorumlar' },
+      { id: 'analytics', icon: 'star',  label: 'Raporlar' },
+      { id: 'campaigns', icon: 'tag',   label: 'Kampanyalar' },
+      { id: 'reviews',   icon: 'heart', label: 'Yorumlar' },
+    ]},
+    { label: 'ÖDÜLLER', items: [
+      { id: 'rewards', icon: 'trophy', label: 'Ödüller & Görevler', badge: '3' },
     ]},
     { label: 'AYARLAR', items: [
       { id: 'settings', icon: 'user', label: 'Ayarlar' },
@@ -155,6 +170,9 @@ function SideNav({ active, onNav, collapsed }) {
                   {item.id === 'orders' && !collapsed && (
                     <span style={{ marginLeft: 'auto', background: 'var(--brand-500)', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 7px', borderRadius: 999 }}>5</span>
                   )}
+                  {item.badge && !collapsed && (
+                    <span style={{ marginLeft: 'auto', background: 'var(--success-500)', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 7px', borderRadius: 999 }}>{item.badge}</span>
+                  )}
                 </button>
               );
             })}
@@ -178,6 +196,6 @@ function SideNav({ active, onNav, collapsed }) {
 
 Object.assign(window, {
   RESTO_INFO, TODAY_STATS, WEEKLY_REVENUE, LIVE_ORDERS, ORDER_STATUSES,
-  MENU_CATEGORIES, MENU_ITEMS, CAMPAIGNS, RECENT_REVIEWS, HOURLY_ORDERS, TOP_ITEMS,
+  MENU_CATEGORIES, MENU_ITEMS, ALLERGENS, CAMPAIGNS, RECENT_REVIEWS, HOURLY_ORDERS, TOP_ITEMS,
   MetricCard, TableHeader, TableRow, SideNav,
 });

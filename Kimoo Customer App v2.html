@@ -17,7 +17,7 @@
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
-  .stage { display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 40px 20px 64px; }
+  .stage { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 22px; padding: 40px 20px 64px; min-height: 100vh; }
   .stage-head { text-align: center; }
   .stage-head h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; color: var(--neutral-900); display: flex; align-items: center; gap: 10px; justify-content: center; }
   .stage-head .badge-k { width: 34px; height: 34px; border-radius: 10px; background: var(--coral-500); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 19px; box-shadow: var(--shadow-brand); }
@@ -45,6 +45,7 @@
 <script type="text/babel" src="kimoo-tabs.jsx"></script>
 <script type="text/babel" src="kimoo-onboarding.jsx"></script>
 <script type="text/babel" src="kimoo-extras.jsx"></script>
+<script type="text/babel" src="kimoo-detail-screens.jsx"></script>
 
 <script type="text/babel">
 const { useState } = React;
@@ -53,7 +54,8 @@ const {
   HomeScreen, RestaurantScreen, ProductScreen, CartScreen, CheckoutScreen, TrackingScreen,
   SearchScreen, OrdersScreen, FavoritesScreen, ProfileScreen,
   SplashScreen, WelcomeScreen, LoginScreen, OTPScreen, LocationScreen,
-  ReviewScreen, RestaurantReviewsScreen, ChatScreen, ReferralScreen,
+  ReviewScreen, RestaurantReviewsScreen, ReportScreen, ReferralScreen,
+  AddressScreen, WalletScreen, CouponsScreen, NotificationsScreen, AccountSettingsScreen,
   useTweaks, TweaksPanel, TweakSection, TweakColor, TweakToggle, TweakSlider, TweakRadio,
 } = window;
 
@@ -77,7 +79,7 @@ function hexA(hex, a) {
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "accent": "#FF5A3C",
   "font": "Sistem",
-  "dark": true,
+  "dark": false,
   "radius": 0
 }/*EDITMODE-END*/;
 
@@ -88,7 +90,7 @@ const TABS = [
   { id: 'favorites', icon: 'heart', label: 'Favoriler' },
   { id: 'profile', icon: 'user', label: 'Profil' },
 ];
-const FLOW = ['restaurant', 'product', 'cart', 'checkout', 'tracking', 'review', 'reviews', 'chat', 'referral'];
+const FLOW = ['restaurant', 'product', 'cart', 'checkout', 'tracking', 'review', 'reviews', 'report', 'referral', 'addresses', 'wallet', 'coupons', 'notifications', 'settings'];
 const ONBOARD = ['splash', 'welcome', 'login', 'otp', 'location'];
 
 function TabBar({ tab, setTab, cartCount }) {
@@ -194,8 +196,13 @@ function App() {
     // extras
     case 'review': view = <ReviewScreen go={go} />; break;
     case 'reviews': view = <RestaurantReviewsScreen go={go} restaurant={restaurant} />; break;
-    case 'chat': view = <ChatScreen go={go} />; break;
+    case 'report': view = <ReportScreen go={go} />; break;
     case 'referral': view = <ReferralScreen go={go} />; break;
+    case 'addresses': view = <AddressScreen go={go} />; break;
+    case 'wallet': view = <WalletScreen go={go} />; break;
+    case 'coupons': view = <CouponsScreen go={go} />; break;
+    case 'notifications': view = <NotificationsScreen go={go} />; break;
+    case 'settings': view = <AccountSettingsScreen go={go} />; break;
     default: view = <HomeScreen go={go} openRestaurant={openRestaurant} cartCount={cartCount} />;
   }
 
@@ -208,7 +215,7 @@ function App() {
         <h1><span className="badge-k">k</span> Kimoo · Müşteri Uygulaması</h1>
         <p>Keşfet → sipariş → canlı takip · <a href="Design System.html">Design System</a> · <a href="index.html">Genel bakış</a></p>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 10, flexWrap: 'wrap' }}>
-          {[['splash','Onboarding'],['review','Değerlendir'],['chat','Canlı Destek'],['referral','Davet Et']].map(([s,l]) => (
+          {[['splash','Onboarding'],['review','Değerlendir'],['report','Sorun Bildir'],['referral','Davet Et']].map(([s,l]) => (
             <button key={s} onClick={() => setScreen(s)} style={{ padding: '7px 14px', borderRadius: 999, fontSize: 13, fontWeight: 600, border: '1.5px solid #E5E0DA', background: '#fff', color: '#5D554E', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>{l}</button>
           ))}
         </div>

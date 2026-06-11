@@ -27,6 +27,9 @@ const I = {
   phone:   'M5 4h4l1.5 5-2 1.5a12 12 0 0 0 5 5l1.5-2 5 1.5v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z',
   msg:     'M4 5h16v11H8l-4 3V5Z',
   back:    'M15 5l-7 7 7 7',
+  trophy:  'M5 3h14v7a7 7 0 0 1-14 0ZM9 22h6M12 16v6M5 7H2M19 7h3',
+  link:    'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71',
+  send:    'M22 2L11 13M22 2l-7 20-4-9-9-4 20-7Z',
 };
 
 function Icon({ name, size = 22, color = 'currentColor', strokeWidth = 2, style = {} }) {
@@ -134,37 +137,50 @@ const CATEGORIES = [
   { id: 'vegan', label: 'Vegan', icon: '🥗' },
 ];
 
+const PAYMENT_LABELS = {
+  card:     '💳 Kredi Kartı',
+  cash:     '💵 Kapıda Nakit',
+  multinet: 'Multinet',
+  metropol: 'Metropol',
+  ticket:   'Ticket',
+};
+
 const RESTAURANTS = [
   {
     id: 'r1', name: 'Köşe Ocakbaşı', cuisine: 'Kebap · Türk', price: '₺₺', rating: 4.8, reviews: 1240,
     eta: '25-35 dk', minOrder: 150, fee: 0, discount: '%30', tags: ['kebap'], open: true, free: true,
+    payments: ['card','cash','multinet','metropol','ticket'],
   },
   {
     id: 'r2', name: 'Napoli Pizzeria', cuisine: 'Pizza · İtalyan', price: '₺₺', rating: 4.7, reviews: 860,
     eta: '30-40 dk', minOrder: 120, fee: 19, discount: null, tags: ['pizza'], open: true,
+    payments: ['card','cash','multinet','ticket'],
   },
   {
     id: 'r3', name: 'Burger Atölyesi', cuisine: 'Burger · Fast Food', price: '₺₺', rating: 4.6, reviews: 2100,
     eta: '20-30 dk', minOrder: 100, fee: 15, discount: '2 Al 1 Öde', tags: ['burger'], open: true,
+    payments: ['card','cash','multinet'],
   },
   {
     id: 'r4', name: 'Yeşil Kâse', cuisine: 'Vegan · Salata', price: '₺₺', rating: 4.9, reviews: 540,
     eta: '15-25 dk', minOrder: 90, fee: 0, discount: null, tags: ['vegan'], open: true, free: true,
+    payments: ['card','multinet','metropol','ticket'],
   },
   {
     id: 'r5', name: 'Tatlıcı Hacı', cuisine: 'Tatlı · Baklava', price: '₺₺₺', rating: 4.8, reviews: 1530,
     eta: '35-45 dk', minOrder: 80, fee: 25, discount: null, tags: ['tatli'], open: false,
+    payments: ['card','cash'],
   },
 ];
 
 const MENU = {
   r1: [
-    { id: 'm1', name: 'Adana Dürüm', desc: 'Acılı kıyma, lavash, közlenmiş biber & soğan', price: 145, popular: true },
-    { id: 'm2', name: 'Urfa Kebap (1 porsiyon)', desc: 'Acısız, közde, pilav & salata ile', price: 220, popular: true },
-    { id: 'm3', name: 'Karışık Izgara', desc: 'Adana, kanat, pirzola, köfte — 2 kişilik', price: 480 },
-    { id: 'm4', name: 'İçli Köfte (3 adet)', desc: 'El yapımı, bol cevizli', price: 95 },
-    { id: 'm5', name: 'Künefe', desc: 'Antep fıstıklı, sıcak servis', price: 110 },
-    { id: 'm6', name: 'Ayran', desc: 'Ev yapımı, köpüklü', price: 35 },
+    { id: 'm1', name: 'Adana Dürüm',            desc: 'Acılı kıyma, lavash, közlenmiş biber & soğan',  price: 145, popular: true, cal: 480 },
+    { id: 'm2', name: 'Urfa Kebap (1 porsiyon)', desc: 'Acısız, közde, pilav & salata ile',               price: 220, popular: true, cal: 560 },
+    { id: 'm3', name: 'Karışık Izgara',          desc: 'Adana, kanat, pirzola, köfte — 2 kişilik',       price: 480,              cal: 920 },
+    { id: 'm4', name: 'İçli Köfte (3 adet)',     desc: 'El yapımı, bol cevizli',                          price: 95,               cal: 310 },
+    { id: 'm5', name: 'Künefe',                  desc: 'Antep fıstıklı, sıcak servis',                    price: 110,              cal: 420 },
+    { id: 'm6', name: 'Ayran',                   desc: 'Ev yapımı, köpüklü',                              price: 35,               cal: 60  },
   ],
 };
 
@@ -188,5 +204,5 @@ const PRODUCT_OPTIONS = {
 
 Object.assign(window, {
   Icon, Pill, MediaBox, Badge, PrimaryBtn, ScreenHeader, money,
-  CATEGORIES, RESTAURANTS, MENU, PRODUCT_OPTIONS,
+  CATEGORIES, RESTAURANTS, MENU, PRODUCT_OPTIONS, PAYMENT_LABELS,
 });
