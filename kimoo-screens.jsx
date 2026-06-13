@@ -6,9 +6,46 @@ const PAD = 16;
 const CONTENT_BOTTOM = 120; // clearance for tab bar / action bar
 
 // ============================ HOME ============================
+const MOBILE_SORT = [
+  { id: 'recommended', label: 'Önerilen' },
+  { id: 'rating',      label: 'En İyi Puan' },
+  { id: 'fastest',     label: 'En Hızlı' },
+];
+
 function HomeScreen({ go, openRestaurant, cartCount }) {
   const [cat, setCat] = React.useState('all');
-  const list = cat === 'all' ? RESTAURANTS : RESTAURANTS.filter(r => r.tags.includes(cat));
+  const [sort, setSort] = React.useState('recommended');
+  const [freeOnly, setFreeOnly] = React.useState(false);
+  const [maxEta, setMaxEta] = React.useState(null);
+  const [minRating, setMinRating] = React.useState(null);
+  const [payFilter, setPayFilter] = React.useState(null);
+  const [showFilters, setShowFilters] = React.useState(false);
+
+  const activeFilterCount = [freeOnly, maxEta, minRating, payFilter].filter(Boolean).length;
+  const clearAll = () => { setFreeOnly(false); setMaxEta(null); setMinRating(null); setPayFilter(null); };
+
+  let list = RESTAURANTS
+    .filter(r => cat === 'all' || r.tags.includes(cat))
+    .filter(r => !freeOnly || r.fee === 0)
+    .filter(r => !maxEta || (parseInt(r.eta) <= maxEta))
+    .filter(r => !minRating || r.rating >= minRating)
+    .filter(r => !payFilter || r.payments?.includes(payFilter));
+  if (sort === 'rating')  list = [...list].sort((a,b) => b.rating - a.rating);
+  if (sort === 'fastest') list = [...list].sort((a,b) => parseInt(a.eta) - parseInt(b.eta));
+
+  const FChip = ({ active, onClick, children, color }) => (
+    <button onClick={onClick} style={{
+      padding: '7px 13px', borderRadius: 999, fontSize: 12, fontWeight: 600,
+      cursor: 'pointer', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap',
+      background: active ? (color || 'var(--brand-500)') : 'var(--bg-sunken)',
+      color: active ? '#fff' : 'var(--text-secondary)',
+      border: 'none', transition: 'all .15s ease',
+      display: 'flex', alignItems: 'center', gap: 5,
+    }}>{children}</button>
+  );
+  const FilterLabel = ({ children }) => (
+    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{children}</div>
+  );
   return (
     <div style={{ paddingBottom: CONTENT_BOTTOM }}>
       {/* location header */}
@@ -51,7 +88,83 @@ function HomeScreen({ go, openRestaurant, cartCount }) {
         </div>
       </div>
 
-      {/* categories */}
+      {/* filter bar */}
+      <div style={{ padding: '4px 16px 6px', display: 'flex', gap: 8, alignItems: 'center' }}>
+        <button onClick={() => setShowFilters(f => !f)} style={{
+          display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 'var(--radius-md)',
+          background: (showFilters || activeFilterCount > 0) ? 'var(--brand-500)' : 'var(--bg-surface)',
+          color: (showFilters || activeFilterCount > 0) ? '#fff' : 'var(--text-secondary)',
+          border: (showFilters || activeFilterCount > 0) ? '1.5px solid var(--brand-500)' : '1.5px solid var(--border-default)',
+          fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)', flex: 'none',
+        }}>
+          <Icon name="filter" size={14} color={(showFilters || activeFilterCount > 0) ? '#fff' : 'var(--text-muted)'} />
+          Filtrele
+          {activeFilterCount > 0 && <span style={{ minWidth: 18, height: 18, borderRadius: 999, background: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: 800, display: 'grid', placeItems: 'center' }}>{activeFilterCount}</span>}
+        </button>
+        <div style={{ width: 1, height: 22, background: 'var(--border-subtle)', flex: 'none' }} />
+        <div style={{ flex: 1, overflowX: 'auto', display: 'flex', gap: 6, scrollbarWidth: 'none' }}>
+          {MOBILE_SORT.map(s => (
+            <button key={s.id} onClick={() => setSort(s.id)} style={{
+              padding: '8px 14px', borderRadius: 999, fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', flex: 'none',
+              background: sort === s.id ? 'var(--brand-50)' : 'transparent',
+              color: sort === s.id ? 'var(--brand-700)' : 'var(--text-tertiary)',
+              border: sort === s.id ? '1.5px solid color-mix(in srgb, var(--brand-500) 30%, transparent)' : '1.5px solid transparent',
+              cursor: 'pointer', fontFamily: 'var(--font-sans)', transition: 'all .15s ease',
+            }}>{s.label}</button>
+          ))}
+        </div>
+        {activeFilterCount > 0 && (
+          <button onClick={clearAll} style={{ width: 30, height: 30, borderRadius: 999, border: 'none', background: 'var(--error-50)', display: 'grid', placeItems: 'center', cursor: 'pointer', flex: 'none' }}>
+            <Icon name="close" size={13} color="var(--error-500)" />
+          </button>
+        )}
+      </div>
+
+      {/* expanded filter panel */}
+      {showFilters && (
+        <div style={{ padding: '0 16px 10px' }}>
+          <div style={{ background: 'var(--bg-surface)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-subtle)', padding: '16px', boxShadow: 'var(--shadow-md)' }}>
+            <div style={{ marginBottom: 16 }}>
+              <FilterLabel>Teslimat ücreti</FilterLabel>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <FChip active={freeOnly} onClick={() => setFreeOnly(v => !v)}>Ücretsiz teslimat</FChip>
+              </div>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <FilterLabel>Minimum puan</FilterLabel>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {[[4.0,'4.0+'],[4.5,'4.5+'],[4.8,'4.8+']].map(([val,label]) => (
+                  <FChip key={val} active={minRating===val} onClick={() => setMinRating(v => v===val ? null : val)} color="var(--warning-500)">
+                    <Icon name="star" size={12} color={minRating===val ? '#fff' : 'var(--warning-500)'} />{label}
+                  </FChip>
+                ))}
+              </div>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <FilterLabel>Teslimat süresi</FilterLabel>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {[[20,'20 dk altı'],[30,'30 dk altı'],[45,'45 dk altı']].map(([val,label]) => (
+                  <FChip key={val} active={maxEta===val} onClick={() => setMaxEta(v => v===val ? null : val)}>
+                    <Icon name="clock" size={12} color={maxEta===val ? '#fff' : 'var(--text-muted)'} />{label}
+                  </FChip>
+                ))}
+              </div>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <FilterLabel>Ödeme yöntemi</FilterLabel>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {[['card','Kredi Kartı'],['cash','Nakit'],['multinet','Multinet'],['metropol','Metropol'],['ticket','Ticket']].map(([p,l]) => (
+                  <FChip key={p} active={payFilter===p} onClick={() => setPayFilter(v => v===p ? null : p)}>{l}</FChip>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 12, borderTop: '1px solid var(--border-subtle)' }}>
+              <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}><strong style={{ color: 'var(--text-primary)' }}>{list.length}</strong> restoran bulundu</span>
+              {activeFilterCount > 0 && <button onClick={() => { clearAll(); }} style={{ fontSize: 13, fontWeight: 700, color: 'var(--error-600)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>Filtreleri temizle</button>}
+            </div>
+          </div>
+        </div>
+      )}
       <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '14px 16px 6px', scrollbarWidth: 'none' }}>
         {CATEGORIES.map(c => (
           <button key={c.id} onClick={() => setCat(c.id)} style={{

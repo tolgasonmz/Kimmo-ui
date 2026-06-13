@@ -24,6 +24,7 @@
   @keyframes kpulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
   .screen-fade { animation: screenIn .3s cubic-bezier(0.22,1,0.36,1); }
   @keyframes screenIn { from { transform: translateY(10px); } to { transform: none; } }
+  @keyframes radarPulse { 0% { transform: scale(0.3); opacity: 0.8; } 100% { transform: scale(2.2); opacity: 0; } }
   ::-webkit-scrollbar { width: 0; height: 0; }
   #root { width: 100%; }
 </style>
@@ -100,6 +101,21 @@ function App() {
   const [screen, setScreen] = useState('home');
   const [tab, setTabState] = useState('home');
   const [online, setOnline] = useState(true);
+  const [orderPhase, setOrderPhase] = React.useState('searching');
+
+  const toggleOnline = () => {
+    setOnline(prev => {
+      const next = !prev;
+      if (next) setOrderPhase('searching');
+      return next;
+    });
+  };
+
+  React.useEffect(() => {
+    if (!online || orderPhase !== 'searching' || screen !== 'home') return;
+    const t = setTimeout(() => setOrderPhase('incoming'), 6000);
+    return () => clearTimeout(t);
+  }, [online, orderPhase, screen]);
 
   const ramp = ACCENT_RAMPS[t.accent] || ACCENT_RAMPS['#FF5A3C'];
   const rootVars = {
@@ -116,11 +132,11 @@ function App() {
 
   let view;
   switch (screen) {
-    case 'home': view = <CourierHome go={go} online={online} setOnline={setOnline} />; break;
+    case 'home': view = <CourierHome go={go} online={online} toggleOnline={toggleOnline} orderPhase={online ? orderPhase : 'offline'} onAcceptOrder={() => setOrderPhase('active')} onRejectOrder={() => setOrderPhase('searching')} />; break;
     case 'earnings': view = <EarningsScreen go={go} />; break;
     case 'profile': view = <CourierProfileScreen go={go} />; break;
     case 'rewards': view = <CourierRewardsScreen go={go} />; break;
-    case 'incoming': view = <IncomingOrderScreen go={go} onAccept={() => go('active')} onReject={() => go('home')} />; break;
+    case 'incoming': view = <IncomingOrderScreen go={go} onAccept={() => { setOrderPhase('active'); go('active'); }} onReject={() => go('home')} />; break;
     case 'active': view = <ActiveDeliveryScreen go={go} />; break;
     case 'performance': view = <PerformanceScreen go={go} />; break;
     case 'support': view = <CourierReportScreen go={go} />; break;

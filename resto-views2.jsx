@@ -21,6 +21,99 @@ function AnalyticsView() {
         <MetricCard label="Tekrar sipariş" value="%64" icon="heart" />
       </div>
 
+      {/* ── Kimoo Komisyon Avantajı ── */}
+      <div style={{ background: 'linear-gradient(135deg, var(--brand-50) 0%, var(--bg-surface) 100%)', border: '1.5px solid color-mix(in srgb, var(--brand-500) 20%, transparent)', borderRadius: 'var(--radius-lg)', padding: 24, marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', right: -30, top: -30, width: 140, height: 140, borderRadius: '50%', background: 'color-mix(in srgb, var(--brand-500) 6%, transparent)' }}></div>
+        <div style={{ position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 999, background: 'var(--brand-500)', display: 'grid', placeItems: 'center' }}>
+              <Icon name="wallet" size={18} color="#fff" />
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>Kimoo Avantajı Hesaplayıcı</div>
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20, lineHeight: 1.5 }}>
+            Entegrasyon platformlarındaki cironuz Kimoo üzerinden kazanılsaydı, komisyon ödemeyeceğiniz için ne kadar fazla kazanırdınız?
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
+            {[
+              { name: 'Yemeksepeti', short: 'YS', bg: '#FFF0EB', fg: '#C94A17', ciro: 86400, commission: 30 },
+              { name: 'Trendyol Yemek', short: 'TY', bg: '#FFF4EB', fg: '#C15E0D', ciro: 52500, commission: 25 },
+            ].map(pl => {
+              const commissionAmount = Math.round(pl.ciro * pl.commission / 100);
+              const net = pl.ciro - commissionAmount;
+              return (
+                <div key={pl.short} style={{ background: 'var(--bg-surface)', borderRadius: 'var(--radius-md)', padding: 18, border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: pl.bg, display: 'grid', placeItems: 'center' }}>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: pl.fg }}>{pl.short}</span>
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{pl.name}</div>
+                  </div>
+                  {[
+                    ['Aylık ciro', money(pl.ciro), false],
+                    [`Komisyon (%${pl.commission})`, '-' + money(commissionAmount), true],
+                    ['Net kazancınız', money(net), false],
+                  ].map(([l, v, isError], i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: i < 2 ? '1px solid var(--border-subtle)' : 'none', fontSize: 13 }}>
+                      <span style={{ color: isError ? 'var(--error-600)' : 'var(--text-secondary)' }}>{l}</span>
+                      <span style={{ fontWeight: 700, color: isError ? 'var(--error-600)' : 'var(--text-primary)' }}>{v}</span>
+                    </div>
+                  ))}
+                  <div style={{ marginTop: 10, padding: 10, background: 'var(--success-50)', borderRadius: 'var(--radius-sm)' }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--success-600)', marginBottom: 2 }}>Kimoo'da kazanırdınız</div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--success-600)' }}>{money(pl.ciro)}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--success-600)' }}>+{money(commissionAmount)} ekstra</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {(() => {
+            const totalCiro = 86400 + 52500;
+            const totalCommission = Math.round(86400 * 0.30) + Math.round(52500 * 0.25);
+            const totalNet = totalCiro - totalCommission;
+            return (
+              <>
+                <div style={{ background: 'var(--brand-500)', borderRadius: 'var(--radius-md)', padding: 20, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, boxShadow: 'var(--shadow-brand)' }}>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 600, opacity: 0.9, marginBottom: 4 }}>Aylık toplam tasarruf</div>
+                    <div style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.02em' }}>{money(totalCommission)}</div>
+                    <div style={{ fontSize: 13, opacity: 0.85, marginTop: 2 }}>Yıllık: {money(totalCommission * 12)}</div>
+                  </div>
+                  <div style={{ width: 64, height: 64, borderRadius: 999, background: 'rgba(255,255,255,0.18)', display: 'grid', placeItems: 'center' }}>
+                    <Icon name="star" size={28} color="#fff" />
+                  </div>
+                </div>
+
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 10 }}>Net kazanç karşılaştırma (aylık)</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>3. parti platformlar (net)</span>
+                      <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{money(totalNet)}</span>
+                    </div>
+                    <div style={{ height: 24, borderRadius: 'var(--radius-sm)', background: 'var(--bg-sunken)', overflow: 'hidden' }}>
+                      <div style={{ width: Math.round(totalNet / totalCiro * 100) + '%', height: '100%', borderRadius: 'var(--radius-sm)', background: 'var(--neutral-400)' }}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                      <span style={{ color: 'var(--brand-600)', fontWeight: 600 }}>Kimoo üzerinden (net)</span>
+                      <span style={{ fontWeight: 700, color: 'var(--brand-600)' }}>{money(totalCiro)}</span>
+                    </div>
+                    <div style={{ height: 24, borderRadius: 'var(--radius-sm)', background: 'var(--bg-sunken)', overflow: 'hidden' }}>
+                      <div style={{ width: '100%', height: '100%', borderRadius: 'var(--radius-sm)', background: 'var(--brand-500)' }}></div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 24 }}>
         {/* Hourly distribution */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 20 }}>

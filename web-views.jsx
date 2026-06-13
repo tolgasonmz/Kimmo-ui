@@ -1,5 +1,24 @@
 // web-views.jsx — Home/Discovery, Restaurant Detail, Cart, Checkout, Tracking
-const { Icon, Badge, money, WEB_CATEGORIES, WEB_CAMPAIGNS, WEB_RESTAURANTS, WEB_MENU } = window;
+const { Icon, Badge, money, WEB_CATEGORIES, WEB_CAMPAIGNS, WEB_RESTAURANTS, WEB_MENU, WEB_PAYMENT_LABELS } = window;
+
+const WEB_SORT_OPTS = [
+  { id: 'recommended', label: 'Önerilen' },
+  { id: 'rating',      label: 'En Yüksek Puan' },
+  { id: 'fastest',     label: 'En Hızlı' },
+];
+
+function FilterChip({ active, onClick, children }) {
+  return (
+    <button onClick={onClick} style={{
+      display: 'flex', alignItems: 'center', gap: 5, padding: '8px 14px', borderRadius: 999, flex: 'none',
+      background: active ? 'var(--brand-500)' : 'var(--bg-surface)',
+      color: active ? '#fff' : 'var(--text-secondary)',
+      border: active ? 'none' : '1.5px solid var(--border-default)',
+      fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-sans)',
+      transition: 'all .12s ease', whiteSpace: 'nowrap',
+    }}>{children}</button>
+  );
+}
 
 // ============ HEADER ============
 function WebHeader({ cartCount, onCartClick, onLogoClick }) {
@@ -44,6 +63,24 @@ function WebHeader({ cartCount, onCartClick, onLogoClick }) {
 // ============ HOME / DISCOVERY ============
 function WebHome({ onRestaurant }) {
   const [activeCat, setActiveCat] = React.useState('all');
+  const [sort, setSort] = React.useState('recommended');
+  const [freeOnly, setFreeOnly] = React.useState(false);
+  const [maxEta, setMaxEta] = React.useState(null);
+  const [minRating, setMinRating] = React.useState(null);
+  const [payFilter, setPayFilter] = React.useState(null);
+  const [showFilters, setShowFilters] = React.useState(false);
+
+  const activeFilterCount = [freeOnly, maxEta, minRating, payFilter].filter(Boolean).length;
+  const clearAll = () => { setFreeOnly(false); setMaxEta(null); setMinRating(null); setPayFilter(null); };
+
+  let list = WEB_RESTAURANTS
+    .filter(r => activeCat === 'all' || r.tags?.includes(activeCat))
+    .filter(r => !freeOnly || r.fee === 0)
+    .filter(r => !maxEta  || r.etaMin <= maxEta)
+    .filter(r => !minRating || r.rating >= minRating)
+    .filter(r => !payFilter || r.payments?.includes(payFilter));
+  if (sort === 'rating')  list = [...list].sort((a,b) => b.rating - a.rating);
+  if (sort === 'fastest') list = [...list].sort((a,b) => a.etaMin - b.etaMin);
 
   return (
     <div>
@@ -60,21 +97,56 @@ function WebHome({ onRestaurant }) {
         </div>
       </div>
 
-      {/* Categories */}
-      <div style={{ padding: '20px clamp(16px, 4vw, 48px) 0' }}>
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+      {/* Sticky category + filter bar */}
+      <div style={{ position: 'sticky', top: 64, zIndex: 40, background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-subtle)', padding: '12px clamp(16px, 4vw, 48px) 0' }}>
+        {/* Categories row */}
+        <div className="web-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 12, alignItems: 'center' }}>
           {WEB_CATEGORIES.map(cat => {
             const on = activeCat === cat.id;
             return (
               <button key={cat.id} onClick={() => setActiveCat(cat.id)} style={{
-                display: 'flex', alignItems: 'center', gap: 6, padding: '10px 18px', borderRadius: 999, flex: 'none',
-                background: on ? 'var(--brand-500)' : 'var(--bg-surface)', color: on ? '#fff' : 'var(--text-secondary)',
-                border: on ? 'none' : '1.5px solid var(--border-default)', fontSize: 14, fontWeight: 700,
-                cursor: 'pointer', fontFamily: 'var(--font-sans)', transition: 'all .12s ease',
+                display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 999, flex: 'none',
+                background: on ? 'var(--brand-500)' : 'var(--bg-sunken)',
+                color: on ? '#fff' : 'var(--text-secondary)',
+                border: on ? 'none' : '1.5px solid transparent',
+                fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)', transition: 'all .12s ease',
               }}><span>{cat.emoji}</span>{cat.name}</button>
             );
           })}
+          <div style={{ width: 1, background: 'var(--border-subtle)', alignSelf: 'stretch', margin: '0 4px', flex: 'none' }} />
+          <button onClick={() => setShowFilters(f => !f)} style={{
+            display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 999, flex: 'none',
+            background: showFilters ? 'var(--brand-50)' : 'var(--bg-sunken)',
+            color: showFilters ? 'var(--brand-600)' : 'var(--text-secondary)',
+            border: `1.5px solid ${showFilters ? 'color-mix(in srgb, var(--brand-500) 35%, transparent)' : 'transparent'}`,
+            fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)',
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            Filtrele
+            {activeFilterCount > 0 && <span style={{ width: 18, height: 18, borderRadius: 999, background: 'var(--brand-500)', color: '#fff', fontSize: 10, fontWeight: 800, display: 'grid', placeItems: 'center' }}>{activeFilterCount}</span>}
+          </button>
         </div>
+
+        {/* Expanded filter row */}
+        {showFilters && (
+          <div className="web-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 12, alignItems: 'center' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', flex: 'none', paddingRight: 2 }}>Sırala</span>
+            {WEB_SORT_OPTS.map(s => <FilterChip key={s.id} active={sort===s.id} onClick={() => setSort(s.id)}>{s.label}</FilterChip>)}
+            <div style={{ width: 1, background: 'var(--border-subtle)', height: 22, flex: 'none', margin: '0 4px' }} />
+            <FilterChip active={freeOnly} onClick={() => setFreeOnly(v => !v)}>✓ Ücretsiz Teslimat</FilterChip>
+            <FilterChip active={maxEta===30} onClick={() => setMaxEta(v => v===30 ? null : 30)}>🕐 30dk altı</FilterChip>
+            <FilterChip active={maxEta===20} onClick={() => setMaxEta(v => v===20 ? null : 20)}>⚡ 20dk altı</FilterChip>
+            <FilterChip active={minRating===4.8} onClick={() => setMinRating(v => v===4.8 ? null : 4.8)}>★ 4.8+</FilterChip>
+            <FilterChip active={minRating===4.5} onClick={() => setMinRating(v => v===4.5 ? null : 4.5)}>★ 4.5+</FilterChip>
+            <div style={{ width: 1, background: 'var(--border-subtle)', height: 22, flex: 'none', margin: '0 4px' }} />
+            {[['card','💳 Kredi Kartı'],['cash','💵 Nakit'],['multinet','Multinet'],['metropol','Metropol'],['ticket','Ticket']].map(([p,l]) => (
+              <FilterChip key={p} active={payFilter===p} onClick={() => setPayFilter(v => v===p ? null : p)}>{l}</FilterChip>
+            ))}
+            {activeFilterCount > 0 && (
+              <button onClick={clearAll} style={{ flex: 'none', padding: '8px 12px', borderRadius: 999, border: '1.5px solid var(--error-400)', color: 'var(--error-600)', background: 'var(--error-50)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap' }}>Temizle ×</button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Popular section */}
@@ -98,9 +170,19 @@ function WebHome({ onRestaurant }) {
 
       {/* All restaurants grid */}
       <div style={{ padding: '32px clamp(16px, 4vw, 48px) 48px' }}>
-        <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 16 }}>Yakınındaki restoranlar</div>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>Yakınındaki restoranlar</div>
+          <span style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>{list.length} restoran</span>
+        </div>
+        {list.length === 0 ? (
+          <div style={{ padding: '60px 0', textAlign: 'center' }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+            <div style={{ fontSize: 15, color: 'var(--text-muted)', marginBottom: 16 }}>Filtrelerinize uygun restoran bulunamadı.</div>
+            <button onClick={clearAll} style={{ padding: '9px 22px', borderRadius: 999, background: 'var(--brand-500)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>Filtreleri temizle</button>
+          </div>
+        ) : (
         <div className="resto-grid">
-          {WEB_RESTAURANTS.map(r => (
+          {list.map(r => (
             <div key={r.id} onClick={() => onRestaurant(r)} className="resto-card" style={{ cursor: 'pointer', background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', transition: 'all .2s ease' }}>
               <div style={{ height: 160, background: 'var(--bg-sunken)', backgroundImage: 'repeating-linear-gradient(135deg, var(--neutral-100) 0 12px, var(--neutral-50) 12px 24px)', display: 'grid', placeItems: 'center', fontSize: 56, position: 'relative' }}>
                 {r.img}
@@ -117,10 +199,18 @@ function WebHome({ onRestaurant }) {
                   <span>🕐 {r.eta}</span>
                   <span>{r.fee === 0 ? '✓ Ücretsiz' : '₺' + r.fee + ' teslimat'}</span>
                 </div>
+                {r.payments && (
+                  <div style={{ display: 'flex', gap: 4, marginTop: 10, flexWrap: 'wrap' }}>
+                    {r.payments.map(p => (
+                      <span key={p} style={{ fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 999, background: 'var(--bg-sunken)', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)', whiteSpace: 'nowrap' }}>{WEB_PAYMENT_LABELS[p]}</span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
+        )}
       </div>
     </div>
   );
@@ -159,6 +249,14 @@ function WebRestaurantDetail({ restaurant, onBack, onAddToCart }) {
               ))}
             </div>
           </div>
+          {r.payments && (
+            <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>Ödeme:</span>
+              {r.payments.map(p => (
+                <span key={p} style={{ fontSize: 12, fontWeight: 600, padding: '4px 11px', borderRadius: 999, background: 'var(--bg-sunken)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)' }}>{WEB_PAYMENT_LABELS[p]}</span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Menu tabs */}
@@ -182,7 +280,10 @@ function WebRestaurantDetail({ restaurant, onBack, onAddToCart }) {
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{item.name}</div>
                 <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 4, lineHeight: 1.45 }}>{item.desc}</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--brand-600)', marginTop: 8 }}>{money(item.price)}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                  <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--brand-600)' }}>{money(item.price)}</span>
+                  {item.cal && <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>· {item.cal} kcal</span>}
+                </div>
               </div>
               <div style={{ position: 'relative', width: 110, height: 90, borderRadius: 'var(--radius-md)', background: 'var(--bg-sunken)', backgroundImage: 'repeating-linear-gradient(135deg, var(--neutral-100) 0 10px, var(--neutral-50) 10px 20px)', display: 'grid', placeItems: 'center', flex: 'none' }}>
                 <span style={{ fontSize: 32 }}>🍽️</span>
