@@ -27,13 +27,13 @@ function EarningsScreen({ go }) {
         </div>
 
         {/* Total */}
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        <div style={{ textAlign: 'center', marginBottom: 16 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-tertiary)', marginBottom: 4 }}>Toplam kazanç</div>
-          <div style={{ fontSize: 40, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>{money(data.gross + data.tip + data.bonus)}</div>
+          <div style={{ fontSize: 36, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>{money(data.gross + data.tip + data.bonus)}</div>
         </div>
 
         {/* Breakdown */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 24 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
           <StatCard label="Teslimat" value={data.deliveries} />
           <StatCard label="Kazanç" value={money(data.gross)} />
           <StatCard label="Bahşiş" value={money(data.tip)} accent="var(--success-600)" />
@@ -168,10 +168,10 @@ function PerformanceScreen({ go }) {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <ScreenHeader title="Performans" onBack={() => go('profile')} />
       <div style={{ flex: 1, overflow: 'auto', padding: '14px 20px 24px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <div style={{ width: 100, height: 100, borderRadius: 999, background: 'var(--brand-50)', display: 'grid', placeItems: 'center', margin: '0 auto 14px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <div style={{ width: 90, height: 90, borderRadius: 999, background: 'var(--brand-50)', display: 'grid', placeItems: 'center', margin: '0 auto 14px' }}>
             <div>
-              <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--brand-600)' }}>4.92</div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--brand-600)' }}>4.92</div>
               <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>/ 5.00</div>
             </div>
           </div>

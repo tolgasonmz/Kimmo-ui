@@ -1,6 +1,6 @@
 // resto-views.jsx — Dashboard, Orders, Menu views
 const { Icon, Badge, money,
-  RESTO_INFO, TODAY_STATS, WEEKLY_REVENUE, LIVE_ORDERS, ORDER_STATUSES,
+  RESTO_INFO, TODAY_STATS, WEEKLY_REVENUE, LIVE_ORDERS, ORDER_STATUSES, SCHEDULED_ORDERS,
   MENU_CATEGORIES, MENU_ITEMS, ALLERGENS,
   MetricCard, TableHeader, TableRow } = window;
 
@@ -89,10 +89,10 @@ function DashboardView() {
 function OrdersView() {
   const [filter, setFilter] = React.useState('all');
   const [selected, setSelected] = React.useState(null);
-  const filtered = filter === 'all' ? LIVE_ORDERS : LIVE_ORDERS.filter(o => o.status === filter);
+  const filtered = filter === 'all' ? LIVE_ORDERS : filter === 'scheduled' ? (SCHEDULED_ORDERS||[]) : LIVE_ORDERS.filter(o => o.status === filter);
 
   if (selected) {
-    const o = LIVE_ORDERS.find(x => x.id === selected);
+    const o = LIVE_ORDERS.find(x => x.id === selected) || (SCHEDULED_ORDERS||[]).find(x => x.id === selected);
     const st = ORDER_STATUSES[o.status];
     return (
       <div style={{ padding: PAD }}>
@@ -133,6 +133,18 @@ function OrdersView() {
               <ActionBtn label="Siparişi kabul et" icon="check" color="var(--success-500)" />
               <ActionBtn label="Reddet" icon="close" color="var(--error-500)" outline />
             </>}
+            {o.status === 'scheduled' && <>
+              <div style={{ background: 'var(--info-50)', borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 4, border: '1px solid color-mix(in srgb, var(--info-500) 20%, transparent)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <Icon name="clock" size={20} color="var(--info-600)" />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--info-600)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>Planlı Sipariş</span>
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>{o.scheduledTime || o.time}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Bu sipariş belirtilen saatte hazır olmalıdır</div>
+              </div>
+              <ActionBtn label="Siparişi onayla" icon="check" color="var(--success-500)" />
+              <ActionBtn label="İptal et" icon="close" color="var(--error-500)" outline />
+            </>}
             {o.status === 'preparing' && <ActionBtn label="Hazır — kuryeye bildir" icon="check" color="var(--brand-500)" />}
             <ActionBtn label="Müşteriyi ara" icon="phone" outline />
             <ActionBtn label="Yazdır" icon="bag" outline />
@@ -149,14 +161,14 @@ function OrdersView() {
 
       {/* Filter pills */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
-        {[['all', 'Tümü'], ['new', 'Yeni'], ['preparing', 'Hazırlanıyor'], ['ready', 'Hazır'], ['picked', 'Kuryede'], ['delivered', 'Teslim']].map(([k, l]) => (
+        {[['all', 'Tümü'], ['new', 'Yeni'], ['preparing', 'Hazırlanıyor'], ['ready', 'Hazır'], ['picked', 'Kuryede'], ['delivered', 'Teslim'], ['scheduled', '📅 Planlı']].map(([k, l]) => (
           <button key={k} onClick={() => setFilter(k)} style={{
             padding: '8px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, cursor: 'pointer',
             background: filter === k ? 'var(--brand-500)' : 'var(--bg-surface)',
             color: filter === k ? '#fff' : 'var(--text-secondary)',
             border: filter === k ? 'none' : '1.5px solid var(--border-default)',
             fontFamily: 'var(--font-sans)',
-          }}>{l} {k !== 'all' && <span style={{ opacity: 0.7 }}>({LIVE_ORDERS.filter(o => k === 'all' || o.status === k).length})</span>}</button>
+          }}>{l} {k !== 'all' && <span style={{ opacity: 0.7 }}>({(k === 'scheduled' ? (SCHEDULED_ORDERS||[]).length : LIVE_ORDERS.filter(o => k === 'all' || o.status === k).length)})</span>}</button>
         ))}
       </div>
 
@@ -234,6 +246,7 @@ function MenuView() {
   const [viewMode, setViewMode] = React.useState('grid');
   const [search, setSearch] = React.useState('');
   const [editId, setEditId] = React.useState(null);
+  const [isAdding, setIsAdding] = React.useState(false);
 
   const filtered = items
     .filter(i => activeCat === 'all' || i.cat === activeCat)
@@ -262,7 +275,7 @@ function MenuView() {
         </div>
         <span style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>{filtered.length} ürün</span>
         <div style={{ flex: 1 }} />
-        <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 999, background: 'var(--brand-500)', color: '#fff', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)', boxShadow: 'var(--shadow-brand)' }}>
+        <button onClick={() => { setEditId(null); setIsAdding(true); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 999, background: 'var(--brand-500)', color: '#fff', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)', boxShadow: 'var(--shadow-brand)' }}>
           <Icon name="plus" size={15} color="#fff" /> Ürün ekle
         </button>
       </div>
@@ -311,8 +324,11 @@ function MenuView() {
         </div>
 
         {/* Edit drawer */}
-        {editItem && (
+        {editItem && !isAdding && (
           <MenuEditDrawer item={editItem} onClose={() => setEditId(null)} onUpdate={patch => updateItem(editId, patch)} />
+        )}
+        {isAdding && (
+          <MenuEditDrawer item={{ id:'new', name:'', desc:'', price:0, cat: activeCat==='all'?'kebap':activeCat, active:true, stock:true, ingredients:[], productOptions:[], options:[], allergens:[], calories:null, prepTime:null }} isNew onClose={() => setIsAdding(false)} onUpdate={newItem => { setItems(its => [...its, { ...newItem, id:'p'+(its.length+1), orderCount:0, revenue:0 }]); setIsAdding(false); }} />
         )}
       </div>
     </div>
@@ -408,11 +424,13 @@ function MenuProductList({ items, editId, onEdit, onToggleActive, onToggleStock 
   );
 }
 
-function MenuEditDrawer({ item, onClose, onUpdate }) {
-  const [form, setForm] = React.useState({...item});
+function MenuEditDrawer({ item, isNew, onClose, onUpdate }) {
+  const [form, setForm] = React.useState({...item, ingredients: item.ingredients||[], productOptions: item.productOptions||[]});
   const [addingOpt, setAddingOpt] = React.useState(false);
   const [newOpt, setNewOpt] = React.useState('');
-  React.useEffect(() => { setForm({...item}); setAddingOpt(false); }, [item.id]);
+  const [addingIngredient, setAddingIngredient] = React.useState(false);
+  const [newIngredient, setNewIngredient] = React.useState('');
+  React.useEffect(() => { setForm({...item, ingredients: item.ingredients||[], productOptions: item.productOptions||[]}); setAddingOpt(false); setAddingIngredient(false); }, [item.id]);
 
   const set = (k,v) => setForm(f => ({...f,[k]:v}));
   const save = () => { onUpdate(form); onClose(); };
@@ -425,7 +443,7 @@ function MenuEditDrawer({ item, onClose, onUpdate }) {
     <div style={{ width: 305, flex: 'none', borderLeft: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', position: 'sticky', top: 55, alignSelf: 'flex-start', maxHeight: 'calc(100vh - 165px)', overflowY: 'auto' }}>
       {/* Header */}
       <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: 'var(--bg-surface)', zIndex: 2 }}>
-        <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Ürün Düzenle</div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{isNew ? 'Yeni Ürün Ekle' : 'Ürün Düzenle'}</div>
         <div style={{ display: 'flex', gap: 6 }}>
           <button onClick={onClose} style={{ padding: '5px 11px', borderRadius: 999, border: '1.5px solid var(--border-default)', background: 'transparent', fontSize: 12, fontWeight: 600, cursor: 'pointer', color: 'var(--text-secondary)', fontFamily: 'var(--font-sans)' }}>İptal</button>
           <button onClick={save} style={{ padding: '5px 12px', borderRadius: 999, background: 'var(--brand-500)', color: '#fff', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>Kaydet</button>
@@ -454,7 +472,7 @@ function MenuEditDrawer({ item, onClose, onUpdate }) {
         {/* Prep + cal row */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
           <div><FieldLabel>Hazırlık (dk)</FieldLabel><input type="number" value={form.prepTime||''} onChange={e=>set('prepTime',+e.target.value)} style={menuInputStyle} /></div>
-          <div><FieldLabel>Kalori (kcal)</FieldLabel><input type="number" value={form.calories||''} onChange={e=>set('calories',+e.target.value)} style={menuInputStyle} /></div>
+          <div><div style={{ display:'flex', alignItems:'center', gap:6 }}><FieldLabel>Kalori</FieldLabel><span style={{ fontSize:9, color:'var(--text-muted)', fontWeight:500, marginBottom:5 }}>opsiyonel</span></div><input type="number" value={form.calories!=null?form.calories:''} onChange={e=>set('calories', e.target.value ? +e.target.value : null)} placeholder="—" style={menuInputStyle} /></div>
         </div>
 
         {/* Category */}
@@ -498,6 +516,62 @@ function MenuEditDrawer({ item, onClose, onUpdate }) {
               </button>
             )}
           </div>
+        </div>
+
+        {/* İçindekiler */}
+        <div style={{ marginBottom: 14 }}>
+          <FieldLabel>İçindekiler</FieldLabel>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+            {(form.ingredients||[]).map((ing,i) => (
+              <div key={i} style={{ display:'flex', alignItems:'center', gap:3, padding:'3px 7px 3px 9px', borderRadius:999, background:'var(--success-50)', border:'1.5px solid color-mix(in srgb, var(--success-500) 25%, transparent)' }}>
+                <span style={{ fontSize:12, fontWeight:600, color:'var(--success-700)' }}>{ing}</span>
+                <button onClick={()=>set('ingredients',(form.ingredients||[]).filter((_,j)=>j!==i))} style={{ background:'none', border:'none', cursor:'pointer', padding:0, display:'flex', alignItems:'center' }}><Icon name="close" size={10} color="var(--success-500)" /></button>
+              </div>
+            ))}
+            {addingIngredient ? (
+              <div style={{ display:'flex', gap:4, alignItems:'center' }}>
+                <input autoFocus value={newIngredient} onChange={e=>setNewIngredient(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){if(newIngredient.trim()){set('ingredients',[...(form.ingredients||[]),newIngredient.trim()]);setNewIngredient('');}setAddingIngredient(false);}if(e.key==='Escape')setAddingIngredient(false);}} placeholder="Malzeme..." style={{...menuInputStyle,width:100,padding:'3px 7px',height:26,fontSize:12}} />
+                <button onClick={()=>{if(newIngredient.trim()){set('ingredients',[...(form.ingredients||[]),newIngredient.trim()]);setNewIngredient('');}setAddingIngredient(false);}} style={{ padding:'3px 9px', borderRadius:999, background:'var(--success-500)', color:'#fff', border:'none', fontSize:12, fontWeight:700, cursor:'pointer', fontFamily:'var(--font-sans)' }}>✓</button>
+              </div>
+            ) : (
+              <button onClick={()=>setAddingIngredient(true)} style={{ padding:'3px 9px', borderRadius:999, border:'1.5px dashed var(--border-default)', background:'none', fontSize:11, fontWeight:600, color:'var(--text-secondary)', cursor:'pointer', display:'flex', alignItems:'center', gap:3, fontFamily:'var(--font-sans)' }}>
+                <Icon name="plus" size={11} color="var(--text-secondary)" /> Ekle
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Ürün Seçenekleri (Müşteri ekranı) */}
+        <div style={{ marginBottom: 14 }}>
+          <FieldLabel>Ürün Seçenekleri</FieldLabel>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8, lineHeight: 1.4 }}>Müşterinin sepete eklerken göreceği seçenek grupları</div>
+          {(form.productOptions||[]).map((group, gi) => (
+            <div key={gi} style={{ border:'1px solid var(--border-subtle)', borderRadius:'var(--radius-sm)', padding:10, marginBottom:8, background:'var(--bg-sunken)' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+                <input value={group.label} onChange={e=>{const po=[...(form.productOptions||[])];po[gi]={...po[gi],label:e.target.value};set('productOptions',po);}} style={{...menuInputStyle,flex:1,padding:'4px 8px',fontSize:12}} placeholder="Grup adı" />
+                <select value={group.type} onChange={e=>{const po=[...(form.productOptions||[])];po[gi]={...po[gi],type:e.target.value};set('productOptions',po);}} style={{...menuInputStyle,width:80,padding:'4px 6px',fontSize:11,cursor:'pointer'}}>
+                  <option value="radio">Tekli</option>
+                  <option value="check">Çoklu</option>
+                </select>
+                <button onClick={()=>set('productOptions',(form.productOptions||[]).filter((_,j)=>j!==gi))} style={{ background:'none', border:'none', cursor:'pointer', padding:2 }}><Icon name="close" size={12} color="var(--error-500)" /></button>
+              </div>
+              <div style={{ display:'flex', alignItems:'center', gap:4, marginBottom:8 }}>
+                <SwitchSmall on={group.required} onClick={()=>{const po=[...(form.productOptions||[])];po[gi]={...po[gi],required:!po[gi].required};set('productOptions',po);}} />
+                <span style={{ fontSize:10, color:'var(--text-muted)', fontWeight:600 }}>Zorunlu</span>
+              </div>
+              {(group.items||[]).map((gItem, ii) => (
+                <div key={ii} style={{ display:'flex', gap:4, marginBottom:4, alignItems:'center' }}>
+                  <input value={gItem.label} onChange={e=>{const po=[...(form.productOptions||[])];const items=[...po[gi].items];items[ii]={...items[ii],label:e.target.value};po[gi]={...po[gi],items};set('productOptions',po);}} style={{...menuInputStyle,flex:1,padding:'4px 8px',fontSize:11}} placeholder="Seçenek adı" />
+                  <div style={{ position:'relative' }}><span style={{ position:'absolute', left:6, top:'50%', transform:'translateY(-50%)', fontSize:10, color:'var(--text-muted)' }}>₺</span><input type="number" value={gItem.price||0} onChange={e=>{const po=[...(form.productOptions||[])];const items=[...po[gi].items];items[ii]={...items[ii],price:+e.target.value};po[gi]={...po[gi],items};set('productOptions',po);}} style={{...menuInputStyle,width:52,padding:'4px 6px 4px 18px',fontSize:11,textAlign:'right'}} /></div>
+                  <button onClick={()=>{const po=[...(form.productOptions||[])];po[gi]={...po[gi],items:po[gi].items.filter((_,j)=>j!==ii)};set('productOptions',po);}} style={{ background:'none', border:'none', cursor:'pointer', padding:1 }}><Icon name="close" size={10} color="var(--text-muted)" /></button>
+                </div>
+              ))}
+              <button onClick={()=>{const po=[...(form.productOptions||[])];po[gi]={...po[gi],items:[...(po[gi].items||[]),{label:'',price:0}]};set('productOptions',po);}} style={{ padding:'2px 8px', borderRadius:999, border:'1px dashed var(--border-default)', background:'none', fontSize:10, fontWeight:600, color:'var(--text-tertiary)', cursor:'pointer', fontFamily:'var(--font-sans)', marginTop:2 }}>+ Seçenek</button>
+            </div>
+          ))}
+          <button onClick={()=>set('productOptions',[...(form.productOptions||[]),{label:'',type:'radio',required:false,items:[{label:'',price:0}]}])} style={{ width:'100%', padding:'7px 0', borderRadius:'var(--radius-sm)', border:'1.5px dashed var(--border-default)', background:'none', fontSize:11, fontWeight:600, color:'var(--brand-600)', cursor:'pointer', fontFamily:'var(--font-sans)', display:'flex', alignItems:'center', justifyContent:'center', gap:4 }}>
+            <Icon name="plus" size={12} color="var(--brand-600)" /> Seçenek grubu ekle
+          </button>
         </div>
 
         {/* Status */}

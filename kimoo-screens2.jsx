@@ -6,6 +6,7 @@ const PAD2 = 16;
 function ProductScreen({ product, go, addToCart }) {
   const [sel, setSel] = React.useState({ size: 'tek', extras: [], spice: 'az' });
   const [qty, setQty] = React.useState(1);
+  const [note, setNote] = React.useState('');
 
   const extra = (groupKey, item) => {
     const g = PRODUCT_OPTIONS[groupKey];
@@ -33,10 +34,24 @@ function ProductScreen({ product, go, addToCart }) {
           <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 8, lineHeight: 1.5 }}>{product.desc}</div>
           <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--brand-600)', marginTop: 12 }}>{money(product.price)}</div>
 
+          {/* Allergen / calorie info */}
+          {product.cal && (
+            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+              <div style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)', background: 'var(--bg-sunken)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Icon name="flame" size={16} color="var(--warning-500)" />
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>{product.cal} kcal</span>
+              </div>
+              <div style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)', background: 'var(--bg-sunken)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Icon name="clock" size={16} color="var(--text-muted)" />
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>15-20 dk</span>
+              </div>
+            </div>
+          )}
+
           {Object.entries(PRODUCT_OPTIONS).map(([key, g]) => (
-            <div key={key} style={{ marginTop: 24 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)' }}>{g.label}</span>
+            <div key={key} style={{ marginTop: 22 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{g.label}</span>
                 {g.required ? <Badge tone="neutral" style={{ fontSize: 10 }}>Zorunlu</Badge> : <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>İsteğe bağlı</span>}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -64,6 +79,34 @@ function ProductScreen({ product, go, addToCart }) {
               </div>
             </div>
           ))}
+          {/* Kitchen note */}
+          <div style={{ marginTop: 22 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>Mutfağa not</span>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>İsteğe bağlı</span>
+            </div>
+            <textarea value={note} onChange={e => setNote(e.target.value.slice(0, 200))} placeholder="Ör: Acısız olsun, soğansız hazırlayın..." rows={3} style={{ width: '100%', border: '1.5px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: '12px 14px', fontSize: 14, fontFamily: 'var(--font-sans)', resize: 'none', outline: 'none', background: 'var(--bg-surface)', color: 'var(--text-primary)', boxSizing: 'border-box', lineHeight: 1.5 }} />
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, textAlign: 'right' }}>{note.length}/200</div>
+          </div>
+
+          {/* Related suggestion */}
+          <div style={{ marginTop: 20, padding: '14px', background: 'var(--bg-sunken)', borderRadius: 'var(--radius-md)' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 10 }}>Bununla da güzel gider</div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              {[{name:'Ayran', price:35, emoji:'🥛'}, {name:'Şalgam', price:25, emoji:'🍷'}].map((s,i) => (
+                <div key={i} style={{ flex: 1, background: 'var(--bg-surface)', borderRadius: 'var(--radius-md)', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 8, border: '1px solid var(--border-subtle)', cursor: 'pointer' }}>
+                  <span style={{ fontSize: 20 }}>{s.emoji}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{s.name}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--brand-600)' }}>{money(s.price)}</div>
+                  </div>
+                  <div style={{ width: 24, height: 24, borderRadius: 999, background: 'var(--brand-50)', display: 'grid', placeItems: 'center' }}>
+                    <Icon name="plus" size={14} color="var(--brand-600)" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -170,10 +213,13 @@ function SummaryRow({ label, value, accent, bold }) {
 function CheckoutScreen({ cart, go, restaurant, placeOrder }) {
   const [pay, setPay] = React.useState('online');
   const [tip, setTip] = React.useState(10);
+  const [deliveryTime, setDeliveryTime] = React.useState('now');
+  const [scheduleDate, setScheduleDate] = React.useState('today');
+  const [scheduleTime, setScheduleTime] = React.useState('19:00');
   const subtotal = cart.reduce((s, i) => s + i.unit * i.qty, 0);
   const fee = restaurant?.fee ?? 0;
   const total = subtotal + fee + tip;
-  const pays = [['online', 'Online kart', 'wallet'], ['wallet', 'Kimoo Cüzdan · ₺250', 'wallet'], ['cash', 'Kapıda nakit', 'tag']];
+  const pays = [['online', 'Online kart', 'wallet'], ['wallet', 'Kimoo Cüzdan · ₺250', 'wallet'], ['cash', 'Kapıda nakit', 'tag'], ['doorcard', 'Kapıda kredi kartı', 'wallet'], ['mealcard', 'Yemek kartı', 'ticket']];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -193,9 +239,25 @@ function CheckoutScreen({ cart, go, restaurant, placeOrder }) {
 
         <Section title="Teslimat zamanı">
           <div style={{ display: 'flex', gap: 10 }}>
-            <TimeChip active label="Standart" sub={restaurant?.eta || '25-35 dk'} />
-            <TimeChip label="Planla" sub="Saat seç" />
+            <TimeChip active={deliveryTime==='now'} onClick={()=>setDeliveryTime('now')} label="Standart" sub={restaurant?.eta || '25-35 dk'} />
+            <TimeChip active={deliveryTime==='scheduled'} onClick={()=>setDeliveryTime('scheduled')} label="Planla" sub={deliveryTime==='scheduled' ? (scheduleDate==='today' ? 'Bugün ' : 'Yarın ') + scheduleTime : 'Saat seç'} />
           </div>
+          {deliveryTime === 'scheduled' && (
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8 }}>Tarih</div>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                {[['today','Bugün'],['tomorrow','Yarın']].map(([k,l]) => (
+                  <button key={k} onClick={() => setScheduleDate(k)} style={{ flex:1, padding:'10px 0', borderRadius:'var(--radius-sm)', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'var(--font-sans)', background: scheduleDate===k ? 'var(--brand-50)' : 'var(--bg-surface)', color: scheduleDate===k ? 'var(--brand-700)' : 'var(--text-secondary)', border: scheduleDate===k ? '1.5px solid var(--brand-500)' : '1.5px solid var(--border-default)' }}>{l}</button>
+                ))}
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8 }}>Saat</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                {['11:00','11:30','12:00','12:30','13:00','18:00','18:30','19:00','19:30','20:00','20:30','21:00'].map(t => (
+                  <button key={t} onClick={() => setScheduleTime(t)} style={{ padding:'9px 0', borderRadius:'var(--radius-sm)', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'var(--font-sans)', background: scheduleTime===t ? 'var(--brand-500)' : 'var(--bg-surface)', color: scheduleTime===t ? '#fff' : 'var(--text-secondary)', border: scheduleTime===t ? '1.5px solid var(--brand-500)' : '1.5px solid var(--border-default)' }}>{t}</button>
+                ))}
+              </div>
+            </div>
+          )}
         </Section>
 
         <Section title="Ödeme yöntemi">
@@ -211,6 +273,16 @@ function CheckoutScreen({ cart, go, restaurant, placeOrder }) {
                 </button>
               );
             })}
+            {pay === 'mealcard' && (
+              <div style={{ padding: '10px 14px', background: 'var(--bg-sunken)', borderRadius: 'var(--radius-md)', marginTop: 4 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>Yemek kartı seçin</div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {['Multinet','Metropol','Ticket','Sodexo','SetCard'].map(card => (
+                    <button key={card} style={{ padding: '7px 14px', borderRadius: 999, fontSize: 12, fontWeight: 600, border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', color: 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>{card}</button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </Section>
 
@@ -247,9 +319,9 @@ function Section({ title, children }) {
     </div>
   );
 }
-function TimeChip({ active, label, sub }) {
+function TimeChip({ active, label, sub, onClick }) {
   return (
-    <div style={{ flex: 1, padding: '12px 14px', borderRadius: 'var(--radius-md)', cursor: 'pointer',
+    <div onClick={onClick} style={{ flex: 1, padding: '12px 14px', borderRadius: 'var(--radius-md)', cursor: 'pointer',
       background: active ? 'var(--brand-50)' : 'var(--bg-surface)', border: active ? '1.5px solid var(--brand-500)' : '1.5px solid var(--border-default)' }}>
       <div style={{ fontSize: 15, fontWeight: 700, color: active ? 'var(--brand-700)' : 'var(--text-primary)' }}>{label}</div>
       <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{sub}</div>

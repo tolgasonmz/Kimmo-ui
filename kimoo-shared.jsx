@@ -30,6 +30,10 @@ const I = {
   trophy:  'M5 3h14v7a7 7 0 0 1-14 0ZM9 22h6M12 16v6M5 7H2M19 7h3',
   link:    'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71',
   send:    'M22 2L11 13M22 2l-7 20-4-9-9-4 20-7Z',
+  bolt:    'M13 2L3 14h9l-1 8 10-12h-9l1-8Z',
+  repeat:  'M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3',
+  gift:    'M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z',
+  percent: 'M19 5L5 19M6.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM17.5 20a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
 };
 
 function Icon({ name, size = 22, color = 'currentColor', strokeWidth = 2, style = {} }) {
@@ -103,7 +107,6 @@ function PrimaryBtn({ children, onClick, disabled, full = true, style = {} }) {
   );
 }
 
-// header used on inner screens
 function ScreenHeader({ title, onBack, right, dark }) {
   return (
     <div style={{
@@ -149,40 +152,71 @@ const RESTAURANTS = [
   {
     id: 'r1', name: 'Köşe Ocakbaşı', cuisine: 'Kebap · Türk', price: '₺₺', rating: 4.8, reviews: 1240,
     eta: '25-35 dk', minOrder: 150, fee: 0, discount: '%30', tags: ['kebap'], open: true, free: true,
+    distance: '1.2 km', orderCount: '2.4B+',
     payments: ['card','cash','multinet','metropol','ticket'],
   },
   {
     id: 'r2', name: 'Napoli Pizzeria', cuisine: 'Pizza · İtalyan', price: '₺₺', rating: 4.7, reviews: 860,
     eta: '30-40 dk', minOrder: 120, fee: 19, discount: null, tags: ['pizza'], open: true,
+    distance: '2.5 km', orderCount: '1.1B+',
     payments: ['card','cash','multinet','ticket'],
   },
   {
     id: 'r3', name: 'Burger Atölyesi', cuisine: 'Burger · Fast Food', price: '₺₺', rating: 4.6, reviews: 2100,
     eta: '20-30 dk', minOrder: 100, fee: 15, discount: '2 Al 1 Öde', tags: ['burger'], open: true,
+    distance: '0.8 km', orderCount: '3.6B+',
     payments: ['card','cash','multinet'],
   },
   {
     id: 'r4', name: 'Yeşil Kâse', cuisine: 'Vegan · Salata', price: '₺₺', rating: 4.9, reviews: 540,
     eta: '15-25 dk', minOrder: 90, fee: 0, discount: null, tags: ['vegan'], open: true, free: true,
+    distance: '1.5 km', orderCount: '780+',
     payments: ['card','multinet','metropol','ticket'],
   },
   {
     id: 'r5', name: 'Tatlıcı Hacı', cuisine: 'Tatlı · Baklava', price: '₺₺₺', rating: 4.8, reviews: 1530,
     eta: '35-45 dk', minOrder: 80, fee: 25, discount: null, tags: ['tatli'], open: false,
+    distance: '3.1 km', orderCount: '1.8B+',
     payments: ['card','cash'],
+  },
+  {
+    id: 'r6', name: 'Kahve Durağı', cuisine: 'Kahve · Tatlı', price: '₺', rating: 4.5, reviews: 890,
+    eta: '10-15 dk', minOrder: 60, fee: 10, discount: null, tags: ['kahve'], open: true,
+    distance: '0.4 km', orderCount: '950+',
+    payments: ['card','cash','multinet'],
+  },
+  {
+    id: 'r7', name: 'Sushi Tokyo', cuisine: 'Japon · Sushi', price: '₺₺₺', rating: 4.7, reviews: 650,
+    eta: '40-50 dk', minOrder: 200, fee: 0, discount: '%20', tags: [], open: true, free: true,
+    distance: '2.8 km', orderCount: '520+',
+    payments: ['card','multinet','ticket'],
   },
 ];
 
 const MENU = {
   r1: [
-    { id: 'm1', name: 'Adana Dürüm',            desc: 'Acılı kıyma, lavash, közlenmiş biber & soğan',  price: 145, popular: true, cal: 480 },
-    { id: 'm2', name: 'Urfa Kebap (1 porsiyon)', desc: 'Acısız, közde, pilav & salata ile',               price: 220, popular: true, cal: 560 },
-    { id: 'm3', name: 'Karışık Izgara',          desc: 'Adana, kanat, pirzola, köfte — 2 kişilik',       price: 480,              cal: 920 },
-    { id: 'm4', name: 'İçli Köfte (3 adet)',     desc: 'El yapımı, bol cevizli',                          price: 95,               cal: 310 },
-    { id: 'm5', name: 'Künefe',                  desc: 'Antep fıstıklı, sıcak servis',                    price: 110,              cal: 420 },
-    { id: 'm6', name: 'Ayran',                   desc: 'Ev yapımı, köpüklü',                              price: 35,               cal: 60  },
+    { id: 'm1', name: 'Adana Dürüm',            desc: 'Acılı kıyma, lavaş, közlenmiş biber & soğan',   price: 145, popular: true, cal: 480, cat: 'kebap' },
+    { id: 'm2', name: 'Urfa Kebap (1 porsiyon)', desc: 'Acısız, közde, pilav & salata ile',              price: 220, popular: true, cal: 560, cat: 'kebap' },
+    { id: 'm3', name: 'Karışık Izgara',          desc: 'Adana, kanat, pirzola, köfte — 2 kişilik',      price: 480,              cal: 920, cat: 'kebap' },
+    { id: 'm9', name: 'Lahmacun (2 adet)',        desc: 'İnce hamur, kıymalı, limonlu',                  price: 85,  popular: true, cal: 350, cat: 'kebap' },
+    { id: 'm7', name: 'Mercimek Çorbası',         desc: 'Limonlu, ev yapımı',                            price: 55,               cal: 180, cat: 'baslangic' },
+    { id: 'm8', name: 'Humus',                    desc: 'Tahin, zeytinyağı, kimyon',                     price: 65,               cal: 220, cat: 'baslangic' },
+    { id: 'm4', name: 'İçli Köfte (3 adet)',      desc: 'El yapımı, bol cevizli',                        price: 95,               cal: 310, cat: 'baslangic' },
+    { id: 'm5', name: 'Künefe',                   desc: 'Antep fıstıklı, sıcak servis',                  price: 110,              cal: 420, cat: 'tatli' },
+    { id:'m11', name: 'Baklava (6 dilim)',         desc: 'Antep fıstıklı, şerbetli',                     price: 180,              cal: 650, cat: 'tatli' },
+    { id: 'm6', name: 'Ayran',                    desc: 'Ev yapımı, köpüklü',                            price: 35,               cal: 60,  cat: 'icecek' },
+    { id:'m10', name: 'Şalgam',                   desc: 'Acılı, soğuk servis',                           price: 25,               cal: 30,  cat: 'icecek' },
+    { id:'m12', name: 'Türk Çayı',                desc: 'Çaydanlıkta demlenmiş',                         price: 20,               cal: 5,   cat: 'icecek' },
   ],
 };
+
+const RESTAURANT_MENU_CATS = [
+  { id: 'all', label: 'Tümü' },
+  { id: 'kebap', label: 'Kebaplar' },
+  { id: 'baslangic', label: 'Başlangıçlar' },
+  { id: 'tatli', label: 'Tatlılar' },
+  { id: 'icecek', label: 'İçecekler' },
+];
 
 // add-on groups for product customization
 const PRODUCT_OPTIONS = {
@@ -202,7 +236,34 @@ const PRODUCT_OPTIONS = {
   ]},
 };
 
+// ============ NEW: Stories / Campaigns ============
+const STORIES = [
+  { id: 1, emoji: '🔥', label: '%30 İndirim', gradient: ['#FF5A3C', '#FF8F6B'] },
+  { id: 2, emoji: '🍕', label: '2 Al 1 Öde', gradient: ['#E11D48', '#FB7185'] },
+  { id: 3, emoji: '🍔', label: 'Yeni Menü', gradient: ['#7C3AED', '#A78BFA'] },
+  { id: 4, emoji: '🥗', label: 'Detox Hafta', gradient: ['#16A34A', '#34D399'] },
+  { id: 5, emoji: '🍰', label: 'Sezon Tatlı', gradient: ['#F59E0B', '#FBBF24'] },
+  { id: 6, emoji: '☕', label: '₺29 Kahve', gradient: ['#78350F', '#B45309'] },
+  { id: 7, emoji: '🎁', label: 'Davet Et', gradient: ['#0EA5E9', '#38BDF8'] },
+];
+
+// ============ NEW: Past Orders for quick reorder ============
+const PAST_ORDERS = [
+  { restaurant: 'Köşe Ocakbaşı', items: 'Adana Dürüm, Ayran', total: 180, emoji: '🍢', date: 'Dün', restId: 'r1' },
+  { restaurant: 'Napoli Pizzeria', items: 'Margherita, Cola', total: 185, emoji: '🍕', date: '3 gün önce', restId: 'r2' },
+  { restaurant: 'Burger Atölyesi', items: 'Classic Burger x2', total: 310, emoji: '🍔', date: '5 gün önce', restId: 'r3' },
+];
+
+// ============ NEW: Flash Deals ============
+const FLASH_DEALS = [
+  { title: 'İlk Sipariş', sub: '%30 indirim · Yeni üyelere özel', code: 'HOSGELDIN', gradient: 'linear-gradient(135deg, #FF5A3C, #FF8F6B)', icon: '🎉' },
+  { title: 'Ücretsiz Teslimat', sub: '₺200 üzeri siparişlerde', code: 'FREE200', gradient: 'linear-gradient(135deg, #7C3AED, #A78BFA)', icon: '🛵' },
+  { title: '2 Al 1 Öde', sub: 'Seçili burger menülerde', code: 'BURGER21', gradient: 'linear-gradient(135deg, #E11D48, #FB7185)', icon: '🍔' },
+  { title: 'Arkadaşını Davet', sub: 'İkinize de ₺50 hediye', code: 'DAVET50', gradient: 'linear-gradient(135deg, #0EA5E9, #38BDF8)', icon: '🎁' },
+];
+
 Object.assign(window, {
   Icon, Pill, MediaBox, Badge, PrimaryBtn, ScreenHeader, money,
   CATEGORIES, RESTAURANTS, MENU, PRODUCT_OPTIONS, PAYMENT_LABELS,
+  STORIES, PAST_ORDERS, FLASH_DEALS, RESTAURANT_MENU_CATS,
 });

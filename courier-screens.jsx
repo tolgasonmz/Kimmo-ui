@@ -72,8 +72,8 @@ function CourierHome({ go, online, toggleOnline, orderPhase, onAcceptOrder, onRe
       {/* ── Dynamic order area ── */}
       {!online && (
         <div style={{ padding: '32px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-          <div style={{ width: 80, height: 80, borderRadius: 999, background: 'var(--bg-sunken)', display: 'grid', placeItems: 'center', marginBottom: 16 }}>
-            <Icon name="scooter" size={36} color="var(--text-muted)" />
+          <div style={{ width: 70, height: 70, borderRadius: 999, background: 'var(--bg-sunken)', display: 'grid', placeItems: 'center', marginBottom: 14 }}>
+            <Icon name="scooter" size={32} color="var(--text-muted)" />
           </div>
           <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Çevrimdışısın</div>
           <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5 }}>Sipariş almak için çevrimiçi ol</div>
@@ -82,17 +82,17 @@ function CourierHome({ go, online, toggleOnline, orderPhase, onAcceptOrder, onRe
 
       {online && orderPhase === 'searching' && (
         <div style={{ padding: '28px 20px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ position: 'relative', width: 140, height: 140, marginBottom: 18 }}>
+          <div style={{ position: 'relative', width: 120, height: 120, marginBottom: 14 }}>
             <div style={{ position: 'absolute', inset: 0, borderRadius: 999, border: '2.5px solid color-mix(in srgb, var(--brand-500) 30%, transparent)', animation: 'radarPulse 2.4s ease-out infinite' }}></div>
             <div style={{ position: 'absolute', inset: 0, borderRadius: 999, border: '2.5px solid color-mix(in srgb, var(--brand-500) 25%, transparent)', animation: 'radarPulse 2.4s ease-out 0.8s infinite' }}></div>
             <div style={{ position: 'absolute', inset: 0, borderRadius: 999, border: '2.5px solid color-mix(in srgb, var(--brand-500) 20%, transparent)', animation: 'radarPulse 2.4s ease-out 1.6s infinite' }}></div>
             <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center' }}>
-              <div style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--brand-500)', display: 'grid', placeItems: 'center', boxShadow: 'var(--shadow-brand)' }}>
-                <Icon name="scooter" size={28} color="#fff" />
+              <div style={{ width: 56, height: 56, borderRadius: 999, background: 'var(--brand-500)', display: 'grid', placeItems: 'center', boxShadow: 'var(--shadow-brand)' }}>
+                <Icon name="scooter" size={24} color="#fff" />
               </div>
             </div>
           </div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Sipariş aranıyor</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Sipariş aranıyor</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--success-500)', animation: 'kpulse 1.2s infinite' }}></span>
             <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Yakındaki siparişler taranıyor...</span>
@@ -139,8 +139,8 @@ function CourierHome({ go, online, toggleOnline, orderPhase, onAcceptOrder, onRe
       )}
 
       {/* Today stats */}
-      <div style={{ padding: '18px 20px 0' }}>
-        <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12 }}>Bugün</div>
+      <div style={{ padding: '16px 20px 0' }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 10 }}>Bugün</div>
         <div style={{ display: 'flex', gap: 10 }}>
           <StatCard label="Teslimat" value={e.deliveries} />
           <StatCard label="Kazanç" value={money(e.gross)} accent="var(--brand-600)" />
@@ -149,7 +149,7 @@ function CourierHome({ go, online, toggleOnline, orderPhase, onAcceptOrder, onRe
       </div>
 
       {/* Bonus bar */}
-      <div style={{ padding: '18px 20px 0' }}>
+      <div style={{ padding: '14px 20px 0' }}>
         <div style={{ background: 'var(--warning-50)', border: '1px solid color-mix(in srgb, var(--warning-500) 20%, transparent)', borderRadius: 'var(--radius-md)', padding: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 42, height: 42, borderRadius: 999, background: 'var(--warning-500)', display: 'grid', placeItems: 'center', flex: 'none' }}>
             <Icon name="flame" size={22} color="#fff" />
@@ -162,7 +162,7 @@ function CourierHome({ go, online, toggleOnline, orderPhase, onAcceptOrder, onRe
       </div>
 
       {/* Recent deliveries */}
-      <div style={{ padding: '22px 20px 0' }}>
+      <div style={{ padding: '16px 20px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>Son teslimatlar</span>
           <button onClick={() => go('earnings')} style={{ background: 'none', border: 'none', color: 'var(--brand-600)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>Tümünü gör</button>
@@ -185,7 +185,7 @@ function CourierHome({ go, online, toggleOnline, orderPhase, onAcceptOrder, onRe
       </div>
 
       {/* Notifications preview */}
-      <div style={{ padding: '22px 20px 0' }}>
+      <div style={{ padding: '16px 20px 0' }}>
         <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12 }}>Bildirimler</div>
         {NOTIFICATIONS.slice(0, 2).map((n, i) => (
           <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 0', borderBottom: '1px solid var(--border-subtle)' }}>
