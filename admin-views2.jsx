@@ -17,7 +17,7 @@ function AdminFinance() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
         <MetricCard label="Toplam GMV" value={'₺' + (f.totalGMV / 1000000).toFixed(1) + 'M'} change="%22" changeUp icon="wallet" />
-        <MetricCard label="Komisyon geliri" value={'₺' + (f.commission / 1000000).toFixed(1) + 'M'} change="%18" changeUp icon="tag" />
+        <MetricCard label="Abonelik & paket geliri" value={'₺' + (f.commission / 1000000).toFixed(1) + 'M'} change="%18" changeUp icon="tag" />
         <MetricCard label="Yapılan ödemeler" value={'₺' + (f.payouts / 1000000).toFixed(1) + 'M'} icon="check" />
         <MetricCard label="Bekleyen ödeme" value={'₺' + (f.pending / 1000000).toFixed(1) + 'M'} icon="clock" />
       </div>
@@ -195,6 +195,12 @@ function AdminRoles() {
         </button>
       </div>
 
+      {/* v8: V1 tek admin rolu + 2FA */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', borderRadius: 'var(--radius-lg)', background: 'var(--info-50)', border: '1px solid color-mix(in srgb, var(--info-500) 20%, transparent)', marginBottom: 16 }}>
+        <div style={{ width: 38, height: 38, borderRadius: 999, background: 'var(--info-500)', display: 'grid', placeItems: 'center', flex: 'none' }}><Icon name="user" size={19} color="#fff" /></div>
+        <div style={{ flex: 1, fontSize: 13.5, color: 'var(--info-600)', lineHeight: 1.45 }}>V1'de tek <strong>Süper Admin</strong> rolü aktiftir; alana göre ayrışma ilerleyen süreçte açılacaktır. Aşağıdaki roller planlanan yapıdır. Admin paneline erişim <strong>2FA</strong> ile korunur (Sprint 1'den zorunlu).</div>
+      </div>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {ROLES.map((r, i) => (
           <div key={i} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 20, display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -251,31 +257,57 @@ function AdminAudit() {
 
 // ============ SYSTEM CONFIG ============
 function AdminConfig() {
-  const configs = [
-    { label: 'Minimum sipariş tutarı', value: '₺80', desc: 'Müşterinin sipariş verebileceği minimum tutar' },
-    { label: 'Komisyon oranı', value: '%12', desc: 'Restoran satışlarından alınan platform komisyonu' },
-    { label: 'Teslimat ücreti (varsayılan)', value: '₺25', desc: 'Kimoo+ dışı siparişler için temel teslimat ücreti' },
-    { label: 'Kimoo+ aylık ücret', value: '₺49.90', desc: 'Premium abonelik aylık ücret' },
-    { label: 'Kurye bahşiş limiti', value: '₺200', desc: 'Tek siparişte verilebilecek maksimum bahşiş' },
-    { label: 'Otomatik sipariş iptali', value: '15 dk', desc: 'Restoran kabul etmezse otomatik iptal süresi' },
-    { label: 'Yoğun saat çarpanı', value: '1.5x', desc: 'Yoğun saatlerde teslimat ücreti çarpanı' },
-    { label: 'Kupon kötüye kullanım limiti', value: '3/gün', desc: 'Kullanıcı başına günlük kupon kullanım limiti' },
+  const groups = [
+    { title: 'Abonelik & Seçili Restoran', items: [
+      { label: 'Aylık abonelik', value: '4.400 TL/ay', desc: 'İlk ay ücretsiz · taahhütsüz' },
+      { label: 'Yıllık abonelik', value: '3.900 TL/ay', desc: '10 ay öde, 12 ay kullan · 2 ay ücretsiz' },
+      { label: 'Seçili Restoran ek ücreti', value: '900 TL/ay', desc: 'Standart aboneliğin üzerine eklenir' },
+      { label: 'Seçili Restoran aktivasyon', value: '%95 profil', desc: '%95 profil tamamlanma + ücret ödemesi zorunlu' },
+    ]},
+    { title: 'Kimoo Puanı', items: [
+      { label: 'Kazanım oranı', value: '%5 · maks 25 TL', desc: 'Yalnızca Seçili Restoran online siparişlerinde' },
+      { label: 'Minimum sipariş (kazanım/kullanım)', value: '250 TL', desc: 'KDV dahil yemek tutarı baz alınır' },
+      { label: 'Kullanım oranı', value: '%20 · maks 100 TL', desc: 'Sipariş tutarının en fazla %20\'si' },
+      { label: 'Birikim tavanı', value: '400 TL', desc: 'Hesapta en fazla biriken Kimoo Puanı' },
+      { label: 'Aylık kullanım tavanı', value: '300 TL', desc: 'Bir ayda kullanılabilecek en fazla puan' },
+      { label: 'Ay sonu devir tavanı', value: '100 TL', desc: 'Sonraki aya devreden en fazla puan' },
+    ]},
+    { title: 'Kurye & Teslimat', items: [
+      { label: 'Havuz kurye net kazancı', value: '97,5 TL', desc: 'Her teslimat için KDV dahil net' },
+      { label: '"Teslimat kodu alınamadı" limiti', value: '2 / gün', desc: 'Kurye başına günlük; arka planda izlenir' },
+      { label: 'Eskalasyon başlangıcı', value: '45 dk', desc: 'Teslim edilmezse chat → arama akışı başlar' },
+      { label: 'Kurye bahşiş limiti', value: '200 TL', desc: 'Tek siparişte verilebilecek maksimum bahşiş' },
+    ]},
+    { title: 'Güvenlik & Onay', items: [
+      { label: 'Admin 2FA', value: 'Zorunlu', desc: 'Sprint 1\'den itibaren zorunludur' },
+      { label: 'İşletme onay SLA', value: '24 saat', desc: 'Admin takvim günü içinde inceler ve karar verir' },
+      { label: 'Şikayet değerlendirme', value: '1-7 iş günü', desc: 'Finansal işlemler muhasebe onayı ile' },
+      { label: 'Nakit ödeme ön koşulu', value: '1 online sipariş', desc: 'En az 1 tamamlanmış online sipariş gerekir' },
+      { label: 'SMS brute force', value: '3 → 5 dk', desc: '3 yanlış giriş sonrası 5 dk bekleme + rate limiting' },
+    ]},
   ];
 
   return (
     <div style={{ padding: AP }}>
       <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Sistem Ayarları</div>
-      <div style={{ fontSize: 14, color: 'var(--text-tertiary)', marginBottom: 20 }}>Platform geneli konfigürasyon</div>
+      <div style={{ fontSize: 14, color: 'var(--text-tertiary)', marginBottom: 20 }}>Platform geneli politika ve konfigürasyon (v8)</div>
 
-      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-        {configs.map((c, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', borderBottom: i < configs.length - 1 ? '1px solid var(--border-subtle)' : 'none', gap: 16 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{c.label}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>{c.desc}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {groups.map((g, gi) => (
+          <div key={gi}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>{g.title}</div>
+            <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+              {g.items.map((c, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '15px 20px', borderBottom: i < g.items.length - 1 ? '1px solid var(--border-subtle)' : 'none', gap: 16 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{c.label}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>{c.desc}</div>
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--brand-600)', minWidth: 120, textAlign: 'right' }}>{c.value}</div>
+                  <MiniBtn icon="chevR" title="Düzenle" />
+                </div>
+              ))}
             </div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--brand-600)', minWidth: 80, textAlign: 'right' }}>{c.value}</div>
-            <MiniBtn icon="chevR" title="Düzenle" />
           </div>
         ))}
       </div>

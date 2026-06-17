@@ -232,6 +232,37 @@ function HomeScreen({ go, openRestaurant, cartCount }) {
         </div>
       )}
 
+      {/* ---- Seçili Restoranlar (v8 — öne çıkma) ---- */}
+      <div style={{ padding: '8px 0 0' }}>
+        <div style={{ padding: '0 16px' }}>
+          <SectionHead title="Seçili Restoranlar" action="Tümü" small />
+          <div style={{ fontSize: 12, color: 'var(--text-tertiary)', margin: '-4px 0 8px', display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Icon name="star" size={12} color="var(--brand-500)" strokeWidth={0} style={{ fill: 'var(--brand-500)' }} />
+            Güvenli restoranlar · siparişten %5 Kimoo Puanı kazan
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', scrollbarWidth: 'none', padding: '0 16px 4px' }}>
+          {RESTAURANTS.filter(r => r.selected).map(r => (
+            <div key={r.id} onClick={() => r.open && openRestaurant(r)} style={{ flex: 'none', width: 260, cursor: r.open ? 'pointer' : 'default', opacity: r.open ? 1 : 0.6, borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1.5px solid color-mix(in srgb, var(--brand-500) 35%, transparent)', background: 'var(--bg-surface)' }}>
+              <MediaBox h={120} label="restoran görseli" radius="0">
+                <Badge solid style={{ position: 'absolute', top: 10, left: 10, fontSize: 11 }}><Icon name="star" size={11} color="#fff" strokeWidth={0} style={{ fill: '#fff' }} />Seçili</Badge>
+                {r.free && <Badge style={{ position: 'absolute', top: 10, right: 10, background: 'var(--bg-surface)', color: 'var(--success-600)', fontSize: 10 }}>Ücretsiz teslimat</Badge>}
+              </MediaBox>
+              <div style={{ padding: '10px 12px 12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{r.name}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                    <Icon name="star" size={13} color="var(--warning-500)" strokeWidth={0} style={{ fill: 'var(--warning-500)' }} />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{r.rating}</span>
+                  </div>
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{r.eta} · {r.distance} · {r.fee === 0 ? 'Ücretsiz teslimat' : money(r.fee)}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* ---- Featured Horizontal ---- */}
       <div style={{ padding: '8px 0 0' }}>
         <div style={{ padding: '0 16px' }}><SectionHead title="Öne çıkanlar" small /></div>
@@ -274,13 +305,16 @@ function RestaurantCard({ r, onClick }) {
       <MediaBox h={138} label="restoran görseli" radius="var(--radius-lg)">
         {r.discount && <Badge solid style={{ position: 'absolute', top: 10, left: 10 }}>{r.discount}</Badge>}
         {r.free && <Badge style={{ position: 'absolute', top: 10, right: 10, background: 'var(--bg-surface)', color: 'var(--success-600)', fontSize: 11 }}>Ücretsiz teslimat</Badge>}
-        {!r.open && <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,23,20,0.5)', display: 'grid', placeItems: 'center' }}><Badge tone="neutral" style={{ background: 'var(--bg-surface)', fontSize: 13, padding: '7px 14px' }}>Yarın 10:00'da açılır</Badge></div>}
+        {!r.open && <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,23,20,0.5)', display: 'grid', placeItems: 'center' }}><Badge tone="neutral" style={{ background: 'var(--bg-surface)', fontSize: 13, padding: '7px 14px' }}>Şu an kapalı · {r.opensAt || '10:00'}'da açılır</Badge></div>}
         {/* order count badge */}
         {r.orderCount && r.open && <div style={{ position: 'absolute', bottom: 10, left: 10, padding: '3px 8px', borderRadius: 999, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)', fontSize: 11, fontWeight: 600, color: '#fff' }}>{r.orderCount} sipariş</div>}
       </MediaBox>
       <div style={{ paddingTop: 8 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{r.name}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.name}</div>
+            {r.selected && <span title="Seçili Restoran" style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flex: 'none', padding: '2px 7px', borderRadius: 999, background: 'var(--brand-50)', color: 'var(--brand-700)', fontSize: 10.5, fontWeight: 800 }}><Icon name="star" size={11} color="var(--brand-600)" strokeWidth={0} style={{ fill: 'var(--brand-600)' }} />Seçili</span>}
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 3, flex: 'none', background: 'var(--bg-sunken)', padding: '3px 8px', borderRadius: 999 }}>
             <Icon name="star" size={13} color="var(--warning-500)" strokeWidth={0} style={{ fill: 'var(--warning-500)' }} />
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{r.rating}</span>
@@ -328,8 +362,11 @@ function RestaurantScreen({ restaurant, go, openProduct, addQuick, openReviews }
       <div style={{ background: 'var(--bg-surface)', borderRadius: '20px 20px 0 0', marginTop: -20, position: 'relative', padding: '16px 16px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 8 }}>
           <div>
-            <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--text-primary)' }}>{restaurant.name}</div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>{restaurant.cuisine} · {restaurant.price}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--text-primary)' }}>{restaurant.name}</div>
+              {restaurant.selected && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 999, background: 'var(--brand-50)', color: 'var(--brand-700)', fontSize: 11.5, fontWeight: 800 }}><Icon name="star" size={12} color="var(--brand-600)" strokeWidth={0} style={{ fill: 'var(--brand-600)' }} />Seçili Restoran</span>}
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>{restaurant.cuisine} · {restaurant.price}{!restaurant.open && <span style={{ color: 'var(--error-600)', fontWeight: 700 }}> · Şu an kapalı</span>}</div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 3, background: 'var(--bg-sunken)', padding: '4px 10px', borderRadius: 999, flex: 'none' }}>
             <Icon name="star" size={14} color="var(--warning-500)" strokeWidth={0} style={{ fill: 'var(--warning-500)' }} />
@@ -355,16 +392,43 @@ function RestaurantScreen({ restaurant, go, openProduct, addQuick, openReviews }
           <Icon name="chevR" size={16} color="var(--text-muted)" />
         </button>
 
-        {/* Payment methods */}
-        {restaurant.payments && (
-          <div style={{ marginTop: 12 }}>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-              {restaurant.payments.map(p => (
-                <span key={p} style={{ fontSize: 11, fontWeight: 600, padding: '4px 9px', borderRadius: 999, background: 'var(--bg-sunken)', color: 'var(--text-muted)' }}>{PAYMENT_LABELS[p]}</span>
-              ))}
-            </div>
+        {/* v8: kapali restoran uyarisi */}
+        {!restaurant.open && (
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 14, padding: '12px 14px', borderRadius: 'var(--radius-md)', background: 'var(--bg-sunken)' }}>
+            <Icon name="clock" size={18} color="var(--text-muted)" />
+            <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-secondary)' }}>Şu an kapalı · {restaurant.opensAt || '10:00'}'da açılır</span>
           </div>
         )}
+
+        {/* v8: Secili Restoran Kimoo Puani kazanim ipucu */}
+        {restaurant.selected && restaurant.open && (
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 14, padding: '12px 14px', borderRadius: 'var(--radius-md)', background: 'var(--brand-50)' }}>
+            <div style={{ width: 32, height: 32, borderRadius: 999, background: 'var(--bg-surface)', display: 'grid', placeItems: 'center', flex: 'none' }}>
+              <Icon name="star" size={16} color="var(--brand-600)" strokeWidth={0} style={{ fill: 'var(--brand-600)' }} />
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-700)', lineHeight: 1.4 }}>250 TL üzeri online siparişte <strong>%5 Kimoo Puanı</strong> (maks 25 TL) kazan, puanını burada kullan.</span>
+          </div>
+        )}
+
+        {/* Payment methods (v8) */}
+        {(() => {
+          const chips = ['card'];
+          if (restaurant.selected) chips.push('puan');
+          if (restaurant.pay?.cash) chips.push('cash');
+          if (restaurant.pay?.doorCard) chips.push('doorcard');
+          (restaurant.pay?.mealCards || []).forEach(c => chips.push(c));
+          const labelOf = (c) => c === 'puan' ? '⭐ Kimoo Puanı' : (PAYMENT_LABELS[c] || c);
+          return (
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Ödeme yöntemleri</div>
+              <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                {chips.map(p => (
+                  <span key={p} style={{ fontSize: 11, fontWeight: 600, padding: '4px 9px', borderRadius: 999, background: 'var(--bg-sunken)', color: 'var(--text-secondary)' }}>{labelOf(p)}</span>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ---- Menu category tabs ---- */}
         <div style={{ display: 'flex', gap: 6, overflowX: 'auto', scrollbarWidth: 'none', margin: '16px -16px 0', padding: '0 16px 12px', borderBottom: '1px solid var(--border-subtle)' }}>

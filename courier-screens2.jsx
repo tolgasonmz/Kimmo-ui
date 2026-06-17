@@ -126,9 +126,13 @@ function CourierProfileScreen({ go }) {
           <div style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--brand-500)', display: 'grid', placeItems: 'center', color: '#fff', fontSize: 24, fontWeight: 800, boxShadow: 'var(--shadow-brand)' }}>{p.initials}</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)' }}>{p.name}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+              <Badge tone="info" style={{ fontSize: 11 }}>{p.courierType}</Badge>
               <Badge tone="brand" style={{ fontSize: 11 }}>{p.level}</Badge>
               <span style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>★ {p.rating}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 5, fontSize: 12.5, color: 'var(--text-tertiary)' }}>
+              <Icon name="pin" size={13} color="var(--text-muted)" />Çalışma bölgesi · {p.region}
             </div>
           </div>
         </div>

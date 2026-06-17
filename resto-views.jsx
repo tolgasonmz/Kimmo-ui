@@ -10,6 +10,7 @@ const PAD = '24px';
 function DashboardView() {
   const s = TODAY_STATS;
   const maxRev = Math.max(...WEEKLY_REVENUE.map(d => d.val));
+  const [autoCourier, setAutoCourier] = React.useState(true);
 
   return (
     <div style={{ padding: PAD }}>
@@ -30,6 +31,47 @@ function DashboardView() {
         <MetricCard label="Bugünkü ciro" value={money(s.revenue)} change="%18" changeUp icon="wallet" />
         <MetricCard label="Ort. sipariş" value={money(s.avgOrder)} change="%5" changeUp icon="tag" />
         <MetricCard label="Aktif sipariş" value={s.activeOrders} icon="clock" />
+      </div>
+
+      {/* Bakiye & Havuz Kurye (v8) */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 24 }}>
+        {/* Restoran bakiyesi */}
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>Restoran bakiyesi</div>
+            <button style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 999, border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}><Icon name="plus" size={14} color="var(--brand-500)" />TL yükle</button>
+          </div>
+          <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>{money(8450)}</div>
+          <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)', marginTop: 2 }}>Yalnızca havuz kurye çağırmak için kullanılır</div>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: 14, padding: '12px 14px', background: 'var(--brand-50)', borderRadius: 'var(--radius-md)' }}>
+            <Icon name="star" size={16} color="var(--brand-600)" style={{ marginTop: 1, flex: 'none' }} />
+            <div style={{ fontSize: 12.5, color: 'var(--brand-700)', lineHeight: 1.45 }}>Müşterilerin harcadığı <strong>Kimoo Puanı</strong> bakiyenize yansır. Biriken bakiye her ayın 15'inde ödenir.</div>
+          </div>
+        </div>
+        {/* Havuz kurye paketi */}
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>Havuz kurye paketi</div>
+            <button style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 999, background: 'var(--brand-500)', border: 'none', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', color: '#fff', fontFamily: 'var(--font-sans)', boxShadow: 'var(--shadow-brand)' }}>Paket al</button>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <span style={{ fontSize: 30, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>64</span>
+            <span style={{ fontSize: 14, color: 'var(--text-tertiary)', fontWeight: 600 }}>/ 100 adet kaldı</span>
+          </div>
+          <div style={{ height: 8, borderRadius: 999, background: 'var(--bg-sunken)', overflow: 'hidden', margin: '10px 0 4px' }}>
+            <div style={{ width: '64%', height: '100%', borderRadius: 999, background: 'var(--brand-500)' }}></div>
+          </div>
+          <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Her havuz kurye çağrısında bakiyeden 1 adet düşer</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--border-subtle)' }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-primary)' }}>Otomatik kurye çağır</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 1 }}>Tüm online siparişler için otomatik havuz kuryesi</div>
+            </div>
+            <button onClick={() => setAutoCourier(a => !a)} style={{ width: 44, height: 26, borderRadius: 999, border: 'none', cursor: 'pointer', position: 'relative', flex: 'none', background: autoCourier ? 'var(--success-500)' : 'var(--border-default)', transition: 'background .2s ease' }}>
+              <span style={{ position: 'absolute', top: 3, left: autoCourier ? 21 : 3, width: 20, height: 20, borderRadius: 999, background: '#fff', boxShadow: 'var(--shadow-xs)', transition: 'left .2s ease' }}></span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 24 }}>
@@ -451,10 +493,10 @@ function MenuEditDrawer({ item, isNew, onClose, onUpdate }) {
       </div>
 
       <div style={{ padding: 16 }}>
-        {/* Photo upload placeholder */}
+        {/* Photo upload placeholder — v8: gorsel zorunlu */}
         <div style={{ height: 96, background: 'var(--bg-sunken)', borderRadius: 'var(--radius-md)', marginBottom: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 5, cursor: 'pointer', border: '2px dashed var(--border-default)' }}>
           <Icon name="plus" size={20} color="var(--text-muted)" />
-          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>Fotoğraf yükle</span>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>Fotoğraf yükle · zorunlu</span>
         </div>
 
         {/* Name */}
@@ -463,10 +505,24 @@ function MenuEditDrawer({ item, isNew, onClose, onUpdate }) {
         {/* Description */}
         <div style={{ marginBottom: 12 }}><FieldLabel>Açıklama</FieldLabel><textarea value={form.desc||''} onChange={e=>set('desc',e.target.value)} rows={3} style={{...menuInputStyle, resize:'none', lineHeight:1.5}} /></div>
 
-        {/* Price row */}
+        {/* Price + Gramaj (v8: gramaj zorunlu) */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
           <div><FieldLabel>Fiyat (₺)</FieldLabel><input type="number" value={form.price} onChange={e=>set('price',+e.target.value)} style={menuInputStyle} /></div>
-          <div><FieldLabel>İndirimli (₺)</FieldLabel><input type="number" value={form.salePrice||''} onChange={e=>set('salePrice',+e.target.value||undefined)} placeholder="—" style={menuInputStyle} /></div>
+          <div><div style={{ display:'flex', alignItems:'center', gap:6 }}><FieldLabel>Gramaj (g)</FieldLabel><Badge tone="neutral" style={{ fontSize:9, marginBottom:5 }}>Zorunlu</Badge></div><input type="number" value={form.gram||''} onChange={e=>set('gram',+e.target.value||undefined)} placeholder="örn. 320" style={{ ...menuInputStyle, borderColor: form.gram ? 'var(--border-default)' : 'color-mix(in srgb, var(--error-500) 45%, transparent)' }} /></div>
+        </div>
+
+        {/* Urun bazli indirim — v8: %5 / %10 / %15, tavan %15 */}
+        <div style={{ marginBottom: 12 }}>
+          <FieldLabel>Ürün indirimi (maks %15)</FieldLabel>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {[0,5,10,15].map(d => {
+              const on = (form.discount||0) === d;
+              return (
+                <button key={d} onClick={()=>set('discount', d)} style={{ flex: 1, padding: '8px 0', borderRadius: 'var(--radius-sm)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)', background: on ? 'var(--brand-500)' : 'var(--bg-surface)', color: on ? '#fff' : 'var(--text-secondary)', border: on ? '1.5px solid var(--brand-500)' : '1.5px solid var(--border-default)' }}>{d === 0 ? 'Yok' : '%'+d}</button>
+              );
+            })}
+          </div>
+          {(form.discount||0) > 0 && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 5 }}>İndirimli fiyat: {money(Math.round(form.price * (1 - form.discount/100)))}</div>}
         </div>
 
         {/* Prep + cal row */}

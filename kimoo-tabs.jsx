@@ -327,7 +327,7 @@ function ProfileScreen({ go }) {
   const items = [
     ['user', 'Hesap bilgilerim', 'settings'],
     ['pin', 'Adreslerim', 'addresses'],
-    ['wallet', 'Kimoo Cüzdan · ₺250', 'wallet'],
+    ['star', 'Kimoo Puanı · 380 TL', 'wallet'],
     ['ticket', 'Kuponlarım', 'coupons'],
     ['msg', 'Bildirimler', 'notifications'],
     ['bag', 'Sipariş geçmişi', null],

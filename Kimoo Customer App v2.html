@@ -135,6 +135,7 @@ function App() {
   const [product, setProduct] = useState(null);
   const [cart, setCart] = useState([]);
   const [hasActive, setHasActive] = useState(false);
+  const [lastOrder, setLastOrder] = useState({ contactless: false, code: '4827' });
   const [toast, setToast] = useState('');
   const [phone, setPhone] = useState('');
 
@@ -171,7 +172,11 @@ function App() {
   const addQuick = (m) => { setCart(c => [...c, { name: m.name, unit: m.price, qty: 1, optLabel: 'Standart' }]); showToast('Sepete eklendi'); };
   const updateQty = (i, d) => setCart(c => c.map((it, idx) => idx === i ? { ...it, qty: Math.max(1, it.qty + d) } : it));
   const removeItem = (i) => setCart(c => c.filter((_, idx) => idx !== i));
-  const placeOrder = () => { setHasActive(true); setCart([]); setScreen('tracking'); };
+  const placeOrder = (opts = {}) => {
+    const code = String(Math.floor(1000 + Math.random() * 9000));
+    setLastOrder({ contactless: !!opts.contactless, code });
+    setHasActive(true); setCart([]); setScreen('tracking');
+  };
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
 
   const inFlow = FLOW.includes(screen) || ONBOARD.includes(screen);
@@ -185,8 +190,8 @@ function App() {
     case 'restaurant': view = <RestaurantScreen restaurant={restaurant} go={go} openProduct={openProduct} addQuick={addQuick} openReviews={() => setScreen('reviews')} />; break;
     case 'product': view = <ProductScreen product={product} go={go} addToCart={addToCart} />; break;
     case 'cart': view = <CartScreen cart={cart} go={go} updateQty={updateQty} removeItem={removeItem} restaurant={restaurant} />; break;
-    case 'checkout': view = <CheckoutScreen cart={cart} go={go} restaurant={restaurant} placeOrder={placeOrder} />; break;
-    case 'tracking': view = <TrackingScreen go={() => { setScreen('home'); setTabState('home'); }} restaurant={restaurant} />; break;
+    case 'checkout': view = <CheckoutScreen cart={cart} go={go} restaurant={restaurant} placeOrder={placeOrder} hasOnlineHistory={true} />; break;
+    case 'tracking': view = <TrackingScreen go={() => { setScreen('home'); setTabState('home'); }} restaurant={restaurant} contactless={lastOrder.contactless} code={lastOrder.code} />; break;
     // onboarding
     case 'splash': view = <SplashScreen onDone={() => setScreen('welcome')} />; break;
     case 'welcome': view = <WelcomeScreen onDone={() => setScreen('login')} />; break;

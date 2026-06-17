@@ -1,5 +1,5 @@
 // kimoo-screens2.jsx — product, cart, checkout, tracking. Depends on shared globals.
-const { Icon, MediaBox, Badge, PrimaryBtn, ScreenHeader, money, PRODUCT_OPTIONS } = window;
+const { Icon, MediaBox, Badge, PrimaryBtn, ScreenHeader, money, PRODUCT_OPTIONS, MEAL_CARDS, KIMOO_PUAN, puanUsable, puanEarn } = window;
 const PAD2 = 16;
 
 // ============================ PRODUCT CUSTOMIZE ============================
@@ -210,22 +210,46 @@ function SummaryRow({ label, value, accent, bold }) {
 }
 
 // ============================ CHECKOUT ============================
-function CheckoutScreen({ cart, go, restaurant, placeOrder }) {
+function CheckoutScreen({ cart, go, restaurant, placeOrder, hasOnlineHistory = true }) {
   const [pay, setPay] = React.useState('online');
+  const [mealCard, setMealCard] = React.useState(null);
+  const [usePuan, setUsePuan] = React.useState(false);
+  const [contactless, setContactless] = React.useState(false);
   const [tip, setTip] = React.useState(10);
   const [deliveryTime, setDeliveryTime] = React.useState('now');
   const [scheduleDate, setScheduleDate] = React.useState('today');
   const [scheduleTime, setScheduleTime] = React.useState('19:00');
   const subtotal = cart.reduce((s, i) => s + i.unit * i.qty, 0);
   const fee = restaurant?.fee ?? 0;
-  const total = subtotal + fee + tip;
-  const pays = [['online', 'Online kart', 'wallet'], ['wallet', 'Kimoo Cüzdan · ₺250', 'wallet'], ['cash', 'Kapıda nakit', 'tag'], ['doorcard', 'Kapıda kredi kartı', 'wallet'], ['mealcard', 'Yemek kartı', 'ticket']];
+
+  const isOnline = pay === 'online';
+  // v8: Kimoo Puani yalnizca Secili Restoran + online odeme + min 250 TL siparislerde kullanilabilir
+  const puanEligible = !!restaurant?.selected && isOnline && subtotal >= KIMOO_PUAN.minOrder;
+  const puanAvail = puanEligible ? puanUsable(subtotal, restaurant) : 0;
+  const puanApplied = usePuan && puanEligible ? puanAvail : 0;
+  // v8: Kimoo Puani kullanilan sipariste puan kazanilmaz
+  const willEarn = isOnline && puanApplied === 0 ? puanEarn(subtotal, restaurant) : 0;
+  const total = subtotal + fee + tip - puanApplied;
+
+  // Temassiz teslimat yalnizca online odemede gosterilir; baska yonteme gecince kapanir
+  React.useEffect(() => { if (!isOnline) { setContactless(false); setUsePuan(false); } }, [isOnline]);
+
+  // v8 odeme yontemleri: online kart her zaman; nakit/kapida-kart/yemek-karti restoran tercihine gore
+  const cashEnabled = !!restaurant?.pay?.cash;
+  const doorEnabled = !!restaurant?.pay?.doorCard;
+  const cards = restaurant?.pay?.mealCards || [];
+  const methods = [
+    { id: 'online', label: 'Online kart', sub: 'Kayıtlı kart · **** 4567', ic: 'wallet', show: true },
+    { id: 'doorcard', label: 'Kapıda kredi kartı', sub: 'Teslimatta kurye POS', ic: 'wallet', show: doorEnabled },
+    { id: 'mealcard', label: 'Yemek kartı', sub: 'Teslimatta okutulur', ic: 'ticket', show: cards.length > 0 },
+    { id: 'cash', label: 'Kapıda nakit', sub: 'Teslimatta öde', ic: 'tag', show: cashEnabled, locked: cashEnabled && !hasOnlineHistory },
+  ].filter(m => m.show);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <ScreenHeader title="Ödeme" onBack={() => go('cart')} />
       <div style={{ flex: 1, overflow: 'auto', padding: '8px 16px 16px' }}>
-        {/* address */}
+        {/* address — v8: siparis olusturulduktan sonra degistirilemez */}
         <Section title="Teslimat adresi">
           <div style={{ display: 'flex', gap: 12, alignItems: 'start' }}>
             <Icon name="pin" size={22} color="var(--brand-500)" />
@@ -234,6 +258,10 @@ function CheckoutScreen({ cart, go, restaurant, placeOrder }) {
               <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 3 }}>Caferağa Mah. Moda Cad. No:12 D:5</div>
             </div>
             <button style={editBtn}>Değiştir</button>
+          </div>
+          <div style={{ display: 'flex', gap: 7, alignItems: 'flex-start', marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border-subtle)' }}>
+            <Icon name="pin" size={14} color="var(--text-muted)" style={{ marginTop: 1 }} />
+            <span style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.45 }}>Adres siparişi onayladıktan sonra değiştirilemez.</span>
           </div>
         </Section>
 
@@ -262,29 +290,93 @@ function CheckoutScreen({ cart, go, restaurant, placeOrder }) {
 
         <Section title="Ödeme yöntemi">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {pays.map(([id, label, ic]) => {
-              const on = pay === id;
+            {methods.map(m => {
+              const on = pay === m.id;
+              if (m.locked) {
+                // v8: nakit on kosulu — en az 1 tamamlanmis online siparis gerekir
+                return (
+                  <div key={m.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '13px 14px', borderRadius: 'var(--radius-md)', background: 'var(--bg-sunken)', border: '1.5px solid var(--border-subtle)', opacity: 0.9 }}>
+                    <Icon name="tag" size={20} color="var(--text-muted)" />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-tertiary)' }}>Kapıda nakit · kilitli</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3, lineHeight: 1.45 }}>İlk siparişini online ver, sonraki siparişlerde nakit ödeme seçeneği açılır.</div>
+                    </div>
+                  </div>
+                );
+              }
               return (
-                <button key={id} onClick={() => setPay(id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px', borderRadius: 'var(--radius-md)', cursor: 'pointer', textAlign: 'left',
+                <button key={m.id} onClick={() => setPay(m.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px', borderRadius: 'var(--radius-md)', cursor: 'pointer', textAlign: 'left',
                   background: on ? 'var(--brand-50)' : 'var(--bg-surface)', border: on ? '1.5px solid var(--brand-500)' : '1.5px solid var(--border-subtle)' }}>
-                  <Icon name={ic} size={20} color={on ? 'var(--brand-600)' : 'var(--text-secondary)'} />
-                  <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{label}</span>
-                  <span style={{ width: 20, height: 20, borderRadius: '50%', border: on ? '2px solid var(--brand-500)' : '1.5px solid var(--border-strong)', display: 'grid', placeItems: 'center' }}>{on && <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--brand-500)' }} />}</span>
+                  <Icon name={m.ic} size={20} color={on ? 'var(--brand-600)' : 'var(--text-secondary)'} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{m.label}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 1 }}>{m.sub}</div>
+                  </div>
+                  <span style={{ width: 20, height: 20, borderRadius: '50%', border: on ? '2px solid var(--brand-500)' : '1.5px solid var(--border-strong)', display: 'grid', placeItems: 'center', flex: 'none' }}>{on && <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--brand-500)' }} />}</span>
                 </button>
               );
             })}
             {pay === 'mealcard' && (
               <div style={{ padding: '10px 14px', background: 'var(--bg-sunken)', borderRadius: 'var(--radius-md)', marginTop: 4 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>Yemek kartı seçin</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>Restoranın kabul ettiği yemek kartları</div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {['Multinet','Metropol','Ticket','Sodexo','SetCard'].map(card => (
-                    <button key={card} style={{ padding: '7px 14px', borderRadius: 999, fontSize: 12, fontWeight: 600, border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', color: 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>{card}</button>
-                  ))}
+                  {cards.map(c => {
+                    const on = mealCard === c;
+                    return (
+                      <button key={c} onClick={() => setMealCard(c)} style={{ padding: '7px 14px', borderRadius: 999, fontSize: 12, fontWeight: 600, border: on ? '1.5px solid var(--brand-500)' : '1.5px solid var(--border-default)', background: on ? 'var(--brand-50)' : 'var(--bg-surface)', color: on ? 'var(--brand-700)' : 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>{MEAL_CARDS[c]}</button>
+                    );
+                  })}
                 </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.4 }}>Yemek kartları yalnızca kapıda geçerlidir; teslimatta kurye okutur.</div>
               </div>
             )}
           </div>
         </Section>
+
+        {/* Kimoo Puani kullan — yalnizca Secili Restoran + online + min 250 TL */}
+        {restaurant?.selected && isOnline && (
+          subtotal >= KIMOO_PUAN.minOrder ? (
+            <Section title="Kimoo Puanı">
+              <button onClick={() => setUsePuan(v => !v)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-sans)', textAlign: 'left' }}>
+                <div style={{ width: 38, height: 38, borderRadius: 999, background: 'var(--brand-50)', display: 'grid', placeItems: 'center', flex: 'none' }}>
+                  <Icon name="star" size={18} color="var(--brand-600)" strokeWidth={0} style={{ fill: 'var(--brand-600)' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{puanAvail} TL Kimoo Puanı kullan</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 1 }}>{KIMOO_PUAN.balance} TL puanın var · maks %20 / {KIMOO_PUAN.useCap} TL</div>
+                </div>
+                <span style={{ width: 46, height: 28, borderRadius: 999, flex: 'none', position: 'relative', background: usePuan ? 'var(--brand-500)' : 'var(--border-default)', transition: 'background .2s ease' }}>
+                  <span style={{ position: 'absolute', top: 3, left: usePuan ? 21 : 3, width: 22, height: 22, borderRadius: 999, background: '#fff', boxShadow: 'var(--shadow-xs)', transition: 'left .2s ease' }} />
+                </span>
+              </button>
+              {usePuan && <div style={{ marginTop: 10, fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.45 }}>Puan kullanılan siparişte yeni puan kazanılmaz.</div>}
+            </Section>
+          ) : null
+        )}
+        {restaurant?.selected && isOnline && subtotal < KIMOO_PUAN.minOrder && (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginTop: 14, padding: '12px 14px', background: 'var(--bg-sunken)', borderRadius: 'var(--radius-md)' }}>
+            <Icon name="star" size={16} color="var(--text-muted)" style={{ marginTop: 1 }} />
+            <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.45 }}>Kimoo Puanı kullanımı için sepet en az {KIMOO_PUAN.minOrder} TL olmalı.</span>
+          </div>
+        )}
+
+        {/* Temassiz teslimat — yalnizca online odemede gosterilir */}
+        {isOnline && (
+          <Section title="Teslimat tercihi">
+            <button onClick={() => setContactless(v => !v)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-sans)', textAlign: 'left' }}>
+              <div style={{ width: 38, height: 38, borderRadius: 999, background: 'var(--bg-sunken)', display: 'grid', placeItems: 'center', flex: 'none' }}>
+                <Icon name="home" size={18} color="var(--brand-600)" />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Temassız teslimat</div>
+                <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 1 }}>Kurye kapıya bırakır, fotoğraf çeker. Kod gerekmez.</div>
+              </div>
+              <span style={{ width: 46, height: 28, borderRadius: 999, flex: 'none', position: 'relative', background: contactless ? 'var(--brand-500)' : 'var(--border-default)', transition: 'background .2s ease' }}>
+                <span style={{ position: 'absolute', top: 3, left: contactless ? 21 : 3, width: 22, height: 22, borderRadius: 999, background: '#fff', boxShadow: 'var(--shadow-xs)', transition: 'left .2s ease' }} />
+              </span>
+            </button>
+          </Section>
+        )}
 
         <Section title="Kuryeye bahşiş">
           <div style={{ display: 'flex', gap: 8 }}>
@@ -299,13 +391,20 @@ function CheckoutScreen({ cart, go, restaurant, placeOrder }) {
           <SummaryRow label="Ara toplam" value={money(subtotal)} />
           <SummaryRow label="Teslimat" value={fee === 0 ? 'Ücretsiz' : money(fee)} accent={fee === 0} />
           <SummaryRow label="Bahşiş" value={money(tip)} />
+          {puanApplied > 0 && <SummaryRow label="Kimoo Puanı" value={'−' + money(puanApplied)} accent />}
           <div style={{ height: 1, background: 'var(--border-default)', margin: '8px 0' }} />
           <SummaryRow label="Toplam" value={money(total)} bold />
+          {willEarn > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, fontSize: 12.5, fontWeight: 700, color: 'var(--brand-600)' }}>
+              <Icon name="star" size={14} color="var(--brand-600)" strokeWidth={0} style={{ fill: 'var(--brand-600)' }} />
+              Bu siparişten +{willEarn} TL Kimoo Puanı kazanacaksın
+            </div>
+          )}
         </div>
       </div>
 
       <div style={{ padding: '14px 16px 30px', background: 'var(--bg-surface)', borderTop: '1px solid var(--border-subtle)' }}>
-        <PrimaryBtn onClick={placeOrder}><span style={{ flex: 1, textAlign: 'left' }}>Siparişi onayla</span><span style={{ fontWeight: 800 }}>{money(total)}</span></PrimaryBtn>
+        <PrimaryBtn onClick={() => placeOrder({ contactless, pay, puanApplied, willEarn })}><span style={{ flex: 1, textAlign: 'left' }}>Siparişi onayla</span><span style={{ fontWeight: 800 }}>{money(total)}</span></PrimaryBtn>
       </div>
     </div>
   );
@@ -330,13 +429,13 @@ function TimeChip({ active, label, sub, onClick }) {
 }
 
 // ============================ ORDER TRACKING ============================
-function TrackingScreen({ go, restaurant, total }) {
+function TrackingScreen({ go, restaurant, total, contactless = false, code = '4827' }) {
   const [step, setStep] = React.useState(0);
   const steps = [
     { t: 'Sipariş onaylandı', d: 'Restoran siparişini aldı' },
     { t: 'Hazırlanıyor', d: 'Şef mutfakta 👨‍🍳' },
     { t: 'Yola çıktı', d: 'Kurye sana doğru geliyor' },
-    { t: 'Teslim edildi', d: 'Afiyet olsun!' },
+    { t: contactless ? 'Kapına bırakıldı' : 'Teslim edildi', d: contactless ? 'Fotoğraf yüklendi · Afiyet olsun!' : 'Afiyet olsun!' },
   ];
   React.useEffect(() => {
     if (step >= steps.length - 1) return;
@@ -364,13 +463,36 @@ function TrackingScreen({ go, restaurant, total }) {
         <div style={{ width: 40, height: 5, borderRadius: 999, background: 'var(--border-default)', margin: '6px auto 16px' }} />
         <div style={{ textAlign: 'center', marginBottom: 6 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Tahmini teslimat</div>
-          <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>{step >= 3 ? 'Teslim edildi ✓' : '20:45'}</div>
+          <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>{step >= 3 ? (contactless ? 'Kapına bırakıldı ✓' : 'Teslim edildi ✓') : '20:45'}</div>
         </div>
 
         {/* progress bar */}
         <div style={{ display: 'flex', gap: 6, margin: '16px 0 20px' }}>
           {steps.map((_, i) => <div key={i} style={{ flex: 1, height: 5, borderRadius: 999, background: i <= step ? 'var(--brand-500)' : 'var(--bg-sunken)', transition: 'background .4s ease' }} />)}
         </div>
+
+        {/* Teslimat kodu / Temassiz teslimat — v8 */}
+        {step < 3 ? (
+          contactless ? (
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', padding: 14, borderRadius: 'var(--radius-md)', background: 'var(--bg-sunken)', marginBottom: 16 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 999, background: 'var(--brand-50)', display: 'grid', placeItems: 'center', flex: 'none' }}><Icon name="home" size={20} color="var(--brand-600)" /></div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Temassız teslimat</div>
+                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 2, lineHeight: 1.4 }}>Kurye paketi kapına bırakıp fotoğraf yükleyecek. Kod gerekmez.</div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ padding: 16, borderRadius: 'var(--radius-md)', background: 'var(--brand-50)', marginBottom: 16, textAlign: 'center' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--brand-700)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Teslimat kodu</div>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 8 }}>
+                {code.split('').map((d, i) => (
+                  <span key={i} style={{ width: 44, height: 54, borderRadius: 'var(--radius-md)', background: 'var(--bg-surface)', border: '1.5px solid var(--brand-500)', display: 'grid', placeItems: 'center', fontSize: 26, fontWeight: 800, color: 'var(--brand-700)' }}>{d}</span>
+                ))}
+              </div>
+              <div style={{ fontSize: 12.5, color: 'var(--brand-700)', lineHeight: 1.4 }}>Kuryeye bu kodu göster. Kurye kodu girince sipariş tamamlanır.</div>
+            </div>
+          )
+        ) : null}
 
         {/* current status */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 18 }}>
@@ -387,6 +509,14 @@ function TrackingScreen({ go, restaurant, total }) {
             </div>
           ))}
         </div>
+
+        {/* contactless photo proof on delivered */}
+        {step >= 3 && contactless && (
+          <div style={{ marginBottom: 16 }}>
+            <MediaBox h={150} label="kurye teslimat fotoğrafı" radius="var(--radius-md)" />
+            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 8, textAlign: 'center' }}>Paketiniz kapınıza bırakıldı 📷</div>
+          </div>
+        )}
 
         {/* courier */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 14, borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>

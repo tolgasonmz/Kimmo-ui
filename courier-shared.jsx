@@ -3,42 +3,47 @@
 
 const { Icon, Badge, money } = window;
 
+// v8: Havuz kuryesi her teslimat icin 97,5 TL KDV dahil net alir.
+const NET_PER_DELIVERY = 97.5;
+
 // ============ COURIER-SPECIFIC DATA ============
 const COURIER_PROFILE = {
   name: 'Mehmet Arslan', initials: 'MA', phone: '+90 532 456 7890',
   rating: 4.92, totalDeliveries: 1243, memberSince: 'Ocak 2024',
   level: 'Altın Kurye', vehicle: 'Motosiklet',
+  courierType: 'Havuz Kuryesi', region: 'Kadıköy · Moda',
 };
 
 const EARNINGS_DATA = {
-  today: { deliveries: 8, hours: 5.2, gross: 640, tip: 95, bonus: 50 },
-  week: { deliveries: 42, hours: 31, gross: 3480, tip: 520, bonus: 200 },
-  month: { deliveries: 168, hours: 124, gross: 14200, tip: 2100, bonus: 800 },
+  today: { deliveries: 8, hours: 5.2, gross: 780, tip: 95, bonus: 50 },
+  week: { deliveries: 42, hours: 31, gross: 4095, tip: 520, bonus: 200 },
+  month: { deliveries: 168, hours: 124, gross: 16380, tip: 2100, bonus: 800 },
 };
 
 const DAILY_CHART = [
-  { day: 'Pzt', val: 580 }, { day: 'Sal', val: 720 }, { day: 'Çar', val: 650 },
-  { day: 'Per', val: 810 }, { day: 'Cum', val: 920 }, { day: 'Cmt', val: 1100 },
-  { day: 'Paz', val: 700 },
+  { day: 'Pzt', val: 585 }, { day: 'Sal', val: 683 }, { day: 'Çar', val: 780 },
+  { day: 'Per', val: 780 }, { day: 'Cum', val: 878 }, { day: 'Cmt', val: 1073 },
+  { day: 'Paz', val: 683 },
 ];
 
 const INCOMING_ORDER = {
   id: 'KM-4833', restaurant: 'Köşe Ocakbaşı', restaurantAddr: 'Moda Cad. No:45, Kadıköy',
   customer: 'Elif Y.', customerAddr: 'Caferağa Mah. Bahariye No:12 D:5',
-  items: 3, distance: 2.4, estTime: '12 dk', earnings: 42, tip: 10,
+  items: 3, distance: 2.4, estTime: '12 dk', earnings: 97.5, tip: 15,
+  contactless: false, code: '4827',
 };
 
 const ACTIVE_ORDERS = [
-  { id: 'KM-4831', restaurant: 'Napoli Pizzeria', customer: 'Can B.', status: 'pickup', items: 2, distance: 1.8, earnings: 35 },
-  { id: 'KM-4833', restaurant: 'Köşe Ocakbaşı', customer: 'Elif Y.', status: 'delivering', items: 3, distance: 2.4, earnings: 42 },
+  { id: 'KM-4831', restaurant: 'Napoli Pizzeria', customer: 'Can B.', status: 'pickup', items: 2, distance: 1.8, earnings: 97.5 },
+  { id: 'KM-4833', restaurant: 'Köşe Ocakbaşı', customer: 'Elif Y.', status: 'delivering', items: 3, distance: 2.4, earnings: 97.5 },
 ];
 
 const PAST_DELIVERIES = [
-  { id: 'KM-4828', restaurant: 'Burger Atölyesi', time: '18:45', earnings: 38, tip: 15, rating: 5 },
-  { id: 'KM-4825', restaurant: 'Yeşil Kâse', time: '17:20', earnings: 32, tip: 10, rating: 5 },
-  { id: 'KM-4820', restaurant: 'Napoli Pizzeria', time: '15:50', earnings: 35, tip: 0, rating: 4 },
-  { id: 'KM-4815', restaurant: 'Köşe Ocakbaşı', time: '14:10', earnings: 42, tip: 20, rating: 5 },
-  { id: 'KM-4810', restaurant: 'Tatlıcı Hacı', time: '12:30', earnings: 28, tip: 5, rating: 5 },
+  { id: 'KM-4828', restaurant: 'Burger Atölyesi', time: '18:45', earnings: 97.5, tip: 15, rating: 5 },
+  { id: 'KM-4825', restaurant: 'Yeşil Kâse', time: '17:20', earnings: 97.5, tip: 10, rating: 5 },
+  { id: 'KM-4820', restaurant: 'Napoli Pizzeria', time: '15:50', earnings: 97.5, tip: 0, rating: 4 },
+  { id: 'KM-4815', restaurant: 'Köşe Ocakbaşı', time: '14:10', earnings: 97.5, tip: 20, rating: 5 },
+  { id: 'KM-4810', restaurant: 'Tatlıcı Hacı', time: '12:30', earnings: 97.5, tip: 5, rating: 5 },
 ];
 
 const NOTIFICATIONS = [
@@ -106,5 +111,6 @@ function OrderActionBtn({ children, onClick, variant = 'primary', style = {} }) 
 
 Object.assign(window, {
   COURIER_PROFILE, EARNINGS_DATA, DAILY_CHART, INCOMING_ORDER, ACTIVE_ORDERS, PAST_DELIVERIES, NOTIFICATIONS,
+  NET_PER_DELIVERY,
   CourierHeader, StatCard, OnlineToggle, OrderActionBtn,
 });

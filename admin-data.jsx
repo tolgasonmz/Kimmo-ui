@@ -24,12 +24,12 @@ const MONTHLY_REVENUE = [
 ];
 
 const RESTAURANTS_LIST = [
-  { id: 'R001', name: 'Köşe Ocakbaşı', branch: 'Kadıköy', plan: 'Pro', rating: 4.8, orders: 1240, revenue: 185000, status: 'active', joined: '2024-01' },
-  { id: 'R002', name: 'Napoli Pizzeria', branch: 'Beşiktaş', plan: 'Pro', rating: 4.7, orders: 860, revenue: 142000, status: 'active', joined: '2024-02' },
-  { id: 'R003', name: 'Burger Atölyesi', branch: 'Şişli', plan: 'Başlangıç', rating: 4.6, orders: 2100, revenue: 310000, status: 'active', joined: '2023-11' },
-  { id: 'R004', name: 'Yeşil Kâse', branch: 'Kadıköy', plan: 'Pro', rating: 4.9, orders: 540, revenue: 78000, status: 'active', joined: '2024-03' },
-  { id: 'R005', name: 'Tatlıcı Hacı', branch: 'Üsküdar', plan: 'Başlangıç', rating: 4.8, orders: 1530, revenue: 198000, status: 'suspended', joined: '2023-09' },
-  { id: 'R006', name: 'Deniz Balık', branch: 'Beykoz', plan: 'Pro', rating: 4.5, orders: 320, revenue: 96000, status: 'pending', joined: '2024-06' },
+  { id: 'R001', name: 'Köşe Ocakbaşı', branch: 'Kadıköy', plan: 'Yıllık', selected: true, rating: 4.8, orders: 1240, revenue: 185000, status: 'active', joined: '2024-01' },
+  { id: 'R002', name: 'Napoli Pizzeria', branch: 'Beşiktaş', plan: 'Yıllık', selected: false, rating: 4.7, orders: 860, revenue: 142000, status: 'active', joined: '2024-02' },
+  { id: 'R003', name: 'Burger Atölyesi', branch: 'Şişli', plan: 'Aylık', selected: false, rating: 4.6, orders: 2100, revenue: 310000, status: 'active', joined: '2023-11' },
+  { id: 'R004', name: 'Yeşil Kâse', branch: 'Kadıköy', plan: 'Yıllık', selected: true, rating: 4.9, orders: 540, revenue: 78000, status: 'active', joined: '2024-03' },
+  { id: 'R005', name: 'Tatlıcı Hacı', branch: 'Üsküdar', plan: 'Aylık', selected: false, rating: 4.8, orders: 1530, revenue: 198000, status: 'suspended', joined: '2023-09' },
+  { id: 'R006', name: 'Deniz Balık', branch: 'Beykoz', plan: 'Aylık', selected: false, rating: 4.5, orders: 320, revenue: 96000, status: 'pending', joined: '2024-06' },
 ];
 
 const CUSTOMERS_LIST = [

@@ -294,47 +294,48 @@ function IncomingOrderScreen({ go, onAccept, onReject }) {
 
 // ============ ACTIVE DELIVERY ============
 function ActiveDeliveryScreen({ go }) {
-  const [step, setStep] = React.useState(0); // 0=going to restaurant, 1=at restaurant, 2=picked up/delivering, 3=arrived, 4=delivered
+  const order = INCOMING_ORDER;
+  const [step, setStep] = React.useState(0); // 0=go to resto,1=pickup,2=go to customer,3=deliver,4=done
+  const [code, setCode] = React.useState('');         // teslimat kodu (musteri gosterir)
+  const [pickupOk, setPickupOk] = React.useState(false); // siparis dogrulandi
+  const [showReport, setShowReport] = React.useState(false);
+  const [reported, setReported] = React.useState(null); // 'nocode' | 'nothome'
   const steps = [
-    { label: 'Restorana git', desc: 'Köşe Ocakbaşı · Moda Cad. No:45', action: 'Restorana vardım', icon: 'bag' },
-    { label: 'Siparişi al', desc: '3 ürün · #KM-4833', action: 'Siparişi aldım', icon: 'check' },
-    { label: 'Müşteriye götür', desc: 'Elif Y. · Bahariye No:12 D:5', action: 'Teslim noktasına vardım', icon: 'scooter' },
-    { label: 'Teslimat yap', desc: 'Kapıda teslim et', action: 'Teslim ettim', icon: 'check' },
+    { label: 'Restorana git', desc: order.restaurant + ' · Moda Cad. No:45', action: 'Restorana vardım', icon: 'bag' },
+    { label: 'Siparişi al', desc: order.items + ' ürün · #' + order.id, action: 'Siparişi aldım', icon: 'check' },
+    { label: 'Müşteriye götür', desc: order.customer + ' · Bahariye No:12 D:5', action: 'Teslim noktasına vardım', icon: 'scooter' },
+    { label: order.contactless ? 'Temassız teslimat' : 'Teslimat yap', desc: order.contactless ? 'Kapıya bırak, fotoğraf çek' : 'Müşterinin kodunu gir', action: order.contactless ? 'Fotoğrafı yükle & tamamla' : 'Teslim ettim', icon: 'check' },
     { label: 'Tamamlandı', desc: '', action: null, icon: 'check' },
   ];
   const s = steps[step];
   const isDone = step >= 4;
+  // step 3 action gating: standart -> 4 haneli kod; temassiz -> her zaman; rapor edildiyse -> her zaman
+  const codeValid = code.length === 4;
+  const canAct = step !== 1 ? (step !== 3 ? true : (order.contactless || codeValid || reported)) : pickupOk;
+
+  const next = () => { setStep(p => p + 1); };
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg-app)' }}>
       {/* Map */}
-      <div style={{ position: 'relative', height: 300, flex: 'none' }}>
-        <MediaBox h={300} radius="0" style={{ backgroundImage: 'repeating-linear-gradient(0deg, var(--border-subtle) 0 1px, transparent 1px 44px), repeating-linear-gradient(90deg, var(--border-subtle) 0 1px, transparent 1px 44px)', background: 'var(--bg-sunken)' }} />
-        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 402 300" preserveAspectRatio="none">
-          <path d="M70 240 C 150 200, 180 120, 330 80" stroke="var(--brand-500)" strokeWidth="4" fill="none" strokeDasharray={step < 2 ? '2 10' : 'none'} strokeLinecap="round" />
+      <div style={{ position: 'relative', height: 264, flex: 'none' }}>
+        <MediaBox h={264} radius="0" style={{ backgroundImage: 'repeating-linear-gradient(0deg, var(--border-subtle) 0 1px, transparent 1px 44px), repeating-linear-gradient(90deg, var(--border-subtle) 0 1px, transparent 1px 44px)', background: 'var(--bg-sunken)' }} />
+        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 402 264" preserveAspectRatio="none">
+          <path d="M70 210 C 150 180, 180 110, 330 70" stroke="var(--brand-500)" strokeWidth="4" fill="none" strokeDasharray={step < 2 ? '2 10' : 'none'} strokeLinecap="round" />
         </svg>
-        {/* Courier dot */}
-        <div style={{ position: 'absolute', left: step < 2 ? 56 : step < 4 ? 200 : 316, top: step < 2 ? 224 : step < 4 ? 140 : 64,
+        <div style={{ position: 'absolute', left: step < 2 ? 56 : step < 4 ? 200 : 316, top: step < 2 ? 194 : step < 4 ? 120 : 54,
           width: 36, height: 36, borderRadius: 999, background: 'var(--brand-500)', display: 'grid', placeItems: 'center', boxShadow: 'var(--shadow-md)', transition: 'all .6s ease' }}>
           <Icon name="scooter" size={18} color="#fff" />
         </div>
-        {/* Destination pin */}
-        <div style={{ position: 'absolute', left: step < 2 ? 56 : 316, top: step < 2 ? 224 : 64, width: 26, height: 26, borderRadius: 999,
-          background: step < 2 ? 'var(--brand-50)' : 'var(--success-500)', border: step < 2 ? '2px solid var(--brand-500)' : 'none',
-          display: 'grid', placeItems: 'center', transition: 'all .6s ease' }}>
-          <Icon name="pin" size={13} color={step < 2 ? 'var(--brand-600)' : '#fff'} />
-        </div>
-
         <button onClick={() => go('home')} style={{ position: 'absolute', top: 58, left: 16, width: 40, height: 40, borderRadius: 999, background: 'rgba(255,255,255,0.95)', border: 'none', display: 'grid', placeItems: 'center', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}>
           <Icon name="back" size={20} color="#1A1714" />
         </button>
       </div>
 
       {/* Sheet */}
-      <div style={{ flex: 1, background: 'var(--bg-surface)', borderRadius: '22px 22px 0 0', marginTop: -22, position: 'relative', padding: '8px 20px 0', boxShadow: 'var(--shadow-lg)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, background: 'var(--bg-surface)', borderRadius: '22px 22px 0 0', marginTop: -22, position: 'relative', padding: '8px 20px 0', boxShadow: 'var(--shadow-lg)', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
         <div style={{ width: 40, height: 5, borderRadius: 999, background: 'var(--border-default)', margin: '6px auto 16px' }}></div>
 
-        {/* Progress bar */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
           {[0,1,2,3].map(i => (
             <div key={i} style={{ flex: 1, height: 5, borderRadius: 999, background: i <= step ? 'var(--brand-500)' : 'var(--bg-sunken)', transition: 'background .4s ease' }}></div>
@@ -342,19 +343,19 @@ function ActiveDeliveryScreen({ go }) {
         </div>
 
         {isDone ? (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 14 }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 12 }}>
             <div style={{ width: 80, height: 80, borderRadius: 999, background: 'var(--success-50)', display: 'grid', placeItems: 'center' }}>
               <Icon name="check" size={38} color="var(--success-500)" />
             </div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)' }}>Teslim edildi!</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--brand-600)' }}>{money(52)}</div>
-            <div style={{ fontSize: 14, color: 'var(--text-secondary)' }}>₺42 kazanç + ₺10 bahşiş</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)' }}>{reported === 'nocode' ? 'Sipariş kapatıldı' : order.contactless ? 'Kapıya bırakıldı!' : 'Teslim edildi!'}</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--brand-600)' }}>{money(order.earnings + order.tip)}</div>
+            <div style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{money(order.earnings)} net kazanç + {money(order.tip)} bahşiş</div>
+            <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 2 }}>Her teslimat 97,5 TL KDV dahil · haftalık fatura ile ödenir</div>
           </div>
         ) : (
           <>
-            {/* Current step */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 999, background: 'var(--brand-50)', display: 'grid', placeItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 999, background: 'var(--brand-50)', display: 'grid', placeItems: 'center', flex: 'none' }}>
                 <Icon name={s.icon} size={24} color="var(--brand-600)" />
               </div>
               <div style={{ flex: 1 }}>
@@ -363,22 +364,73 @@ function ActiveDeliveryScreen({ go }) {
               </div>
             </div>
 
-            {/* Contact + order info */}
+            {/* contact + nav buttons */}
             <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
               {step >= 2 && (
                 <>
-                  <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 0', borderRadius: 999, border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-sans)', color: 'var(--text-primary)' }}>
-                    <Icon name="phone" size={18} color="var(--brand-500)" />Ara
-                  </button>
-                  <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 0', borderRadius: 999, border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-sans)', color: 'var(--text-primary)' }}>
-                    <Icon name="msg" size={18} color="var(--brand-500)" />Mesaj
-                  </button>
+                  <button style={courierMiniBtn}><Icon name="phone" size={18} color="var(--brand-500)" />Ara</button>
+                  <button style={courierMiniBtn}><Icon name="msg" size={18} color="var(--brand-500)" />Mesaj</button>
                 </>
               )}
-              <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 0', borderRadius: 999, border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-sans)', color: 'var(--text-primary)' }}>
-                <Icon name="pin" size={18} color="var(--brand-500)" />Navigasyon
-              </button>
+              <button style={courierMiniBtn}><Icon name="pin" size={18} color="var(--brand-500)" />Navigasyon</button>
             </div>
+
+            {/* STEP 1 — pickup verification (QR / siparis kodu) */}
+            {step === 1 && (
+              <div style={{ background: 'var(--bg-sunken)', borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 14 }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Siparişi doğrula</div>
+                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 12, lineHeight: 1.45 }}>QR okut veya sipariş numarasını girerek doğru paketi teslim al.</div>
+                <button onClick={() => setPickupOk(true)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px 0', borderRadius: 'var(--radius-md)', border: pickupOk ? '1.5px solid var(--success-500)' : '1.5px solid var(--brand-500)', background: pickupOk ? 'var(--success-50)' : 'var(--bg-surface)', color: pickupOk ? 'var(--success-600)' : 'var(--brand-600)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)', marginBottom: 10 }}>
+                  <Icon name={pickupOk ? 'check' : 'search'} size={18} color={pickupOk ? 'var(--success-600)' : 'var(--brand-600)'} />{pickupOk ? 'Sipariş doğrulandı · #' + order.id : 'QR kodu okut'}
+                </button>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input value={code} onChange={e => { const v = e.target.value.replace(/\D/g,'').slice(0,6); setCode(v); if (v.length >= 4) setPickupOk(true); }} placeholder="Sipariş kodunu gir" inputMode="numeric" style={{ flex: 1, border: '1.5px solid var(--border-default)', borderRadius: 'var(--radius-sm)', padding: '11px 12px', fontSize: 15, fontFamily: 'var(--font-mono, monospace)', fontWeight: 700, letterSpacing: '0.1em', outline: 'none', background: 'var(--bg-surface)', color: 'var(--text-primary)', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3 — delivery completion */}
+            {step === 3 && !reported && (
+              order.contactless ? (
+                <div style={{ marginBottom: 14 }}>
+                  <MediaBox h={140} label="teslimat fotoğrafı çek" radius="var(--radius-md)" />
+                  <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 8, textAlign: 'center', lineHeight: 1.45 }}>Paketi kapıya bırak, fotoğraf çek. Kod gerekmez; sipariş otomatik kapanır.</div>
+                </div>
+              ) : (
+                <div style={{ background: 'var(--bg-sunken)', borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 14 }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Teslimat kodu</div>
+                  <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 12, lineHeight: 1.45 }}>Müşterinin gösterdiği 4 haneli kodu gir.</div>
+                  <input autoFocus value={code} onChange={e => setCode(e.target.value.replace(/\D/g,'').slice(0,4))} placeholder="– – – –" inputMode="numeric" style={{ width: '100%', textAlign: 'center', border: codeValid ? '1.5px solid var(--success-500)' : '1.5px solid var(--brand-500)', borderRadius: 'var(--radius-md)', padding: '14px 0', fontSize: 28, fontFamily: 'var(--font-mono, monospace)', fontWeight: 800, letterSpacing: '0.4em', outline: 'none', background: 'var(--bg-surface)', color: 'var(--text-primary)', boxSizing: 'border-box' }} />
+                  <button onClick={() => setShowReport(v => !v)} style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)', padding: 0 }}>
+                    <Icon name="msg" size={15} color="var(--text-secondary)" />Kodu alamıyorum · Bildir
+                  </button>
+                  {showReport && (
+                    <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <button onClick={() => { setReported('nocode'); }} style={reportOptBtn}>
+                        <Icon name="close" size={16} color="var(--warning-600)" /><span style={{ flex: 1, textAlign: 'left' }}>Teslimat kodu alınamadı</span>
+                      </button>
+                      <button onClick={() => { setReported('nothome'); }} style={reportOptBtn}>
+                        <Icon name="msg" size={16} color="var(--info-600)" /><span style={{ flex: 1, textAlign: 'left' }}>Müşteri evde yok — sohbet aç</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )
+            )}
+
+            {/* report acknowledged states */}
+            {step === 3 && reported === 'nocode' && (
+              <div style={{ background: 'var(--warning-50)', borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 14, display: 'flex', gap: 10 }}>
+                <Icon name="check" size={18} color="var(--warning-600)" style={{ flex: 'none', marginTop: 1 }} />
+                <div style={{ fontSize: 13, color: 'var(--warning-700)', lineHeight: 1.45 }}>"Teslimat kodu alınamadı" işaretlendi. Onayla'ya basınca sipariş kapanır.</div>
+              </div>
+            )}
+            {step === 3 && reported === 'nothome' && (
+              <div style={{ background: 'var(--info-50)', borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 14, display: 'flex', gap: 10 }}>
+                <Icon name="msg" size={18} color="var(--info-600)" style={{ flex: 'none', marginTop: 1 }} />
+                <div style={{ fontSize: 13, color: 'var(--info-600)', lineHeight: 1.45 }}>Müşteriyle sohbet açıldı. Cevap gelmezse sorumluluk müşteridedir; iade yapılmaz, restoran ödemesi gerçekleşir.</div>
+              </div>
+            )}
           </>
         )}
 
@@ -387,14 +439,22 @@ function ActiveDeliveryScreen({ go }) {
           {isDone ? (
             <OrderActionBtn onClick={() => go('home')}>Anasayfaya dön</OrderActionBtn>
           ) : (
-            <OrderActionBtn onClick={() => setStep(s => s + 1)}>
-              <Icon name={step < 3 ? 'chevR' : 'check'} size={20} color="#fff" />{s.action}
-            </OrderActionBtn>
+            <button onClick={canAct ? next : undefined} disabled={!canAct} style={{
+              fontFamily: 'var(--font-sans)', fontWeight: 700, fontSize: 16, color: '#fff', width: '100%',
+              background: 'var(--brand-500)', border: 'none', borderRadius: 999, padding: '15px 22px',
+              cursor: canAct ? 'pointer' : 'not-allowed', opacity: canAct ? 1 : 0.45,
+              boxShadow: canAct ? 'var(--shadow-brand)' : 'none',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            }}>
+              <Icon name={step < 3 ? 'chevR' : 'check'} size={20} color="#fff" />{reported === 'nocode' ? 'Siparişi kapat' : s.action}
+            </button>
           )}
         </div>
       </div>
     </div>
   );
 }
+const courierMiniBtn = { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 0', borderRadius: 999, border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-sans)', color: 'var(--text-primary)' };
+const reportOptBtn = { display: 'flex', alignItems: 'center', gap: 10, padding: '13px 14px', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-sans)', color: 'var(--text-primary)', width: '100%' };
 
 Object.assign(window, { CourierHome, IncomingOrderCard, IncomingOrderScreen, ActiveDeliveryScreen });

@@ -134,9 +134,6 @@ function SideNav({ active, onNav, collapsed }) {
       { id: 'campaigns', icon: 'tag',   label: 'Kampanyalar' },
       { id: 'reviews',   icon: 'heart', label: 'Yorumlar' },
     ]},
-    { label: 'ÖDÜLLER', items: [
-      { id: 'rewards', icon: 'trophy', label: 'Ödüller & Görevler', badge: '3' },
-    ]},
     { label: 'AYARLAR', items: [
       { id: 'settings', icon: 'user', label: 'Ayarlar' },
     ]},

@@ -41,7 +41,6 @@
 <script type="text/babel" src="resto-data.jsx"></script>
 <script type="text/babel" src="resto-views.jsx"></script>
 <script type="text/babel" src="resto-views2.jsx"></script>
-<script type="text/babel" src="resto-rewards.jsx"></script>
 <script type="text/babel" src="resto-messages.jsx"></script>
 <script type="text/babel" src="resto-integrations.jsx"></script>
 
@@ -51,7 +50,7 @@ const {
   ChromeWindow, Icon, SideNav,
   DashboardView, OrdersView, MenuView,
   AnalyticsView, CampaignsView, ReviewsView, SettingsView,
-  RestaurantRewardsView, MessagesView, IntegrationsView,
+  MessagesView, IntegrationsView,
   useTweaks, TweaksPanel, TweakSection, TweakToggle, TweakSlider,
 } = window;
 
@@ -64,7 +63,6 @@ const URL_MAP = {
   analytics:  'panel.kimoo.com/raporlar',
   campaigns:  'panel.kimoo.com/kampanyalar',
   reviews:    'panel.kimoo.com/yorumlar',
-  rewards:    'panel.kimoo.com/oduller',
   messages:    'panel.kimoo.com/mesajlar',
   integrations:'panel.kimoo.com/entegrasyonlar',
   settings:    'panel.kimoo.com/ayarlar',
@@ -78,7 +76,6 @@ const NAV_PAGES = [
   ['messages',      'Mesajlar'],
   ['analytics',     'Raporlar'],
   ['campaigns',     'Kampanyalar'],
-  ['rewards',       'Ödüller'],
   ['settings',      'Ayarlar'],
 ];
 
@@ -90,7 +87,6 @@ function TopBar({ page }) {
     analytics: 'Raporlar & Analitik',
     campaigns: 'Kampanyalar',
     reviews: 'Yorumlar',
-    rewards: 'Ödüller & Meydan Okumalar',
     messages:     'Müşteri Mesajları',
     integrations: 'Platform Entegrasyonları',
     settings:     'Ayarlar',
@@ -134,7 +130,6 @@ function App() {
     case 'analytics':  view = <AnalyticsView />;           break;
     case 'campaigns':  view = <CampaignsView />;           break;
     case 'reviews':    view = <ReviewsView />;             break;
-    case 'rewards':       view = <RestaurantRewardsView />;  break;
     case 'messages':      view = <MessagesView />;           break;
     case 'integrations':  view = <IntegrationsView />;       break;
     case 'settings':   view = <SettingsView />;            break;
@@ -145,7 +140,7 @@ function App() {
     <div className="stage">
       <div className="stage-head">
         <h1><span className="badge-k">k</span> Kimoo · Restoran Portalı</h1>
-        <p>Sipariş yönetimi · Menü · Kampanyalar · Ödüller · <a href="index.html">Genel bakış</a> · <a href="Kimoo Courier App.html">Kurye App</a></p>
+        <p>Sipariş yönetimi · Menü · Kampanyalar · <a href="index.html">Genel bakış</a> · <a href="Kimoo Courier App.html">Kurye App</a></p>
         <div className="nav-chips">
           {NAV_PAGES.map(([id, label]) => (
             <button key={id} className={'nav-chip' + (page === id ? ' active' : '')} onClick={() => setPage(id)}>{label}</button>

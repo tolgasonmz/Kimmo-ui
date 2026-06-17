@@ -1,5 +1,5 @@
 // kimoo-detail-screens.jsx — Address, Wallet, Coupons, Notifications, Account Settings
-const { Icon, Badge, PrimaryBtn, ScreenHeader, money } = window;
+const { Icon, Badge, PrimaryBtn, ScreenHeader, money, KIMOO_PUAN } = window;
 
 // ============ ADDRESSES ============
 function AddressScreen({ go }) {
@@ -84,56 +84,97 @@ function AddressScreen({ go }) {
   );
 }
 
-// ============ WALLET ============
+// ============ KIMOO PUANI (v8 — kapalı döngü, "bakiye" değil) ============
 function WalletScreen({ go }) {
+  const P = KIMOO_PUAN;
+  // Kimoo Puani hareketleri: kazanım (teslimat onayında), kullanım, iade. Hepsi Seçili Restoran.
   const TRANSACTIONS = [
-    { label: 'Sipariş iadesi', date: '10 Haz', amount: +85, type: 'credit' },
-    { label: 'Köşe Ocakbaşı siparişi', date: '9 Haz', amount: -290, type: 'debit' },
-    { label: 'Davet bonusu', date: '8 Haz', amount: +50, type: 'credit' },
-    { label: 'Napoli Pizzeria siparişi', date: '7 Haz', amount: -185, type: 'debit' },
-    { label: 'Kimoo+ iade kredisi', date: '5 Haz', amount: +25, type: 'credit' },
-    { label: 'Burger Atölyesi siparişi', date: '4 Haz', amount: -145, type: 'debit' },
+    { label: 'Köşe Ocakbaşı siparişi', sub: 'Teslimat onaylandı · ₺480 sipariş', date: '10 Haz', amount: +25, type: 'earn' },
+    { label: 'Köşe Ocakbaşı siparişi', sub: 'Kimoo Puanı kullanıldı', date: '9 Haz', amount: -60, type: 'use' },
+    { label: 'Yeşil Kâse siparişi', sub: 'Teslimat onaylandı · ₺320 sipariş', date: '7 Haz', amount: +16, type: 'earn' },
+    { label: 'Sushi Tokyo iadesi', sub: 'İptal — kullanılan puan iade edildi', date: '5 Haz', amount: +40, type: 'refund' },
+    { label: 'Yeşil Kâse siparişi', sub: 'Teslimat onaylandı · ₺250 sipariş', date: '3 Haz', amount: +12, type: 'earn' },
   ];
+  const iconFor = { earn: 'plus', refund: 'repeat', use: 'bag' };
+  const monthlyLeft = Math.max(0, P.monthlyCap - P.monthlyUsed);
+  const balancePct = Math.min(100, (P.balance / P.balanceCap) * 100);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <ScreenHeader title="Kimoo Cüzdan" onBack={() => go('profile')} />
+      <ScreenHeader title="Kimoo Puanı" onBack={() => go('profile')} />
       <div style={{ flex: 1, overflow: 'auto' }}>
-        {/* Balance card */}
-        <div style={{ margin: '16px 16px 20px', background: 'var(--brand-500)', borderRadius: 'var(--radius-xl)', padding: '24px 20px', color: '#fff', position: 'relative', overflow: 'hidden', boxShadow: 'var(--shadow-brand)' }}>
+        {/* Puan card */}
+        <div style={{ margin: '16px 16px 14px', background: 'var(--brand-500)', borderRadius: 'var(--radius-xl)', padding: '22px 20px', color: '#fff', position: 'relative', overflow: 'hidden', boxShadow: 'var(--shadow-brand)' }}>
           <div style={{ position: 'absolute', right: -20, top: -20, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }}></div>
-          <div style={{ position: 'absolute', right: 20, bottom: -30, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }}></div>
-          <div style={{ fontSize: 13, fontWeight: 600, opacity: 0.85, marginBottom: 8 }}>Mevcut bakiye</div>
-          <div style={{ fontSize: 38, fontWeight: 800, letterSpacing: '-0.03em' }}>₺250,00</div>
-          <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>Kimoo Cüzdan</div>
-        </div>
-
-        {/* Quick actions */}
-        <div style={{ display: 'flex', gap: 10, padding: '0 16px', marginBottom: 24 }}>
-          {[['plus', 'Para Yükle'], ['bag', 'Ödemeler'], ['heart', 'Kampanyalar']].map(([ic, l], i) => (
-            <button key={i} style={{ flex: 1, padding: '13px 0', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
-              <Icon name={ic} size={20} color="var(--brand-500)" />
-              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', fontFamily: 'var(--font-sans)' }}>{l}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Transactions */}
-        <div style={{ padding: '0 16px' }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12 }}>Son işlemler</div>
-          {TRANSACTIONS.map((t, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0', borderBottom: '1px solid var(--border-subtle)' }}>
-              <div style={{ width: 40, height: 40, borderRadius: 999, flex: 'none', display: 'grid', placeItems: 'center', background: t.type === 'credit' ? 'var(--success-50)' : 'var(--bg-sunken)' }}>
-                <Icon name={t.type === 'credit' ? 'plus' : 'bag'} size={18} color={t.type === 'credit' ? 'var(--success-500)' : 'var(--text-tertiary)'} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{t.label}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>{t.date}</div>
-              </div>
-              <div style={{ fontSize: 15, fontWeight: 800, color: t.type === 'credit' ? 'var(--success-600)' : 'var(--text-primary)' }}>
-                {t.type === 'credit' ? '+' : ''}{money(Math.abs(t.amount))}
-              </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 700, opacity: 0.9, marginBottom: 8 }}>
+            <Icon name="star" size={15} color="#fff" strokeWidth={0} style={{ fill: '#fff' }} /> Kimoo Puanı
+          </div>
+          <div style={{ fontSize: 38, fontWeight: 800, letterSpacing: '-0.03em' }}>{P.balance} <span style={{ fontSize: 20, fontWeight: 700, opacity: 0.85 }}>TL</span></div>
+          {/* cap progress */}
+          <div style={{ marginTop: 14 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, opacity: 0.9, marginBottom: 5 }}>
+              <span>Birikim tavanı</span><span>{P.balance} / {P.balanceCap} TL</span>
             </div>
-          ))}
+            <div style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,0.25)', overflow: 'hidden' }}>
+              <div style={{ width: balancePct + '%', height: '100%', borderRadius: 999, background: '#fff' }}></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bu ay kullanım + devir */}
+        <div style={{ display: 'flex', gap: 10, padding: '0 16px', marginBottom: 18 }}>
+          <div style={{ flex: 1, background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: '12px 14px' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 3 }}>Bu ay kullanılabilir</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>{monthlyLeft} TL</div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>Aylık tavan {P.monthlyCap} TL</div>
+          </div>
+          <div style={{ flex: 1, background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: '12px 14px' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 3 }}>Bu ay kullanılan</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>{P.monthlyUsed} TL</div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>Devir maks {P.carryoverCap} TL</div>
+          </div>
+        </div>
+
+        {/* Nasıl çalışır */}
+        <div style={{ padding: '0 16px', marginBottom: 18 }}>
+          <div style={{ background: 'var(--brand-50)', borderRadius: 'var(--radius-md)', padding: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--brand-700)', marginBottom: 12 }}>Kimoo Puanı nasıl çalışır?</div>
+            {[
+              ['plus', `Seçili Restoran siparişlerinde %5 puan kazan (maks ${P.earnCap} TL). ${P.minOrder} TL altı siparişte kazanım yok.`],
+              ['bag', `Seçili Restoran'da sipariş tutarının %20'sine kadar (maks ${P.useCap} TL) puan kullan.`],
+              ['wallet', `Yalnızca online ödemeli (kart) siparişlerde geçerli. Nakit ve yemek kartında kazanılmaz/kullanılmaz.`],
+              ['close', `Hiçbir şekilde nakde çevrilemez. Ay sonunda en fazla ${P.carryoverCap} TL bir sonraki aya devreder.`],
+            ].map(([ic, txt], i) => (
+              <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: i < 3 ? 10 : 0 }}>
+                <div style={{ width: 24, height: 24, borderRadius: 999, background: 'var(--bg-surface)', display: 'grid', placeItems: 'center', flex: 'none', marginTop: 1 }}>
+                  <Icon name={ic} size={13} color="var(--brand-600)" />
+                </div>
+                <div style={{ fontSize: 12.5, color: 'var(--brand-700)', lineHeight: 1.5 }}>{txt}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Hareketler */}
+        <div style={{ padding: '0 16px 24px' }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12 }}>Puan hareketleri</div>
+          {TRANSACTIONS.map((t, i) => {
+            const credit = t.amount > 0;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+                <div style={{ width: 40, height: 40, borderRadius: 999, flex: 'none', display: 'grid', placeItems: 'center', background: credit ? 'var(--success-50)' : 'var(--bg-sunken)' }}>
+                  <Icon name={iconFor[t.type]} size={18} color={credit ? 'var(--success-500)' : 'var(--text-tertiary)'} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{t.label}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>{t.sub} · {t.date}</div>
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: credit ? 'var(--success-600)' : 'var(--text-primary)' }}>
+                  {credit ? '+' : '−'}{Math.abs(t.amount)} TL
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

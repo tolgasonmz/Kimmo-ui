@@ -136,11 +136,20 @@ function AdminRestaurants() {
         ))}
       </div>
 
+      {/* v8: 24 saat onay SLA */}
+      {RESTAURANTS_LIST.some(r => r.status === 'pending') && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', borderRadius: 'var(--radius-lg)', background: 'var(--info-50)', border: '1px solid color-mix(in srgb, var(--info-500) 20%, transparent)', marginBottom: 16 }}>
+          <div style={{ width: 38, height: 38, borderRadius: 999, background: 'var(--info-500)', display: 'grid', placeItems: 'center', flex: 'none' }}><Icon name="clock" size={19} color="#fff" /></div>
+          <div style={{ flex: 1, fontSize: 13.5, color: 'var(--info-600)', lineHeight: 1.45 }}><strong>Deniz Balık</strong> onay bekliyor · SLA: 24 saat içinde incele ve karar ver. Red durumunda hesap kapanmaz; saha personeli eksik evrak için yönlendirilir.</div>
+        </div>
+      )}
+
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
         <TableHeader>
           <span style={{ flex: '0 0 70px' }}>ID</span>
           <span style={{ flex: 1 }}>Restoran</span>
           <span style={{ flex: '0 0 80px' }}>Plan</span>
+          <span style={{ flex: '0 0 90px' }}>Rozet</span>
           <span style={{ flex: '0 0 60px' }}>Puan</span>
           <span style={{ flex: '0 0 80px' }}>Sipariş</span>
           <span style={{ flex: '0 0 100px' }}>Ciro</span>
@@ -156,7 +165,8 @@ function AdminRestaurants() {
                 <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-sm)', background: 'var(--bg-sunken)', display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 12, color: 'var(--text-secondary)', flex: 'none' }}>{r.name.slice(0, 2)}</div>
                 <div><div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{r.name}</div><div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>{r.branch}</div></div>
               </span>
-              <span style={{ flex: '0 0 80px' }}><Badge tone={r.plan === 'Pro' ? 'brand' : 'neutral'} style={{ fontSize: 11 }}>{r.plan}</Badge></span>
+              <span style={{ flex: '0 0 80px' }}><Badge tone={r.plan === 'Yıllık' ? 'brand' : 'neutral'} style={{ fontSize: 11 }}>{r.plan}</Badge></span>
+              <span style={{ flex: '0 0 90px' }}>{r.selected ? <Badge tone="brand" style={{ fontSize: 10.5 }}><Icon name="star" size={11} color="var(--brand-600)" strokeWidth={0} style={{ fill: 'var(--brand-600)' }} />Seçili</Badge> : <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>—</span>}</span>
               <span style={{ flex: '0 0 60px', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>★ {r.rating}</span>
               <span style={{ flex: '0 0 80px', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{r.orders.toLocaleString('tr-TR')}</span>
               <span style={{ flex: '0 0 100px', fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{money(r.revenue)}</span>

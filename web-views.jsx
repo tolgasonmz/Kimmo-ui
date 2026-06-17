@@ -139,7 +139,7 @@ function WebHome({ onRestaurant }) {
             <FilterChip active={minRating===4.8} onClick={() => setMinRating(v => v===4.8 ? null : 4.8)}>★ 4.8+</FilterChip>
             <FilterChip active={minRating===4.5} onClick={() => setMinRating(v => v===4.5 ? null : 4.5)}>★ 4.5+</FilterChip>
             <div style={{ width: 1, background: 'var(--border-subtle)', height: 22, flex: 'none', margin: '0 4px' }} />
-            {[['card','💳 Kredi Kartı'],['cash','💵 Nakit'],['multinet','Multinet'],['metropol','Metropol'],['ticket','Ticket']].map(([p,l]) => (
+            {[['card','💳 Online kart'],['cash','💵 Kapıda nakit'],['multinet','Multinet'],['metropol','Metropol Card'],['ticket','Ticket Restaurant']].map(([p,l]) => (
               <FilterChip key={p} active={payFilter===p} onClick={() => setPayFilter(v => v===p ? null : p)}>{l}</FilterChip>
             ))}
             {activeFilterCount > 0 && (
@@ -187,6 +187,7 @@ function WebHome({ onRestaurant }) {
               <div style={{ height: 160, background: 'var(--bg-sunken)', backgroundImage: 'repeating-linear-gradient(135deg, var(--neutral-100) 0 12px, var(--neutral-50) 12px 24px)', display: 'grid', placeItems: 'center', fontSize: 56, position: 'relative' }}>
                 {r.img}
                 {r.promo && <span style={{ position: 'absolute', top: 12, left: 12, padding: '5px 12px', borderRadius: 999, background: 'var(--brand-500)', color: '#fff', fontSize: 12, fontWeight: 700 }}>{r.promo}</span>}
+                {r.selected && <span style={{ position: 'absolute', bottom: 12, left: 12, display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 999, background: 'rgba(255,255,255,0.95)', color: 'var(--brand-700)', fontSize: 11, fontWeight: 800 }}>⭐ Seçili Restoran</span>}
                 {r.fee === 0 && <span style={{ position: 'absolute', top: 12, right: 12, padding: '5px 10px', borderRadius: 999, background: 'var(--success-500)', color: '#fff', fontSize: 11, fontWeight: 700 }}>Ücretsiz teslimat</span>}
               </div>
               <div style={{ padding: '14px 16px 16px' }}>
@@ -237,7 +238,10 @@ function WebRestaurantDetail({ restaurant, onBack, onAddToCart }) {
         <div style={{ padding: '24px 0', borderBottom: '1px solid var(--border-subtle)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>{r.name}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>{r.name}</div>
+                {r.selected && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 11px', borderRadius: 999, background: 'var(--brand-50)', color: 'var(--brand-700)', fontSize: 12, fontWeight: 800 }}>⭐ Seçili Restoran</span>}
+              </div>
               <div style={{ fontSize: 15, color: 'var(--text-secondary)', marginTop: 4 }}>{r.category}</div>
             </div>
             <div style={{ display: 'flex', gap: 12 }}>
@@ -252,9 +256,17 @@ function WebRestaurantDetail({ restaurant, onBack, onAddToCart }) {
           {r.payments && (
             <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>Ödeme:</span>
-              {r.payments.map(p => (
+              <span style={{ fontSize: 12, fontWeight: 600, padding: '4px 11px', borderRadius: 999, background: 'var(--bg-sunken)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)' }}>{WEB_PAYMENT_LABELS.card}</span>
+              {r.selected && <span style={{ fontSize: 12, fontWeight: 600, padding: '4px 11px', borderRadius: 999, background: 'var(--bg-sunken)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)' }}>⭐ Kimoo Puanı</span>}
+              {r.payments.filter(p => p !== 'card').map(p => (
                 <span key={p} style={{ fontSize: 12, fontWeight: 600, padding: '4px 11px', borderRadius: 999, background: 'var(--bg-sunken)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)' }}>{WEB_PAYMENT_LABELS[p]}</span>
               ))}
+            </div>
+          )}
+          {r.selected && (
+            <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderRadius: 'var(--radius-md)', background: 'var(--brand-50)' }}>
+              <Icon name="star" size={18} color="var(--brand-600)" strokeWidth={0} style={{ fill: 'var(--brand-600)' }} />
+              <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--brand-700)', lineHeight: 1.4 }}>250 TL üzeri online siparişte <strong>%5 Kimoo Puanı</strong> (maks 25 TL) kazan, puanını burada kullan.</span>
             </div>
           )}
         </div>
@@ -303,6 +315,11 @@ function WebRestaurantDetail({ restaurant, onBack, onAddToCart }) {
 function WebCartSidebar({ cart, onClose, onCheckout, updateQty }) {
   const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
   const fee = total >= 200 ? 0 : 25;
+  const [pay, setPay] = React.useState('online');
+  const usable = total >= 250 ? Math.min(Math.floor(total * 0.2), 100) : 0;
+  const [usePuan, setUsePuan] = React.useState(false);
+  const puanApplied = (pay === 'online' && usePuan) ? usable : 0;
+  const PAY_METHODS = [['online','💳 Online kart'],['cash','💵 Kapıda nakit'],['doorcard','💳 Kapıda kart'],['mealcard','🎟️ Yemek kartı']];
 
   return (
     <>
@@ -345,17 +362,40 @@ function WebCartSidebar({ cart, onClose, onCheckout, updateQty }) {
 
         {cart.length > 0 && (
           <div style={{ borderTop: '1px solid var(--border-subtle)', padding: '16px 20px 24px' }}>
+            {/* v8 odeme yontemleri */}
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>Ödeme yöntemi</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 12 }}>
+              {PAY_METHODS.map(([id, l]) => {
+                const on = pay === id;
+                return (
+                  <button key={id} onClick={() => setPay(id)} style={{ padding: '9px 10px', borderRadius: 'var(--radius-sm)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-sans)', textAlign: 'left', background: on ? 'var(--brand-50)' : 'var(--bg-surface)', color: on ? 'var(--brand-700)' : 'var(--text-secondary)', border: on ? '1.5px solid var(--brand-500)' : '1.5px solid var(--border-default)' }}>{l}</button>
+                );
+              })}
+            </div>
+            {/* Kimoo Puani — yalnizca online + min 250 TL */}
+            {pay === 'online' && total >= 250 && (
+              <button onClick={() => setUsePuan(v => !v)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontFamily: 'var(--font-sans)', textAlign: 'left', marginBottom: 12, background: usePuan ? 'var(--brand-50)' : 'var(--bg-sunken)', border: usePuan ? '1.5px solid var(--brand-500)' : '1.5px solid transparent' }}>
+                <Icon name="star" size={16} color="var(--brand-600)" strokeWidth={0} style={{ fill: 'var(--brand-600)' }} />
+                <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{usable} TL Kimoo Puanı kullan</span>
+                <span style={{ width: 38, height: 22, borderRadius: 999, flex: 'none', position: 'relative', background: usePuan ? 'var(--brand-500)' : 'var(--border-default)' }}><span style={{ position: 'absolute', top: 3, left: usePuan ? 19 : 3, width: 16, height: 16, borderRadius: 999, background: '#fff' }} /></span>
+              </button>
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--text-secondary)', marginBottom: 8 }}>
               <span>Ara toplam</span><span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{money(total)}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--text-secondary)', marginBottom: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--text-secondary)', marginBottom: puanApplied > 0 ? 8 : 12 }}>
               <span>Teslimat</span><span style={{ fontWeight: 600, color: fee === 0 ? 'var(--success-600)' : 'var(--text-primary)' }}>{fee === 0 ? 'Ücretsiz' : money(fee)}</span>
             </div>
+            {puanApplied > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--text-secondary)', marginBottom: 12 }}>
+                <span>Kimoo Puanı</span><span style={{ fontWeight: 700, color: 'var(--success-600)' }}>−{money(puanApplied)}</span>
+              </div>
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', padding: '12px 0', borderTop: '1px solid var(--border-subtle)' }}>
-              <span>Toplam</span><span>{money(total + fee)}</span>
+              <span>Toplam</span><span>{money(total + fee - puanApplied)}</span>
             </div>
             <button onClick={onCheckout} style={{ width: '100%', padding: '15px 0', borderRadius: 999, background: 'var(--brand-500)', color: '#fff', border: 'none', fontSize: 16, fontWeight: 800, cursor: 'pointer', fontFamily: 'var(--font-sans)', boxShadow: 'var(--shadow-brand)', marginTop: 8 }}>
-              Siparişi tamamla · {money(total + fee)}
+              Siparişi tamamla · {money(total + fee - puanApplied)}
             </button>
           </div>
         )}
@@ -387,7 +427,22 @@ function WebTracking({ onBack }) {
       </button>
 
       <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>Sipariş takibi</div>
-      <div style={{ fontSize: 15, color: 'var(--text-secondary)', marginBottom: 28 }}>Sipariş #KM-4835 · Köşe Ocakbaşı</div>
+      <div style={{ fontSize: 15, color: 'var(--text-secondary)', marginBottom: 20 }}>Sipariş #KM-4835 · Köşe Ocakbaşı</div>
+
+      {/* v8 teslimat kodu */}
+      {step < 3 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 'var(--radius-lg)', background: 'var(--brand-50)', marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--brand-700)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Teslimat kodu</div>
+            <div style={{ fontSize: 13, color: 'var(--brand-700)', marginTop: 4, lineHeight: 1.4 }}>Kuryeye bu kodu göster; kurye kodu girince sipariş tamamlanır.</div>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {'4827'.split('').map((d, i) => (
+              <span key={i} style={{ width: 40, height: 50, borderRadius: 'var(--radius-md)', background: 'var(--bg-surface)', border: '1.5px solid var(--brand-500)', display: 'grid', placeItems: 'center', fontSize: 24, fontWeight: 800, color: 'var(--brand-700)' }}>{d}</span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Map placeholder */}
       <div style={{ height: 260, borderRadius: 'var(--radius-xl)', background: 'var(--bg-sunken)', backgroundImage: 'repeating-linear-gradient(0deg, var(--border-subtle) 0 1px, transparent 1px 44px), repeating-linear-gradient(90deg, var(--border-subtle) 0 1px, transparent 1px 44px)', marginBottom: 28, display: 'grid', placeItems: 'center', position: 'relative', overflow: 'hidden' }}>

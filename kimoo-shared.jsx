@@ -140,56 +140,80 @@ const CATEGORIES = [
   { id: 'vegan', label: 'Vegan', icon: '🥗' },
 ];
 
-const PAYMENT_LABELS = {
-  card:     '💳 Kredi Kartı',
-  cash:     '💵 Kapıda Nakit',
+// v8: Kapida yemek karti markalari (Multinet, Sodexo, Setcard, Ticket Restaurant, Metropol Card, Pluxee)
+const MEAL_CARDS = {
   multinet: 'Multinet',
-  metropol: 'Metropol',
-  ticket:   'Ticket',
+  sodexo:   'Sodexo',
+  setcard:  'Setcard',
+  ticket:   'Ticket Restaurant',
+  metropol: 'Metropol Card',
+  pluxee:   'Pluxee',
 };
 
+// v8 Kimoo Puani politikasi — kapali dongu, nakde cevrilemez. "bakiye" yerine "Kimoo Puani".
+const KIMOO_PUAN = {
+  balance: 380,        // mevcut Kimoo Puani (TL)
+  monthlyUsed: 60,     // bu ay kullanilan (TL)
+  earnRate: 0.05, earnCap: 25,   // kazanim: %5, maks 25 TL
+  minOrder: 250,                 // 250 TL alti kazanc/kullanim yok
+  useRate: 0.20, useCap: 100,    // kullanim: maks %20, maks 100 TL
+  balanceCap: 400,               // hesapta maks 400 TL birikir
+  monthlyCap: 300,               // aylik kullanim tavani 300 TL
+  carryoverCap: 100,             // ay sonu devir maks 100 TL
+};
+
+// PAYMENT_LABELS: restoran kartı ödeme çiplerinde kullanılır
+const PAYMENT_LABELS = {
+  card:     '💳 Online kart',
+  cash:     '💵 Kapıda nakit',
+  doorcard: '💳 Kapıda kart',
+  ...MEAL_CARDS,
+};
+
+// pay: restoran tercihine göre açılan kapıda ödeme yöntemleri. Online kart + Kimoo Puanı her zaman açıktır.
+// selected: Seçili Restoran programı (rozet, öne çıkma, Kimoo Puanı kazan/kullan)
 const RESTAURANTS = [
   {
     id: 'r1', name: 'Köşe Ocakbaşı', cuisine: 'Kebap · Türk', price: '₺₺', rating: 4.8, reviews: 1240,
-    eta: '25-35 dk', minOrder: 150, fee: 0, discount: '%30', tags: ['kebap'], open: true, free: true,
-    distance: '1.2 km', orderCount: '2.4B+',
-    payments: ['card','cash','multinet','metropol','ticket'],
+    eta: '25-35 dk', minOrder: 150, fee: 0, discount: '%15', tags: ['kebap'], open: true, free: true,
+    distance: '1.2 km', orderCount: '2.4B+', selected: true, closeAt: '23:30',
+    pay: { cash: true, doorCard: true, mealCards: ['multinet','ticket','sodexo','metropol'] },
   },
   {
     id: 'r2', name: 'Napoli Pizzeria', cuisine: 'Pizza · İtalyan', price: '₺₺', rating: 4.7, reviews: 860,
     eta: '30-40 dk', minOrder: 120, fee: 19, discount: null, tags: ['pizza'], open: true,
-    distance: '2.5 km', orderCount: '1.1B+',
-    payments: ['card','cash','multinet','ticket'],
+    distance: '2.5 km', orderCount: '1.1B+', selected: false, closeAt: '23:00',
+    pay: { cash: true, doorCard: false, mealCards: ['multinet','ticket'] },
   },
   {
     id: 'r3', name: 'Burger Atölyesi', cuisine: 'Burger · Fast Food', price: '₺₺', rating: 4.6, reviews: 2100,
-    eta: '20-30 dk', minOrder: 100, fee: 15, discount: '2 Al 1 Öde', tags: ['burger'], open: true,
-    distance: '0.8 km', orderCount: '3.6B+',
-    payments: ['card','cash','multinet'],
+    eta: '20-30 dk', minOrder: 100, fee: 15, discount: null, tags: ['burger'], open: true,
+    distance: '0.8 km', orderCount: '3.6B+', selected: false, closeAt: '23:00',
+    pay: { cash: true, doorCard: true, mealCards: ['multinet'] },
   },
   {
     id: 'r4', name: 'Yeşil Kâse', cuisine: 'Vegan · Salata', price: '₺₺', rating: 4.9, reviews: 540,
-    eta: '15-25 dk', minOrder: 90, fee: 0, discount: null, tags: ['vegan'], open: true, free: true,
-    distance: '1.5 km', orderCount: '780+',
-    payments: ['card','multinet','metropol','ticket'],
+    eta: '15-25 dk', minOrder: 90, fee: 0, discount: '%15', tags: ['vegan'], open: true, free: true,
+    distance: '1.5 km', orderCount: '780+', selected: true, closeAt: '22:00',
+    pay: { cash: false, doorCard: false, mealCards: ['multinet','metropol','ticket'] },
   },
   {
     id: 'r5', name: 'Tatlıcı Hacı', cuisine: 'Tatlı · Baklava', price: '₺₺₺', rating: 4.8, reviews: 1530,
     eta: '35-45 dk', minOrder: 80, fee: 25, discount: null, tags: ['tatli'], open: false,
-    distance: '3.1 km', orderCount: '1.8B+',
-    payments: ['card','cash'],
+    distance: '3.1 km', orderCount: '1.8B+', selected: false, opensAt: '10:00',
+    pay: { cash: true, doorCard: false, mealCards: [] },
   },
   {
     id: 'r6', name: 'Kahve Durağı', cuisine: 'Kahve · Tatlı', price: '₺', rating: 4.5, reviews: 890,
     eta: '10-15 dk', minOrder: 60, fee: 10, discount: null, tags: ['kahve'], open: true,
-    distance: '0.4 km', orderCount: '950+',
-    payments: ['card','cash','multinet'],
+    distance: '0.4 km', orderCount: '950+', selected: false, closeAt: '22:00',
+    pay: { cash: true, doorCard: false, mealCards: ['multinet'] },
   },
   {
     id: 'r7', name: 'Sushi Tokyo', cuisine: 'Japon · Sushi', price: '₺₺₺', rating: 4.7, reviews: 650,
-    eta: '40-50 dk', minOrder: 200, fee: 0, discount: '%20', tags: [], open: true, free: true,
-    distance: '2.8 km', orderCount: '520+',
-    payments: ['card','multinet','ticket'],
+    eta: '40-50 dk', minOrder: 200, fee: 0, discount: '%15', tags: [], open: true, free: true,
+    distance: '2.8 km', orderCount: '520+', selected: true, closeAt: '23:00',
+    pay: { cash: false, doorCard: false, mealCards: ['multinet','ticket'] },
   },
 ];
 
@@ -262,8 +286,24 @@ const FLASH_DEALS = [
   { title: 'Arkadaşını Davet', sub: 'İkinize de ₺50 hediye', code: 'DAVET50', gradient: 'linear-gradient(135deg, #0EA5E9, #38BDF8)', icon: '🎁' },
 ];
 
+// Kimoo Puani kullanilabilir tutar hesabi (Secili Restoran + min 250 TL)
+function puanUsable(subtotal, restaurant) {
+  if (!restaurant?.selected) return 0;
+  if (subtotal < KIMOO_PUAN.minOrder) return 0;
+  const byRate = Math.floor(subtotal * KIMOO_PUAN.useRate);
+  const monthlyLeft = Math.max(0, KIMOO_PUAN.monthlyCap - KIMOO_PUAN.monthlyUsed);
+  return Math.max(0, Math.min(byRate, KIMOO_PUAN.useCap, KIMOO_PUAN.balance, monthlyLeft));
+}
+// Kimoo Puani kazanim hesabi (Secili Restoran + min 250 TL, online)
+function puanEarn(subtotal, restaurant) {
+  if (!restaurant?.selected) return 0;
+  if (subtotal < KIMOO_PUAN.minOrder) return 0;
+  return Math.min(Math.floor(subtotal * KIMOO_PUAN.earnRate), KIMOO_PUAN.earnCap);
+}
+
 Object.assign(window, {
   Icon, Pill, MediaBox, Badge, PrimaryBtn, ScreenHeader, money,
   CATEGORIES, RESTAURANTS, MENU, PRODUCT_OPTIONS, PAYMENT_LABELS,
+  MEAL_CARDS, KIMOO_PUAN, puanUsable, puanEarn,
   STORIES, PAST_ORDERS, FLASH_DEALS, RESTAURANT_MENU_CATS,
 });
