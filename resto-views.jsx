@@ -1,6 +1,6 @@
 // resto-views.jsx — Dashboard, Orders, Menu views
 const { Icon, Badge, money,
-  RESTO_INFO, TODAY_STATS, WEEKLY_REVENUE, LIVE_ORDERS, ORDER_STATUSES, SCHEDULED_ORDERS,
+  RESTO_INFO, TODAY_STATS, WEEKLY_REVENUE, LIVE_ORDERS, ORDER_STATUSES, SCHEDULED_ORDERS, PLATFORMS,
   MENU_CATEGORIES, MENU_ITEMS, ALLERGENS,
   MetricCard, TableHeader, TableRow } = window;
 
@@ -127,15 +127,103 @@ function DashboardView() {
   );
 }
 
-// ============ ORDERS ============
-function OrdersView() {
-  const [filter, setFilter] = React.useState('all');
-  const [selected, setSelected] = React.useState(null);
-  const filtered = filter === 'all' ? LIVE_ORDERS : filter === 'scheduled' ? (SCHEDULED_ORDERS||[]) : LIVE_ORDERS.filter(o => o.status === filter);
+// ============ ORDERS — v8: çoklu platform + auto-onay + satır eylemleri + senaryo detayları ============
+function PlatformTag({ code, size = 'sm' }) {
+  const p = PLATFORMS[code] || PLATFORMS.KM;
+  const fs = size === 'lg' ? 12 : 10.5;
+  const pad = size === 'lg' ? '4px 9px' : '3px 7px';
+  return <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: fs, fontWeight: 800, padding: pad, borderRadius: 6, background: p.bg, color: p.fg, fontFamily: 'var(--font-mono, monospace)', letterSpacing: '0.04em', flex: 'none' }}>{code}</span>;
+}
 
+function RowAction({ label, icon, primary, danger, onClick }) {
+  const bg = primary ? 'var(--brand-500)' : danger ? 'var(--bg-surface)' : 'var(--bg-surface)';
+  const color = primary ? '#fff' : danger ? 'var(--error-600)' : 'var(--text-primary)';
+  const border = primary ? 'none' : danger ? '1.5px solid color-mix(in srgb, var(--error-500) 35%, transparent)' : '1.5px solid var(--border-default)';
+  return (
+    <button onClick={(e) => { e.stopPropagation(); onClick && onClick(); }} style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 11px', borderRadius: 999,
+      background: bg, color, border, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap',
+    }}>{icon && <Icon name={icon} size={13} color={primary ? '#fff' : (danger ? 'var(--error-600)' : 'var(--text-secondary)')} />}{label}</button>
+  );
+}
+
+function RowActionsFor({ o, onChange }) {
+  // v8: durum bazlı eylemler — her satıra inline
+  const set = (status) => onChange && onChange(o.id, status);
+  switch (o.status) {
+    case 'new':       return <><RowAction primary label="Kabul Et" icon="check" onClick={() => set('preparing')} /><RowAction danger label="Reddet" icon="close" onClick={() => set('cancelled')} /></>;
+    case 'preparing': return <RowAction primary label="Hazır İşaretle" icon="check" onClick={() => set('ready')} />;
+    case 'ready':     return <RowAction primary label="Kurye Ata" icon="scooter" onClick={() => set('picked')} />;
+    case 'picked':    return <RowAction label="Kurye Değiştir" icon="repeat" />;
+    case 'delivered': return <RowAction label="Detay Gör" icon="chevR" />;
+    case 'cancelled': return <RowAction label="Detay Gör" icon="chevR" />;
+    case 'scheduled': return <RowAction primary label="Onayla" icon="check" />;
+    default:          return null;
+  }
+}
+
+function OrdersView() {
+  const [orders, setOrders] = React.useState(LIVE_ORDERS);
+  const [filter, setFilter] = React.useState('all');
+  const [platformFilter, setPlatformFilter] = React.useState('all');
+  const [selected, setSelected] = React.useState(null);
+  const [autoApprove, setAutoApprove] = React.useState(false);
+
+  const setStatus = (id, status) => setOrders(arr => arr.map(o => o.id === id ? { ...o, status } : o));
+
+  const base = filter === 'scheduled' ? (SCHEDULED_ORDERS || []) : orders;
+  const filtered = base
+    .filter(o => filter === 'all' || filter === 'scheduled' || o.status === filter)
+    .filter(o => platformFilter === 'all' || o.platform === platformFilter);
+
+  // ---- Detay sayfası (8 senaryo) ----
   if (selected) {
-    const o = LIVE_ORDERS.find(x => x.id === selected) || (SCHEDULED_ORDERS||[]).find(x => x.id === selected);
+    const o = orders.find(x => x.id === selected) || (SCHEDULED_ORDERS || []).find(x => x.id === selected);
+    if (!o) return null;
     const st = ORDER_STATUSES[o.status];
+    const p = PLATFORMS[o.platform] || PLATFORMS.KM;
+
+    // senaryo → buton seti
+    const scenarioActions = (() => {
+      switch (o.status) {
+        case 'new': return [
+          { label: 'Siparişi kabul et', icon: 'check', color: 'var(--success-500)', onClick: () => setStatus(o.id, 'preparing') },
+          { label: 'Reddet', icon: 'close', color: 'var(--error-500)', outline: true },
+          { label: 'Müşteriyi ara', icon: 'phone', outline: true },
+        ];
+        case 'preparing': return [
+          { label: 'Hazır işaretle', icon: 'check', color: 'var(--brand-500)', onClick: () => setStatus(o.id, 'ready') },
+          { label: 'Müşteriyi ara', icon: 'phone', outline: true },
+          { label: 'Hazırlama süresini uzat', icon: 'clock', outline: true },
+        ];
+        case 'ready': return [
+          { label: 'Kurye ata', icon: 'scooter', color: 'var(--brand-500)', onClick: () => setStatus(o.id, 'picked') },
+          { label: 'Hazırlık tekrar', icon: 'repeat', outline: true },
+          { label: 'Müşteriyi ara', icon: 'phone', outline: true },
+        ];
+        case 'picked': return [
+          { label: 'Kuryeyi ara', icon: 'phone', color: 'var(--brand-500)' },
+          { label: 'Kurye değiştir', icon: 'repeat', outline: true },
+          { label: 'Müşteriyi ara', icon: 'phone', outline: true },
+        ];
+        case 'delivered': return [
+          { label: 'Faturayı görüntüle', icon: 'bag', color: 'var(--brand-500)' },
+          { label: 'İade başlat', icon: 'repeat', outline: true },
+          { label: 'Müşteriye mesaj gönder', icon: 'msg', outline: true },
+        ];
+        case 'cancelled': return [
+          { label: 'İptal nedenini görüntüle', icon: 'msg', color: 'var(--brand-500)' },
+          { label: 'Müşteriye mesaj', icon: 'msg', outline: true },
+        ];
+        case 'scheduled': return [
+          { label: 'Siparişi onayla', icon: 'check', color: 'var(--success-500)' },
+          { label: 'Hazırlık saatini değiştir', icon: 'clock', outline: true },
+          { label: 'İptal et', icon: 'close', color: 'var(--error-500)', outline: true },
+        ];
+        default: return [{ label: 'Detay', icon: 'chevR', outline: true }];
+      }
+    })();
+
     return (
       <div style={{ padding: PAD }}>
         <button onClick={() => setSelected(null)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', fontFamily: 'var(--font-sans)', marginBottom: 18 }}>
@@ -143,10 +231,15 @@ function OrdersView() {
         </button>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20 }}>
           <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>#{o.id}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <PlatformTag code={o.platform || 'KM'} size="lg" />
+                <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>#{o.id}</div>
+              </div>
               <Badge tone={st.tone} style={{ fontSize: 13, padding: '5px 14px' }}><span style={{ width: 7, height: 7, borderRadius: 999, background: st.dotColor }}></span>{st.label}</Badge>
             </div>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 18 }}>Platform: <strong style={{ color: p.fg }}>{p.name}</strong></div>
+
             <div style={{ display: 'flex', gap: 14, marginBottom: 24 }}>
               {[['Müşteri', o.customer, 'user'], ['Zaman', o.time, 'clock'], ['Toplam', money(o.total), 'wallet']].map(([l, v, ic], i) => (
                 <div key={i} style={{ flex: 1, background: 'var(--bg-sunken)', borderRadius: 'var(--radius-md)', padding: 14, textAlign: 'center' }}>
@@ -156,7 +249,14 @@ function OrdersView() {
                 </div>
               ))}
             </div>
-            {/* Items */}
+
+            {o.courier && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--info-50)', borderRadius: 'var(--radius-md)', marginBottom: 18 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 999, background: 'var(--info-500)', display: 'grid', placeItems: 'center', flex: 'none' }}><Icon name="scooter" size={16} color="#fff" /></div>
+                <div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 700, color: 'var(--info-600)' }}>Kurye: {o.courier}</div><div style={{ fontSize: 12, color: 'var(--info-600)', opacity: 0.85 }}>{o.status === 'picked' ? 'Yolda · ETA 12 dk' : 'Teslim edildi'}</div></div>
+              </div>
+            )}
+
             <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12 }}>Ürünler</div>
             {o.items.map((item, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border-subtle)', fontSize: 14 }}>
@@ -169,13 +269,10 @@ function OrdersView() {
               </div>
             )}
           </div>
-          {/* Actions sidebar */}
+
+          {/* Senaryo bazlı eylemler */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {o.status === 'new' && <>
-              <ActionBtn label="Siparişi kabul et" icon="check" color="var(--success-500)" />
-              <ActionBtn label="Reddet" icon="close" color="var(--error-500)" outline />
-            </>}
-            {o.status === 'scheduled' && <>
+            {o.status === 'scheduled' && (
               <div style={{ background: 'var(--info-50)', borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 4, border: '1px solid color-mix(in srgb, var(--info-500) 20%, transparent)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <Icon name="clock" size={20} color="var(--info-600)" />
@@ -184,77 +281,111 @@ function OrdersView() {
                 <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>{o.scheduledTime || o.time}</div>
                 <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Bu sipariş belirtilen saatte hazır olmalıdır</div>
               </div>
-              <ActionBtn label="Siparişi onayla" icon="check" color="var(--success-500)" />
-              <ActionBtn label="İptal et" icon="close" color="var(--error-500)" outline />
-            </>}
-            {o.status === 'preparing' && <ActionBtn label="Hazır — kuryeye bildir" icon="check" color="var(--brand-500)" />}
-            <ActionBtn label="Müşteriyi ara" icon="phone" outline />
-            <ActionBtn label="Yazdır" icon="bag" outline />
+            )}
+            {scenarioActions.map((a, i) => <ActionBtn key={i} {...a} />)}
           </div>
         </div>
       </div>
     );
   }
 
+  // ---- Liste sayfası ----
   return (
     <div style={{ padding: PAD }}>
-      <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Siparişler</div>
-      <div style={{ fontSize: 14, color: 'var(--text-tertiary)', marginBottom: 18 }}>Canlı sipariş yönetimi</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)' }}>Sipariş Yönetimi</div>
+        {/* v8: gelen siparişleri otomatik onayla */}
+        <button onClick={() => setAutoApprove(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', borderRadius: 999, border: '1.5px solid ' + (autoApprove ? 'var(--success-500)' : 'var(--border-default)'), background: autoApprove ? 'var(--success-50)' : 'var(--bg-surface)', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: autoApprove ? 'var(--success-600)' : 'var(--text-secondary)' }}>Gelen siparişleri otomatik onayla</span>
+          <span style={{ width: 38, height: 22, borderRadius: 999, position: 'relative', background: autoApprove ? 'var(--success-500)' : 'var(--border-default)', flex: 'none' }}>
+            <span style={{ position: 'absolute', top: 3, left: autoApprove ? 19 : 3, width: 16, height: 16, borderRadius: 999, background: '#fff', transition: 'left .2s ease' }} />
+          </span>
+        </button>
+      </div>
+      <div style={{ fontSize: 14, color: 'var(--text-tertiary)', marginBottom: 18 }}>Tüm platformlardan gelen canlı siparişler — Kimoo · Yemeksepeti · Trendyol · Migros Yemek</div>
 
-      {/* Filter pills */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
-        {[['all', 'Tümü'], ['new', 'Yeni'], ['preparing', 'Hazırlanıyor'], ['ready', 'Hazır'], ['picked', 'Kuryede'], ['delivered', 'Teslim'], ['scheduled', '📅 Planlı']].map(([k, l]) => (
-          <button key={k} onClick={() => setFilter(k)} style={{
-            padding: '8px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, cursor: 'pointer',
-            background: filter === k ? 'var(--brand-500)' : 'var(--bg-surface)',
-            color: filter === k ? '#fff' : 'var(--text-secondary)',
-            border: filter === k ? 'none' : '1.5px solid var(--border-default)',
-            fontFamily: 'var(--font-sans)',
-          }}>{l} {k !== 'all' && <span style={{ opacity: 0.7 }}>({(k === 'scheduled' ? (SCHEDULED_ORDERS||[]).length : LIVE_ORDERS.filter(o => k === 'all' || o.status === k).length)})</span>}</button>
-        ))}
+      {/* Durum filtre */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+        {[['all', 'Tümü'], ['new', 'Yeni'], ['preparing', 'Hazırlanıyor'], ['ready', 'Hazır'], ['picked', 'Kuryede'], ['delivered', 'Teslim'], ['scheduled', '📅 Planlı']].map(([k, l]) => {
+          const count = k === 'all' ? orders.length : k === 'scheduled' ? (SCHEDULED_ORDERS||[]).length : orders.filter(o => o.status === k).length;
+          return (
+            <button key={k} onClick={() => setFilter(k)} style={{
+              padding: '8px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+              background: filter === k ? 'var(--brand-500)' : 'var(--bg-surface)',
+              color: filter === k ? '#fff' : 'var(--text-secondary)',
+              border: filter === k ? 'none' : '1.5px solid var(--border-default)',
+              fontFamily: 'var(--font-sans)',
+            }}>{l} <span style={{ opacity: 0.7 }}>({count})</span></button>
+          );
+        })}
+      </div>
+
+      {/* Platform filtre */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 18, alignItems: 'center' }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginRight: 4 }}>Platform:</span>
+        <button onClick={() => setPlatformFilter('all')} style={{ padding: '5px 12px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)', background: platformFilter === 'all' ? 'var(--bg-sunken)' : 'transparent', color: 'var(--text-secondary)', border: '1.5px solid ' + (platformFilter === 'all' ? 'var(--border-default)' : 'transparent') }}>Tümü</button>
+        {Object.keys(PLATFORMS).map(k => {
+          const p = PLATFORMS[k]; const on = platformFilter === k;
+          return (
+            <button key={k} onClick={() => setPlatformFilter(k)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 11px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-sans)', background: on ? p.bg : 'transparent', color: on ? p.fg : 'var(--text-secondary)', border: '1.5px solid ' + (on ? p.color : 'transparent') }}>
+              <span style={{ width: 7, height: 7, borderRadius: 2, background: p.color }} />{k} · {p.name}
+            </button>
+          );
+        })}
       </div>
 
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-        <OrdersTable orders={filtered} onSelect={setSelected} />
+        <OrdersTable orders={filtered} onSelect={setSelected} onChange={setStatus} withActions />
       </div>
     </div>
   );
 }
 
-function OrdersTable({ orders, onSelect, compact }) {
+function OrdersTable({ orders, onSelect, onChange, compact, withActions }) {
   return (
     <div>
       <TableHeader>
-        <span style={{ flex: '0 0 90px' }}>Sipariş</span>
+        <span style={{ flex: '0 0 48px' }}>Pl.</span>
+        <span style={{ flex: '0 0 96px' }}>Sipariş</span>
         <span style={{ flex: 1 }}>Müşteri</span>
-        <span style={{ flex: 1 }}>Ürünler</span>
+        <span style={{ flex: 1.4 }}>Ürünler</span>
         <span style={{ flex: '0 0 80px' }}>Tutar</span>
-        <span style={{ flex: '0 0 100px' }}>Durum</span>
-        <span style={{ flex: '0 0 80px' }}>Zaman</span>
+        <span style={{ flex: '0 0 110px' }}>Durum</span>
+        <span style={{ flex: '0 0 76px' }}>Zaman</span>
+        {withActions && <span style={{ flex: '0 0 230px', textAlign: 'right' }}>Eylem</span>}
       </TableHeader>
       {orders.map(o => {
         const st = ORDER_STATUSES[o.status];
         return (
           <TableRow key={o.id} onClick={onSelect ? () => onSelect(o.id) : undefined}>
-            <span style={{ flex: '0 0 90px', fontWeight: 700, fontSize: 13, fontFamily: 'var(--font-mono, monospace)', color: 'var(--text-primary)' }}>{o.id}</span>
+            <span style={{ flex: '0 0 48px' }}><PlatformTag code={o.platform || 'KM'} /></span>
+            <span style={{ flex: '0 0 96px', fontWeight: 700, fontSize: 13, fontFamily: 'var(--font-mono, monospace)', color: 'var(--text-primary)' }}>{o.id}</span>
             <span style={{ flex: 1, fontWeight: 600, color: 'var(--text-primary)' }}>{o.customer}</span>
-            <span style={{ flex: 1, color: 'var(--text-secondary)', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{o.items.join(', ')}</span>
+            <span style={{ flex: 1.4, color: 'var(--text-secondary)', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{o.items.join(', ')}</span>
             <span style={{ flex: '0 0 80px', fontWeight: 700, color: 'var(--text-primary)' }}>{money(o.total)}</span>
-            <span style={{ flex: '0 0 100px' }}><Badge tone={st.tone} style={{ fontSize: 11 }}><span style={{ width: 6, height: 6, borderRadius: 999, background: st.dotColor }}></span>{st.label}</Badge></span>
-            <span style={{ flex: '0 0 80px', color: 'var(--text-tertiary)', fontSize: 13 }}>{o.time}</span>
+            <span style={{ flex: '0 0 110px' }}><Badge tone={st.tone} style={{ fontSize: 11 }}><span style={{ width: 6, height: 6, borderRadius: 999, background: st.dotColor }}></span>{st.label}</Badge></span>
+            <span style={{ flex: '0 0 76px', color: 'var(--text-tertiary)', fontSize: 12 }}>{o.time}</span>
+            {withActions && (
+              <span style={{ flex: '0 0 230px', display: 'flex', gap: 5, justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
+                <RowActionsFor o={o} onChange={onChange} />
+              </span>
+            )}
           </TableRow>
         );
       })}
+      {orders.length === 0 && (
+        <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 14 }}>Bu filtrede sipariş yok</div>
+      )}
     </div>
   );
 }
 
-function ActionBtn({ label, icon, color, outline }) {
+function ActionBtn({ label, icon, color, outline, onClick }) {
   return (
-    <button style={{
+    <button onClick={onClick} style={{
       display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px', borderRadius: 'var(--radius-md)',
       fontFamily: 'var(--font-sans)', fontSize: 15, fontWeight: 700, cursor: 'pointer', width: '100%',
-      background: outline ? 'var(--bg-surface)' : color,
+      background: outline ? 'var(--bg-surface)' : (color || 'var(--brand-500)'),
       color: outline ? 'var(--text-primary)' : '#fff',
       border: outline ? '1.5px solid var(--border-default)' : 'none',
       boxShadow: outline ? 'none' : '0 4px 12px ' + (color || 'var(--brand-500)') + '44',

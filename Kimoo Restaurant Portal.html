@@ -41,6 +41,8 @@
 <script type="text/babel" src="resto-data.jsx"></script>
 <script type="text/babel" src="resto-views.jsx"></script>
 <script type="text/babel" src="resto-views2.jsx"></script>
+<script type="text/babel" src="resto-couriers.jsx"></script>
+<script type="text/babel" src="resto-complaints.jsx"></script>
 <script type="text/babel" src="resto-messages.jsx"></script>
 <script type="text/babel" src="resto-integrations.jsx"></script>
 
@@ -49,7 +51,8 @@ const { useState } = React;
 const {
   ChromeWindow, Icon, SideNav,
   DashboardView, OrdersView, MenuView,
-  AnalyticsView, CampaignsView, ReviewsView, SettingsView,
+  AnalyticsView, ReviewsView, SettingsView,
+  CourierFindView, MyCouriersView, ComplaintsView,
   MessagesView, IntegrationsView,
   useTweaks, TweaksPanel, TweakSection, TweakToggle, TweakSlider,
 } = window;
@@ -57,39 +60,46 @@ const {
 const TWEAK_DEFAULTS = { dark: false, radius: 1 };
 
 const URL_MAP = {
-  dashboard:  'panel.kimoo.com/dashboard',
-  orders:     'panel.kimoo.com/siparisler',
-  menu:       'panel.kimoo.com/menu',
-  analytics:  'panel.kimoo.com/raporlar',
-  campaigns:  'panel.kimoo.com/kampanyalar',
-  reviews:    'panel.kimoo.com/yorumlar',
-  messages:    'panel.kimoo.com/mesajlar',
-  integrations:'panel.kimoo.com/entegrasyonlar',
-  settings:    'panel.kimoo.com/ayarlar',
+  dashboard:    'panel.kimoo.com/dashboard',
+  orders:       'panel.kimoo.com/siparisler',
+  menu:         'panel.kimoo.com/menu',
+  'courier-find': 'panel.kimoo.com/kurye-bul',
+  'my-couriers':  'panel.kimoo.com/kuryelerim',
+  messages:     'panel.kimoo.com/mesajlar',
+  reviews:      'panel.kimoo.com/yorumlar',
+  complaints:   'panel.kimoo.com/sikayetler',
+  analytics:    'panel.kimoo.com/raporlar',
+  integrations: 'panel.kimoo.com/entegrasyonlar',
+  settings:     'panel.kimoo.com/ayarlar',
 };
 
 const NAV_PAGES = [
-  ['dashboard',    'Genel Bakış'],
-  ['orders',        'Siparişler'],
+  ['dashboard',     'Genel Bakış'],
+  ['orders',        'Sipariş Yönetimi'],
   ['menu',          'Menü'],
-  ['integrations',  'Entegrasyonlar'],
+  ['courier-find',  'Kurye Bul'],
+  ['my-couriers',   'Kuryelerim'],
   ['messages',      'Mesajlar'],
+  ['reviews',       'Yorumlar'],
+  ['complaints',    'Şikayet & İadeler'],
   ['analytics',     'Raporlar'],
-  ['campaigns',     'Kampanyalar'],
+  ['integrations',  'Entegrasyonlar'],
   ['settings',      'Ayarlar'],
 ];
 
 function TopBar({ page }) {
   const titles = {
-    dashboard: 'Genel Bakış',
-    orders: 'Siparişler',
-    menu: 'Menü Yönetimi',
-    analytics: 'Raporlar & Analitik',
-    campaigns: 'Kampanyalar',
-    reviews: 'Yorumlar',
-    messages:     'Müşteri Mesajları',
-    integrations: 'Platform Entegrasyonları',
-    settings:     'Ayarlar',
+    dashboard:     'Genel Bakış',
+    orders:        'Sipariş Yönetimi',
+    menu:          'Menü Yönetimi',
+    'courier-find':'Kurye Bul',
+    'my-couriers': 'Kuryelerim',
+    messages:      'Müşteri Mesajları',
+    reviews:       'Yorumlar',
+    complaints:    'Şikayet & İadeler',
+    analytics:     'Raporlar & Analitik',
+    integrations:  'Platform Entegrasyonları',
+    settings:      'Ayarlar',
   };
   return (
     <div style={{
@@ -124,23 +134,25 @@ function App() {
 
   let view;
   switch (page) {
-    case 'dashboard':  view = <DashboardView />;           break;
-    case 'orders':     view = <OrdersView />;              break;
-    case 'menu':       view = <MenuView />;                break;
-    case 'analytics':  view = <AnalyticsView />;           break;
-    case 'campaigns':  view = <CampaignsView />;           break;
-    case 'reviews':    view = <ReviewsView />;             break;
-    case 'messages':      view = <MessagesView />;           break;
-    case 'integrations':  view = <IntegrationsView />;       break;
-    case 'settings':   view = <SettingsView />;            break;
-    default:           view = <DashboardView />;
+    case 'dashboard':     view = <DashboardView />;       break;
+    case 'orders':        view = <OrdersView />;          break;
+    case 'menu':          view = <MenuView />;            break;
+    case 'courier-find':  view = <CourierFindView />;     break;
+    case 'my-couriers':   view = <MyCouriersView />;      break;
+    case 'messages':      view = <MessagesView />;        break;
+    case 'reviews':       view = <ReviewsView />;         break;
+    case 'complaints':    view = <ComplaintsView />;      break;
+    case 'analytics':     view = <AnalyticsView />;       break;
+    case 'integrations':  view = <IntegrationsView />;    break;
+    case 'settings':      view = <SettingsView />;        break;
+    default:              view = <DashboardView />;
   }
 
   return (
     <div className="stage">
       <div className="stage-head">
         <h1><span className="badge-k">k</span> Kimoo · Restoran Portalı</h1>
-        <p>Sipariş yönetimi · Menü · Kampanyalar · <a href="index.html">Genel bakış</a> · <a href="Kimoo Courier App.html">Kurye App</a></p>
+        <p>Sipariş yönetimi · Kurye · Şikayet İadeler · <a href="index.html">Genel bakış</a> · <a href="Kimoo Courier App.html">Kurye App</a></p>
         <div className="nav-chips">
           {NAV_PAGES.map(([id, label]) => (
             <button key={id} className={'nav-chip' + (page === id ? ' active' : '')} onClick={() => setPage(id)}>{label}</button>

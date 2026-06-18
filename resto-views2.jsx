@@ -288,6 +288,7 @@ function SetToggle({ on, onClick, locked }) {
 }
 
 function SettingsView() {
+  const [tab, setTab] = React.useState('profile'); // profile | payments | selected
   const [open, setOpen] = React.useState(true);
   const [plan, setPlan] = React.useState('yearly'); // monthly | yearly
   const [selected, setSelected] = React.useState(true); // Secili Restoran programi
@@ -313,128 +314,185 @@ function SettingsView() {
     </div>
   );
 
+  const TABS = [
+    { id: 'profile',  label: 'Profil',           icon: 'user' },
+    { id: 'payments', label: 'Ödeme Yöntemleri', icon: 'wallet' },
+    { id: 'selected', label: 'Seçili Restoran',  icon: 'star' },
+  ];
+
   return (
     <div style={{ padding: RPAD }}>
-      <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 20 }}>Ayarlar</div>
+      <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Ayarlar</div>
+      <div style={{ fontSize: 14, color: 'var(--text-tertiary)', marginBottom: 18 }}>Restoran profili, ödeme yöntemleri ve Seçili Restoran programı</div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
-        {/* Restaurant info */}
-        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24 }}>
-          <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 18 }}>Restoran bilgileri</div>
-          {[['Restoran adı', 'Köşe Ocakbaşı'], ['Şube (Branch)', 'Kadıköy'], ['Adres', 'Moda Cad. No:45, Kadıköy, İstanbul'], ['Telefon', '+90 216 345 6789'], ['E-posta', 'kadikoy@koseocakbasi.com']].map(([l, v], i) => (
-            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border-subtle)' }}>
-              <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{l}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{v}</span>
-            </div>
-          ))}
-          <button style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px', borderRadius: 999, border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', fontSize: 13, fontWeight: 700, cursor: 'pointer', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
-            <Icon name="user" size={16} color="var(--brand-500)" />Düzenle
-          </button>
-        </div>
-
-        {/* Operating hours */}
-        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-            <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)' }}>Çalışma saatleri</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: open ? 'var(--success-600)' : 'var(--text-tertiary)' }}>{open ? 'Açık' : 'Kapalı'}</span>
-              <SetToggle on={open} onClick={() => setOpen(o => !o)} />
-            </div>
-          </div>
-          {HOURS.map(([day, hrs], i) => (
-            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border-subtle)' }}>
-              <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{day}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{hrs}</span>
-            </div>
-          ))}
-          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginTop: 14, padding: '12px 14px', background: 'var(--bg-sunken)', borderRadius: 'var(--radius-md)' }}>
-            <Icon name="clock" size={16} color="var(--text-muted)" style={{ marginTop: 1, flex: 'none' }} />
-            <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.45 }}>Çalışma saatleri dışında sistem otomatik kapanır; restoran listede "Şu an kapalı, açılış: HH:MM" olarak görünür. Tatil günleri ve teslimat süresi de buradan ayarlanır.</span>
-          </div>
-        </div>
+      {/* Üst sekmeler */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: '1px solid var(--border-subtle)' }}>
+        {TABS.map(t => {
+          const on = tab === t.id;
+          return (
+            <button key={t.id} onClick={() => setTab(t.id)} style={{
+              display: 'flex', alignItems: 'center', gap: 8, padding: '12px 18px', border: 'none', background: 'none',
+              cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: 14, fontWeight: 700,
+              color: on ? 'var(--brand-700)' : 'var(--text-tertiary)',
+              borderBottom: on ? '2.5px solid var(--brand-500)' : '2.5px solid transparent',
+              marginBottom: -1,
+            }}>
+              <Icon name={t.icon} size={17} color={on ? 'var(--brand-600)' : 'var(--text-muted)'} />{t.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Abonelik + Secili Restoran */}
-      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24, marginBottom: 14 }}>
-        <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 16 }}>Abonelik planı</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 18 }}>
-          {[
-            { id: 'monthly', name: 'Aylık Abonelik', price: '4.400 TL/ay', note: 'İlk ay ücretsiz · taahhütsüz, esnek' },
-            { id: 'yearly', name: 'Yıllık Abonelik', price: '3.900 TL/ay', note: '10 ay öde, 12 ay kullan · 2 ay ücretsiz' },
-          ].map(p => {
-            const on = plan === p.id;
-            return (
-              <button key={p.id} onClick={() => setPlan(p.id)} style={{ textAlign: 'left', cursor: 'pointer', fontFamily: 'var(--font-sans)', background: on ? 'var(--brand-50)' : 'var(--bg-surface)', border: on ? '1.5px solid var(--brand-500)' : '1.5px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{p.name}</span>
-                  {on && <Badge tone="brand" style={{ fontSize: 10 }}>Aktif</Badge>}
+      {/* TAB: PROFİL */}
+      {tab === 'profile' && (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+            <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 18 }}>Restoran bilgileri</div>
+              {[['Restoran adı', 'Köşe Ocakbaşı'], ['Şube (Branch)', 'Kadıköy'], ['Adres', 'Moda Cad. No:45, Kadıköy, İstanbul'], ['Telefon', '+90 216 345 6789'], ['E-posta', 'kadikoy@koseocakbasi.com'], ['Vergi no', '1234567890']].map(([l, v], i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+                  <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{l}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{v}</span>
                 </div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: on ? 'var(--brand-700)' : 'var(--text-primary)', letterSpacing: '-0.02em' }}>{p.price}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 4, lineHeight: 1.4 }}>{p.note}</div>
+              ))}
+              <button style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px', borderRadius: 999, border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', fontSize: 13, fontWeight: 700, cursor: 'pointer', color: 'var(--text-primary)', fontFamily: 'var(--font-sans)' }}>
+                <Icon name="user" size={16} color="var(--brand-500)" />Düzenle
               </button>
-            );
-          })}
-        </div>
-        {/* Secili Restoran add-on */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 16, borderRadius: 'var(--radius-md)', background: selected ? 'var(--brand-50)' : 'var(--bg-sunken)', border: selected ? '1.5px solid color-mix(in srgb, var(--brand-500) 35%, transparent)' : '1.5px solid var(--border-subtle)' }}>
-          <div style={{ width: 40, height: 40, borderRadius: 999, background: 'var(--brand-500)', display: 'grid', placeItems: 'center', flex: 'none' }}>
-            <Icon name="star" size={20} color="#fff" />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>Seçili Restoran Programı · +900 TL/ay</div>
-            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 2, lineHeight: 1.45 }}>Rozet, ana sayfada öne çıkma, Kimoo Puanı döngüsü, ürün bazlı indirim. Aktivasyon için %95 profil tamamlanma + ücret ödemesi gerekir.</div>
-          </div>
-          <SetToggle on={selected} onClick={() => setSelected(s => !s)} />
-        </div>
-        {selected && profilePct < 95 && (
-          <div style={{ marginTop: 10, fontSize: 12.5, color: 'var(--warning-600)', fontWeight: 600 }}>Profil %95'e ulaşmadan program aktifleşmez.</div>
-        )}
-      </div>
-
-      {/* Profil tamamlanma */}
-      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24, marginBottom: 14 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)' }}>Profil tamamlanma</div>
-          <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--brand-600)' }}>%{profilePct}</span>
-        </div>
-        <div style={{ height: 10, borderRadius: 999, background: 'var(--bg-sunken)', overflow: 'hidden', marginBottom: 14 }}>
-          <div style={{ width: profilePct + '%', height: '100%', borderRadius: 999, background: 'var(--brand-500)' }}></div>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          {[['Evrak yükleme', true], ['Görsel ekleme', true], ['Ürün açıklamaları', true], ['Makro bilgileri', false]].map(([l, done], i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: done ? 'var(--text-secondary)' : 'var(--text-muted)' }}>
-              <span style={{ width: 18, height: 18, borderRadius: 999, flex: 'none', display: 'grid', placeItems: 'center', background: done ? 'var(--success-50)' : 'var(--bg-sunken)' }}>
-                <Icon name={done ? 'check' : 'clock'} size={11} color={done ? 'var(--success-600)' : 'var(--text-muted)'} />
-              </span>
-              {l}
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Odeme yontemleri */}
-      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24 }}>
-        <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Ödeme yöntemleri</div>
-        <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginBottom: 8 }}>Online ödeme her zaman açıktır ve kapatılamaz. Kapıda ödeme yöntemleri tercihinize bağlıdır.</div>
-        <Row title="Online kart (Kredi / Banka)" sub="Iyzico/Stripe provision modeli · kapatılamaz" locked><SetToggle on={true} locked /></Row>
-        <Row title="Kimoo Puanı" sub="DB rezervasyon ile çalışır · kapatılamaz" locked><SetToggle on={true} locked /></Row>
-        <Row title="Kapıda nakit" sub="Kimoo buluşturucu — tahsilat kapıda"><SetToggle on={cash} onClick={() => setCash(c => !c)} /></Row>
-        <Row title="Kapıda kredi kartı" sub="Teslimatta kurye POS ile tahsilat"><SetToggle on={doorCard} onClick={() => setDoorCard(d => !d)} /></Row>
-
-        <div style={{ paddingTop: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>Yemek kartları</div>
-          <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)', marginBottom: 12 }}>Her kartı tekil olarak aç/kapat. Yalnızca kapıda geçerlidir; müşteri yalnızca aktif ettiklerinizi görür.</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            {Object.keys(MEAL).map(k => (
-              <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: cards[k] ? 'var(--bg-surface)' : 'var(--bg-sunken)' }}>
-                <Icon name="ticket" size={18} color={cards[k] ? 'var(--brand-500)' : 'var(--text-muted)'} />
-                <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{MEAL[k]}</span>
-                <SetToggle on={!!cards[k]} onClick={() => setCards(c => ({ ...c, [k]: !c[k] }))} />
+            <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+                <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)' }}>Çalışma saatleri</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: open ? 'var(--success-600)' : 'var(--text-tertiary)' }}>{open ? 'Açık' : 'Kapalı'}</span>
+                  <SetToggle on={open} onClick={() => setOpen(o => !o)} />
+                </div>
               </div>
-            ))}
+              {HOURS.map(([day, hrs], i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+                  <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{day}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{hrs}</span>
+                </div>
+              ))}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginTop: 14, padding: '12px 14px', background: 'var(--bg-sunken)', borderRadius: 'var(--radius-md)' }}>
+                <Icon name="clock" size={16} color="var(--text-muted)" style={{ marginTop: 1, flex: 'none' }} />
+                <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.45 }}>Çalışma saatleri dışında sistem otomatik kapanır; restoran listede "Şu an kapalı, açılış: HH:MM" olarak görünür.</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Profil tamamlanma */}
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)' }}>Profil tamamlanma</div>
+              <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--brand-600)' }}>%{profilePct}</span>
+            </div>
+            <div style={{ height: 10, borderRadius: 999, background: 'var(--bg-sunken)', overflow: 'hidden', marginBottom: 14 }}>
+              <div style={{ width: profilePct + '%', height: '100%', borderRadius: 999, background: 'var(--brand-500)' }}></div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              {[['Evrak yükleme', true], ['Görsel ekleme', true], ['Ürün açıklamaları', true], ['Makro bilgileri', false]].map(([l, done], i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: done ? 'var(--text-secondary)' : 'var(--text-muted)' }}>
+                  <span style={{ width: 18, height: 18, borderRadius: 999, flex: 'none', display: 'grid', placeItems: 'center', background: done ? 'var(--success-50)' : 'var(--bg-sunken)' }}>
+                    <Icon name={done ? 'check' : 'clock'} size={11} color={done ? 'var(--success-600)' : 'var(--text-muted)'} />
+                  </span>
+                  {l}
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 14, padding: '10px 14px', background: 'var(--brand-50)', borderRadius: 'var(--radius-md)', display: 'flex', gap: 10, alignItems: 'center' }}>
+              <Icon name="star" size={16} color="var(--brand-600)" />
+              <span style={{ fontSize: 12.5, color: 'var(--brand-700)', lineHeight: 1.4 }}><strong>%95'in altına düşersen</strong> Seçili Restoran rozetin pasifleşir.</span>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* TAB: ÖDEME YÖNTEMLERİ */}
+      {tab === 'payments' && (
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24 }}>
+          <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Ödeme yöntemleri</div>
+          <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginBottom: 8 }}>Online ödeme her zaman açıktır ve kapatılamaz. Kapıda ödeme yöntemleri tercihinize bağlıdır.</div>
+          <Row title="Online kart (Kredi / Banka)" sub="Iyzico/Stripe provision modeli · kapatılamaz" locked><SetToggle on={true} locked /></Row>
+          <Row title="Kimoo Puanı" sub="DB rezervasyon ile çalışır · kapatılamaz" locked><SetToggle on={true} locked /></Row>
+          <Row title="Kapıda nakit" sub="Kimoo buluşturucu — tahsilat kapıda"><SetToggle on={cash} onClick={() => setCash(c => !c)} /></Row>
+          <Row title="Kapıda kredi kartı" sub="Teslimatta kurye POS ile tahsilat"><SetToggle on={doorCard} onClick={() => setDoorCard(d => !d)} /></Row>
+
+          <div style={{ paddingTop: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>Yemek kartları</div>
+            <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)', marginBottom: 12 }}>Her kartı tekil olarak aç/kapat. Yalnızca kapıda geçerlidir; müşteri yalnızca aktif ettiklerinizi görür.</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {Object.keys(MEAL).map(k => (
+                <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', background: cards[k] ? 'var(--bg-surface)' : 'var(--bg-sunken)' }}>
+                  <Icon name="ticket" size={18} color={cards[k] ? 'var(--brand-500)' : 'var(--text-muted)'} />
+                  <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{MEAL[k]}</span>
+                  <SetToggle on={!!cards[k]} onClick={() => setCards(c => ({ ...c, [k]: !c[k] }))} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* TAB: SEÇİLİ RESTORAN */}
+      {tab === 'selected' && (
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: 24 }}>
+          <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 16 }}>Abonelik planı</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 18 }}>
+            {[
+              { id: 'monthly', name: 'Aylık Abonelik', price: '4.400 TL/ay', note: 'İlk ay ücretsiz · taahhütsüz, esnek' },
+              { id: 'yearly', name: 'Yıllık Abonelik', price: '3.900 TL/ay', note: '10 ay öde, 12 ay kullan · 2 ay ücretsiz' },
+            ].map(p => {
+              const on = plan === p.id;
+              return (
+                <button key={p.id} onClick={() => setPlan(p.id)} style={{ textAlign: 'left', cursor: 'pointer', fontFamily: 'var(--font-sans)', background: on ? 'var(--brand-50)' : 'var(--bg-surface)', border: on ? '1.5px solid var(--brand-500)' : '1.5px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{p.name}</span>
+                    {on && <Badge tone="brand" style={{ fontSize: 10 }}>Aktif</Badge>}
+                  </div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: on ? 'var(--brand-700)' : 'var(--text-primary)', letterSpacing: '-0.02em' }}>{p.price}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 4, lineHeight: 1.4 }}>{p.note}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 16, borderRadius: 'var(--radius-md)', background: selected ? 'var(--brand-50)' : 'var(--bg-sunken)', border: selected ? '1.5px solid color-mix(in srgb, var(--brand-500) 35%, transparent)' : '1.5px solid var(--border-subtle)' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 999, background: 'var(--brand-500)', display: 'grid', placeItems: 'center', flex: 'none' }}>
+              <Icon name="star" size={20} color="#fff" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>Seçili Restoran Programı · +900 TL/ay</div>
+              <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 2, lineHeight: 1.45 }}>Rozet, ana sayfada öne çıkma, Kimoo Puanı döngüsü, ürün bazlı indirim. Aktivasyon için %95 profil tamamlanma + ücret ödemesi gerekir.</div>
+            </div>
+            <SetToggle on={selected} onClick={() => setSelected(s => !s)} />
+          </div>
+          {selected && profilePct < 95 && (
+            <div style={{ marginTop: 10, fontSize: 12.5, color: 'var(--warning-600)', fontWeight: 600 }}>Profil %95'e ulaşmadan program aktifleşmez.</div>
+          )}
+
+          {/* Faydalar listesi */}
+          <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid var(--border-subtle)' }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12 }}>Program faydaları</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {[
+                ['Ana sayfada öne çıkma', 'star'],
+                ['"Seçili" rozet ve kategori', 'star'],
+                ['Kimoo Puanı kazanım/kullanım', 'wallet'],
+                ['Ürün bazlı %5/%10/%15 indirim', 'tag'],
+                ['Havuz kurye bakiye dönüşümü', 'scooter'],
+                ['Müşteri bağlılığı raporu', 'heart'],
+              ].map(([t, ic], i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: 'var(--text-secondary)' }}>
+                  <span style={{ width: 28, height: 28, borderRadius: 999, background: 'var(--brand-50)', display: 'grid', placeItems: 'center', flex: 'none' }}>
+                    <Icon name={ic} size={14} color="var(--brand-600)" />
+                  </span>{t}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

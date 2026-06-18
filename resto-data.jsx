@@ -18,12 +18,25 @@ const WEEKLY_REVENUE = [
   { day: 'Paz', val: 12480 },
 ];
 
+// v8: Çoklu platform marşaşı — KM (Kimoo), YS (Yemeksepeti), TY (Trendyol), MY (Migros Yemek)
+const PLATFORMS = {
+  KM: { name: 'Kimoo',        color: 'var(--brand-500)',  bg: 'var(--brand-50)',   fg: 'var(--brand-700)' },
+  YS: { name: 'Yemeksepeti',  color: '#FA0050',           bg: '#FFE4EC',           fg: '#A8003A' },
+  TY: { name: 'Trendyol',     color: '#F27A1A',           bg: '#FFF0DF',           fg: '#A04E0A' },
+  MY: { name: 'Migros Yemek', color: '#FF6900',           bg: '#FFE8D6',           fg: '#9E4400' },
+};
+
 const LIVE_ORDERS = [
-  { id: 'KM-4833', customer: 'Elif Y.', items: ['Adana Dürüm x2', 'Ayran x2'], total: 360, time: '2 dk önce', status: 'new', note: 'Acısız olsun' },
-  { id: 'KM-4832', customer: 'Can B.', items: ['Karışık Izgara', 'İçli Köfte x3'], total: 765, time: '5 dk önce', status: 'preparing', note: '' },
-  { id: 'KM-4831', customer: 'Zeynep A.', items: ['Urfa Kebap', 'Künefe'], total: 330, time: '12 dk önce', status: 'ready', note: '' },
-  { id: 'KM-4830', customer: 'Mehmet T.', items: ['Adana Dürüm', 'Patates'], total: 185, time: '18 dk önce', status: 'picked', note: '' },
-  { id: 'KM-4829', customer: 'Ayşe K.', items: ['İçli Köfte x6', 'Ayran x3'], total: 295, time: '25 dk önce', status: 'delivered', note: '' },
+  { id: 'KM-4833', platform: 'KM', customer: 'Elif Y.', items: ['Adana Dürüm x2', 'Ayran x2'],   total: 360, time: '2 dk önce',  status: 'new',       note: 'Acısız olsun' },
+  { id: 'YS-9182', platform: 'YS', customer: 'Burak K.', items: ['Karma Pizza',  'Cola x2'],     total: 285, time: '4 dk önce',  status: 'new',       note: '' },
+  { id: 'KM-4832', platform: 'KM', customer: 'Can B.',   items: ['Karışık Izgara', 'İçli Köfte x3'], total: 765, time: '5 dk önce',  status: 'preparing', note: '' },
+  { id: 'TY-2208', platform: 'TY', customer: 'Selin M.', items: ['Tavuk Dürüm', 'Ayran'],         total: 195, time: '8 dk önce',  status: 'preparing', note: 'Az acılı' },
+  { id: 'KM-4831', platform: 'KM', customer: 'Zeynep A.',items: ['Urfa Kebap', 'Künefe'],         total: 330, time: '12 dk önce', status: 'ready',     note: '' },
+  { id: 'MY-7044', platform: 'MY', customer: 'Onur D.',  items: ['Adana Dürüm', 'Şalgam x2'],      total: 215, time: '15 dk önce', status: 'ready',     note: '' },
+  { id: 'KM-4830', platform: 'KM', customer: 'Mehmet T.',items: ['Adana Dürüm', 'Patates'],       total: 185, time: '18 dk önce', status: 'picked',    note: '', courier: 'M. Arslan' },
+  { id: 'YS-9175', platform: 'YS', customer: 'Pelin S.', items: ['Lahmacun x4'],                  total: 160, time: '22 dk önce', status: 'picked',    note: '', courier: 'A. Yılmaz' },
+  { id: 'KM-4829', platform: 'KM', customer: 'Ayşe K.', items: ['İçli Köfte x6', 'Ayran x3'],   total: 295, time: '25 dk önce', status: 'delivered', note: '', courier: 'C. Öztürk' },
+  { id: 'TY-2201', platform: 'TY', customer: 'Berk Ö.', items: ['Karma Tabak'],                  total: 410, time: '45 dk önce', status: 'delivered', note: '', courier: 'M. Arslan' },
 ];
 
 const ORDER_STATUSES = {
@@ -119,23 +132,28 @@ function TableRow({ children, onClick }) {
 }
 
 function SideNav({ active, onNav, collapsed }) {
+  const courierPackets = window.COURIER_PACKETS_LEFT || 64;
   const sections = [
     { label: 'ANA MENÜ', items: [
-      { id: 'dashboard',    icon: 'home',    label: 'Genel Bakış' },
-      { id: 'orders',       icon: 'bag',     label: 'Siparişler' },
-      { id: 'menu',         icon: 'flame',   label: 'Menü Yönetimi' },
-      { id: 'integrations', icon: 'link',    label: 'Entegrasyonlar' },
+      { id: 'dashboard',  icon: 'home',  label: 'Genel Bakış' },
+      { id: 'orders',     icon: 'bag',   label: 'Sipariş Yönetimi' },
+      { id: 'menu',       icon: 'flame', label: 'Menü Yönetimi' },
+    ]},
+    { label: 'KURYE', items: [
+      { id: 'courier-find', icon: 'scooter', label: 'Kurye Bul', packets: courierPackets },
+      { id: 'my-couriers',  icon: 'user',    label: 'Kuryelerim' },
     ]},
     { label: 'MÜŞTERİ', items: [
-      { id: 'messages',  icon: 'msg',   label: 'Müşteri Mesajları', badge: '3' },
+      { id: 'messages',   icon: 'msg',   label: 'Müşteri Mesajları', badge: '3' },
+      { id: 'reviews',    icon: 'heart', label: 'Yorumlar' },
+      { id: 'complaints', icon: 'close', label: 'Şikayet & İadeler' },
     ]},
     { label: 'ANALİTİK', items: [
-      { id: 'analytics', icon: 'star',  label: 'Raporlar' },
-      { id: 'campaigns', icon: 'tag',   label: 'Kampanyalar' },
-      { id: 'reviews',   icon: 'heart', label: 'Yorumlar' },
+      { id: 'analytics',  icon: 'star',  label: 'Raporlar' },
     ]},
     { label: 'AYARLAR', items: [
-      { id: 'settings', icon: 'user', label: 'Ayarlar' },
+      { id: 'integrations', icon: 'link', label: 'Entegrasyonlar' },
+      { id: 'settings',     icon: 'user', label: 'Ayarlar' },
     ]},
   ];
 
@@ -167,6 +185,9 @@ function SideNav({ active, onNav, collapsed }) {
                   {!collapsed && <span>{item.label}</span>}
                   {item.id === 'orders' && !collapsed && (
                     <span style={{ marginLeft: 'auto', background: 'var(--brand-500)', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 7px', borderRadius: 999 }}>5</span>
+                  )}
+                  {item.packets != null && !collapsed && (
+                    <span style={{ marginLeft: 'auto', background: 'var(--bg-sunken)', color: 'var(--text-secondary)', fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 999 }}>{item.packets}</span>
                   )}
                   {item.badge && !collapsed && (
                     <span style={{ marginLeft: 'auto', background: 'var(--success-500)', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 7px', borderRadius: 999 }}>{item.badge}</span>
@@ -200,7 +221,7 @@ const SCHEDULED_ORDERS = [
 ];
 
 Object.assign(window, {
-  RESTO_INFO, TODAY_STATS, WEEKLY_REVENUE, LIVE_ORDERS, ORDER_STATUSES, SCHEDULED_ORDERS,
+  RESTO_INFO, TODAY_STATS, WEEKLY_REVENUE, LIVE_ORDERS, ORDER_STATUSES, SCHEDULED_ORDERS, PLATFORMS,
   MENU_CATEGORIES, MENU_ITEMS, ALLERGENS, CAMPAIGNS, RECENT_REVIEWS, HOURLY_ORDERS, TOP_ITEMS,
   MetricCard, TableHeader, TableRow, SideNav,
 });
