@@ -35,6 +35,7 @@
 
 <script type="text/babel" src="browser-window.jsx"></script>
 <script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="kimoo-theme.jsx"></script>
 <script type="text/babel" src="kimoo-shared.jsx"></script>
 <script type="text/babel" src="resto-data.jsx"></script>
 <script type="text/babel" src="admin-data.jsx"></script>
@@ -74,6 +75,7 @@ const NAV_BUTTONS = [
 
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  useKimooTheme(t.dark, (v) => setTweak('dark', v));
   const [page, setPage] = useState('dashboard');
 
   const rootVars = { '--radius-scale': t.radius, width: '100%' };

@@ -98,6 +98,7 @@
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
 <script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="kimoo-theme.jsx"></script>
 <script type="text/babel" src="kimoo-shared.jsx"></script>
 <script type="text/babel" src="web-data.jsx"></script>
 <script type="text/babel" src="web-views.jsx"></script>
@@ -119,6 +120,7 @@ const BPS = [
 
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  useKimooTheme(t.dark, (v) => setTweak('dark', v));
   const [page, setPage] = useState('home');
   const [restaurant, setRestaurant] = useState(null);
   const [cart, setCart] = useState([]);

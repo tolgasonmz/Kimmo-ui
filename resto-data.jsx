@@ -148,6 +148,9 @@ function SideNav({ active, onNav, collapsed }) {
       { id: 'reviews',    icon: 'heart', label: 'Yorumlar' },
       { id: 'complaints', icon: 'close', label: 'Şikayet & İadeler' },
     ]},
+    { label: 'PAZARLAMA', items: [
+      { id: 'campaigns',  icon: 'percent', label: 'Kampanyalar' },
+    ]},
     { label: 'ANALİTİK', items: [
       { id: 'analytics',  icon: 'star',  label: 'Raporlar' },
     ]},

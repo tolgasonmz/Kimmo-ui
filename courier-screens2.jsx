@@ -139,6 +139,10 @@ function CourierProfileScreen({ go }) {
       </div>
 
       <div style={{ padding: '14px 20px 0' }}>
+        {/* Görünüm — v8 koyu mod */}
+        <div style={{ marginBottom: 16 }}>
+          <window.ThemeRow subtitle="Açık veya koyu tema arasında geç" />
+        </div>
         <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
           <StatCard label="Toplam teslimat" value={p.totalDeliveries.toLocaleString('tr-TR')} />
           <StatCard label="Puan" value={p.rating} accent="var(--warning-600)" />

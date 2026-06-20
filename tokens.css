@@ -144,34 +144,55 @@
 }
 
 /* ============================================================
-   DARK MODE — surface tokens remap; palettes stay constant
+   DARK MODE — warm, layered, harmonious
+   Hierarchy (low → high elevation): app → sunken → surface → surface-2
    ============================================================ */
 [data-theme="dark"] {
-  --bg-app:        var(--neutral-950);
-  --bg-surface:    #17140F;
-  --bg-surface-2:  #211D17;
-  --bg-sunken:     #0B0907;
+  /* ---- Surface stack (warm, +brightness as elevation rises) ---- */
+  --bg-app:        #0D0B09;  /* canvas — deepest */
+  --bg-sunken:     #141210;  /* inset/recessed (inputs, list rails) */
+  --bg-surface:    #1C1815;  /* cards, sheets */
+  --bg-surface-2:  #261F1A;  /* modals, popovers, hover */
   --bg-inverse:    var(--neutral-50);
-  --bg-overlay:    rgba(0,0,0,0.6);
+  --bg-overlay:    rgba(0,0,0,0.62);
 
-  --text-primary:   #F7F4F0;
-  --text-secondary: #BDB4AA;
-  --text-tertiary:  #948B81;
-  --text-muted:     #6E665E;
+  /* ---- Text (warm off-white scale) ---- */
+  --text-primary:   #F4EFE8;
+  --text-secondary: #C0B5A7;
+  --text-tertiary:  #948879;
+  --text-muted:     #6A6056;
   --text-inverse:   var(--neutral-900);
 
-  --border-subtle: rgba(255,255,255,0.07);
-  --border-default: rgba(255,255,255,0.12);
-  --border-strong: rgba(255,255,255,0.2);
+  /* ---- Borders (warm-tinted, low alpha) ---- */
+  --border-subtle:  rgba(245, 230, 210, 0.07);
+  --border-default: rgba(245, 230, 210, 0.12);
+  --border-strong:  rgba(245, 230, 210, 0.20);
 
-  --brand-50:  rgba(255,90,60,0.14);
-  --brand-100: rgba(255,90,60,0.22);
+  /* ---- Brand tints (transparent so they tint whichever surface they sit on) ---- */
+  --brand-50:  rgba(255, 122, 84, 0.14);
+  --brand-100: rgba(255, 122, 84, 0.22);
+  /* brand-700 is used as text-on-brand-50 — lift to a readable bright coral */
+  --brand-700: var(--coral-300);
 
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.4);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
-  --shadow-lg: 0 12px 28px rgba(0,0,0,0.6);
-  --shadow-xl: 0 24px 56px rgba(0,0,0,0.7);
+  /* ---- Semantic surfaces — translucent tints instead of pastel pinks/yellows ---- */
+  --success-50: rgba(34, 197, 94, 0.16);
+  --success-600: #4ADE80;  /* brighter for dark bg */
+  --warning-50: rgba(245, 158, 11, 0.18);
+  --warning-600: #FBBF24;
+  --warning-700: #F59E0B;
+  --error-50:   rgba(248, 113, 113, 0.18);
+  --error-600:  #F87171;
+  --info-50:    rgba(96, 165, 250, 0.18);
+  --info-500:   #60A5FA;
+  --info-600:   #93C5FD;
+
+  /* ---- Shadows (soften — dark already implies depth) ---- */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.32);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.36);
+  --shadow-md: 0 6px 16px rgba(0,0,0,0.42);
+  --shadow-lg: 0 14px 32px rgba(0,0,0,0.52);
+  --shadow-xl: 0 28px 64px rgba(0,0,0,0.6);
+  --shadow-brand: 0 10px 28px rgba(255, 90, 60, 0.28);
 }
 
 * { box-sizing: border-box; }

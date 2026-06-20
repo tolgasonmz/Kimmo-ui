@@ -1,0 +1,338 @@
+<div style="background: #f5f3f0; border-radius: 16px; padding: 1.5rem; font-family: system-ui, -apple-system, sans-serif; font-size: 13px; color: #2D3436;">
+
+<!-- Sekme -->
+<div style="display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 0.5px solid #e0e0e0;">
+  <div style="padding: 8px 16px; font-size: 13px; color: #999;">Profil</div>
+  <div style="padding: 8px 16px; font-size: 13px; color: #999;">Ödeme Yöntemleri</div>
+  <div style="padding: 8px 16px; font-size: 13px; color: #999;">Abonelik</div>
+  <div style="padding: 8px 16px; font-size: 13px; font-weight: 500; color: #00897B; border-bottom: 2px solid #00897B;">Rozetler</div>
+</div>
+
+<!-- Profil vitrin -->
+<div style="background: linear-gradient(135deg, #00897B, #00695C); border-radius: 14px; padding: 20px; margin-bottom: 16px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+    <div>
+      <div style="font-size: 16px; font-weight: 600; color: white;">Rozet vitrininiz</div>
+      <div style="font-size: 11px; color: rgba(255,255,255,0.5);">Müşteriler profilinizde bu 3 rozeti görür</div>
+    </div>
+    <div style="background: rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 12px;">
+      <span style="font-size: 12px; color: #F5A623; font-weight: 600;">7</span><span style="font-size: 11px; color: rgba(255,255,255,0.4);"> / 20 rozet kazanıldı</span>
+    </div>
+  </div>
+  <div style="display: flex; gap: 14px;">
+    <div style="flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 18px 12px; text-align: center; backdrop-filter: blur(4px);">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #F5A623, #E8950E); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 26px; box-shadow: 0 4px 12px rgba(245,166,35,0.3);">⭐</div>
+      <div style="font-size: 12px; font-weight: 600; color: white;">Seçili Restoran</div>
+      <div style="font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 3px;">Statü rozeti</div>
+    </div>
+    <div style="flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 18px 12px; text-align: center;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #E65100, #BF360C); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 26px; box-shadow: 0 4px 12px rgba(230,81,0,0.3); position: relative;">📦
+        <div style="position: absolute; bottom: -2px; right: -2px; background: white; color: #E65100; font-size: 8px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">III</div>
+      </div>
+      <div style="font-size: 12px; font-weight: 600; color: white;">Paket Şampiyonu</div>
+      <div style="font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 3px;">3 kez kazanıldı</div>
+    </div>
+    <div style="flex: 1; background: rgba(255,255,255,0.06); border: 1px dashed rgba(255,255,255,0.15); border-radius: 14px; padding: 18px 12px; text-align: center; cursor: pointer;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 22px; color: rgba(255,255,255,0.2);">+</div>
+      <div style="font-size: 12px; color: rgba(255,255,255,0.3);">Rozet yerleştir</div>
+      <div style="font-size: 9px; color: rgba(255,255,255,0.15); margin-top: 3px;">Boş slot</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATÜ ROZETLERİ -->
+<div style="background: white; border-radius: 14px; padding: 20px; border: 0.5px solid #eee; margin-bottom: 14px;">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #F5A623, #E8950E); display: flex; align-items: center; justify-content: center; font-size: 16px;">👑</div>
+    <div>
+      <div style="font-size: 15px; font-weight: 600;">Statü Rozetleri</div>
+      <div style="font-size: 10px; color: #888;">Üyelik ve resmi statünüzü gösteren prestij rozetleri</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+    <!-- Seçili - kazanılmış -->
+    <div style="background: linear-gradient(145deg, #f0faf8, #e0f2ef); border: 1px solid #00897B; border-radius: 12px; padding: 16px; text-align: center;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #00897B, #00695C); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 28px; box-shadow: 0 4px 14px rgba(0,137,123,0.25);">⭐</div>
+      <div style="font-size: 13px; font-weight: 600; color: #00897B;">Seçili Restoran</div>
+      <div style="font-size: 10px; color: #888; margin-top: 6px; line-height: 1.5;">Kimoo'nun doğrulanmış iş ortağı. Müşteriler sizi güvenle seçer.</div>
+      <div style="margin-top: 8px; padding-top: 8px; border-top: 0.5px solid #c8ede8;">
+        <div style="font-size: 9px; color: #00897B; font-weight: 500;">✓ Aktif · Profilinde</div>
+      </div>
+    </div>
+
+    <!-- Elit - kazanılmamış -->
+    <div style="background: #f9f9f9; border: 0.5px solid #e0e0e0; border-radius: 12px; padding: 16px; text-align: center; position: relative;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 28px; filter: grayscale(0.8); opacity: 0.5;">👑</div>
+      <div style="font-size: 13px; font-weight: 600; color: #aaa;">Elit Restoran</div>
+      <div style="font-size: 10px; color: #bbb; margin-top: 6px; line-height: 1.5;">Kimoo'nun en prestijli kategorisi. Bölgenizde sadece 5-10 restoran.</div>
+      <div style="margin-top: 8px; padding-top: 8px; border-top: 0.5px solid #eee;">
+        <div style="font-size: 9px; color: #F5A623;">Puanınız uygun · Başvuru yapabilirsiniz</div>
+      </div>
+    </div>
+
+    <!-- Michelin - kazanılmamış -->
+    <div style="background: #f9f9f9; border: 0.5px solid #e0e0e0; border-radius: 12px; padding: 16px; text-align: center;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 28px; filter: grayscale(0.8); opacity: 0.5;">🌟</div>
+      <div style="font-size: 13px; font-weight: 600; color: #aaa;">Michelin Yıldızlı</div>
+      <div style="font-size: 10px; color: #bbb; margin-top: 6px; line-height: 1.5;">Michelin Rehberi tarafından ödüllendirilmiş dünya standartı.</div>
+      <div style="margin-top: 8px; padding-top: 8px; border-top: 0.5px solid #eee;">
+        <div style="font-size: 9px; color: #ccc;">🔒 Harici doğrulama gerekli</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MEMNUNİYET ROZETLERİ -->
+<div style="background: white; border-radius: 14px; padding: 20px; border: 0.5px solid #eee; margin-bottom: 14px;">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #E53935, #C62828); display: flex; align-items: center; justify-content: center; font-size: 16px;">❤️</div>
+    <div>
+      <div style="font-size: 15px; font-weight: 600;">Memnuniyet Rozetleri</div>
+      <div style="font-size: 10px; color: #888;">Müşterileriniz sizi seviyor — bunu kanıtlayın</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+    <!-- Kazanılmış -->
+    <div style="background: linear-gradient(145deg, #FFF5F5, #FFEBEE); border: 1px solid #FFCDD2; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #E53935, #C62828); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(229,57,53,0.25); flex-shrink: 0; position: relative;">❤️
+          <div style="position: absolute; bottom: -2px; right: -2px; background: white; color: #E53935; font-size: 8px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">II</div>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600;">Memnuniyet Abidesi</div>
+          <div style="font-size: 10px; color: #888; line-height: 1.5; margin-top: 4px;">Müşterileriniz sürekli olarak mükemmel deneyim yaşıyor. 30 gün üst üste %95+ memnuniyet oranını korumanız bunu kanıtlıyor.</div>
+          <div style="font-size: 9px; color: #E53935; margin-top: 6px; font-weight: 500;">✓ 2 kez kazanıldı · Profile ekle →</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(145deg, #FFF5F5, #FFEBEE); border: 1px solid #FFCDD2; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #E53935, #C62828); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(229,57,53,0.25); flex-shrink: 0;">⭐</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600;">Yüksek Puanlı</div>
+          <div style="font-size: 10px; color: #888; line-height: 1.5; margin-top: 4px;">3 ay boyunca 4.5 üzeri puan ortalaması. İstikrarlı kalite, tek seferlik başarı değil.</div>
+          <div style="font-size: 9px; color: #E53935; margin-top: 6px; font-weight: 500;">✓ Kazanıldı · Profile ekle →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kazanılmamış -->
+    <div style="background: #f9f9f9; border: 0.5px solid #eee; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; filter: grayscale(1); opacity: 0.4;">🥇</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #aaa;">Misafir Favorisi</div>
+          <div style="font-size: 10px; color: #bbb; line-height: 1.5; margin-top: 4px;">Müşterileriniz tekrar tekrar geliyor. Tekrar sipariş oranınız bölgede ilk %10'a girmelidir.</div>
+          <div style="height: 4px; background: #e8e8e8; border-radius: 2px; margin-top: 8px;"><div style="width: 68%; height: 100%; background: #E53935; border-radius: 2px; opacity: 0.5;"></div></div>
+          <div style="font-size: 9px; color: #ccc; margin-top: 4px;">🔒 %68 tamamlandı — hedefe yaklaşıyorsunuz</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #f9f9f9; border: 0.5px solid #eee; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; filter: grayscale(1); opacity: 0.4;">💯</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #aaa;">Kusursuz Deneyim</div>
+          <div style="font-size: 10px; color: #bbb; line-height: 1.5; margin-top: 4px;">60 gün boyunca tek bir geçerli şikayet almamak. Mükemmellik standartlarınızın kanıtı.</div>
+          <div style="height: 4px; background: #e8e8e8; border-radius: 2px; margin-top: 8px;"><div style="width: 70%; height: 100%; background: #E53935; border-radius: 2px; opacity: 0.5;"></div></div>
+          <div style="font-size: 9px; color: #ccc; margin-top: 4px;">🔒 42/60 gün — 18 gün kaldı</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PERFORMANS ROZETLERİ -->
+<div style="background: white; border-radius: 14px; padding: 20px; border: 0.5px solid #eee; margin-bottom: 14px;">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #E65100, #BF360C); display: flex; align-items: center; justify-content: center; font-size: 16px;">🚀</div>
+    <div>
+      <div style="font-size: 15px; font-weight: 600;">Performans Rozetleri</div>
+      <div style="font-size: 10px; color: #888;">Hızınız, hacminiz ve operasyonel gücünüzün ispatı</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+    <div style="background: linear-gradient(145deg, #FFF8F0, #FFF3E0); border: 1px solid #FFE0B2; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #E65100, #BF360C); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(230,81,0,0.25); flex-shrink: 0; position: relative;">📦
+          <div style="position: absolute; bottom: -2px; right: -2px; background: white; color: #E65100; font-size: 8px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">III</div>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600;">Paket Şampiyonu</div>
+          <div style="font-size: 10px; color: #888; line-height: 1.5; margin-top: 4px;">Bölgenizde ayın en çok teslimat yapan restoranısınız. Operasyonel gücünüzün kanıtı.</div>
+          <div style="font-size: 9px; color: #E65100; margin-top: 6px; font-weight: 500;">✓ 3 kez · Haz'26, Nis'26, Oca'26 · Profilinde ✓</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(145deg, #FFF8F0, #FFF3E0); border: 1px solid #FFE0B2; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #E65100, #BF360C); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(230,81,0,0.25); flex-shrink: 0;">⚡</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600;">Hız Ustası</div>
+          <div style="font-size: 10px; color: #888; line-height: 1.5; margin-top: 4px;">Siparişleriniz bölge ortalamasından %20 daha hızlı hazırlanıyor. Müşteri beklemez.</div>
+          <div style="font-size: 9px; color: #E65100; margin-top: 6px; font-weight: 500;">✓ Kazanıldı · Profile ekle →</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #f9f9f9; border: 0.5px solid #eee; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; filter: grayscale(1); opacity: 0.4;">🏆</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #aaa;">Ayın Restoranı</div>
+          <div style="font-size: 10px; color: #bbb; line-height: 1.5; margin-top: 4px;">Sipariş hacmi, memnuniyet ve hız birleşiminde aylık genel sıralamada 1. olmak.</div>
+          <div style="height: 4px; background: #e8e8e8; border-radius: 2px; margin-top: 8px;"><div style="width: 82%; height: 100%; background: #E65100; border-radius: 2px; opacity: 0.5;"></div></div>
+          <div style="font-size: 9px; color: #ccc; margin-top: 4px;">🔒 Sıralamanız: 3. — zirveye çok yakınsınız</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #f9f9f9; border: 0.5px solid #eee; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; filter: grayscale(1); opacity: 0.4;">🔥</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #aaa;">Bölgenin Favorisi</div>
+          <div style="font-size: 10px; color: #bbb; line-height: 1.5; margin-top: 4px;">Bölgenizde en çok tercih edilen 3 restorandan biri olmak. Mahallede herkes sizi tanır.</div>
+          <div style="height: 4px; background: #e8e8e8; border-radius: 2px; margin-top: 8px;"><div style="width: 55%; height: 100%; background: #E65100; border-radius: 2px; opacity: 0.5;"></div></div>
+          <div style="font-size: 9px; color: #ccc; margin-top: 4px;">🔒 Bölge sırası: 5. — 2 sıra kaldı</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #f9f9f9; border: 0.5px solid #eee; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; filter: grayscale(1); opacity: 0.4;">📈</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #aaa;">Yükselen Yıldız</div>
+          <div style="font-size: 10px; color: #bbb; line-height: 1.5; margin-top: 4px;">Son 30 günde sipariş hacminiz %50+ arttı. Büyümeniz dikkat çekiyor.</div>
+          <div style="height: 4px; background: #e8e8e8; border-radius: 2px; margin-top: 8px;"><div style="width: 64%; height: 100%; background: #E65100; border-radius: 2px; opacity: 0.5;"></div></div>
+          <div style="font-size: 9px; color: #ccc; margin-top: 4px;">🔒 Artış: %32 — %50 hedefine yaklaşıyorsunuz</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KALİTE ROZETLERİ -->
+<div style="background: white; border-radius: 14px; padding: 20px; border: 0.5px solid #eee; margin-bottom: 14px;">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #2E7D32, #1B5E20); display: flex; align-items: center; justify-content: center; font-size: 16px;">🍽️</div>
+    <div>
+      <div style="font-size: 15px; font-weight: 600;">Kalite Rozetleri</div>
+      <div style="font-size: 10px; color: #888;">Lezzetiniz ve özgünlüğünüz takdir ediliyor</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+    <div style="background: linear-gradient(145deg, #F1F8E9, #E8F5E9); border: 1px solid #C8E6C9; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #2E7D32, #1B5E20); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(46,125,50,0.25); flex-shrink: 0;">🍽️</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600;">Gurme Rozeti</div>
+          <div style="font-size: 10px; color: #888; line-height: 1.5; margin-top: 4px;">Kimoo kalite ekibi tarafından yerinde değerlendirilmiş, lezzet standartlarını aşan restoran.</div>
+          <div style="font-size: 9px; color: #2E7D32; margin-top: 6px; font-weight: 500;">✓ Kazanıldı · Profile ekle →</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #f9f9f9; border: 0.5px solid #eee; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; filter: grayscale(1); opacity: 0.4;">👨‍🍳</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #aaa;">Şefin İmzası</div>
+          <div style="font-size: 10px; color: #bbb; line-height: 1.5; margin-top: 4px;">Menünüzde özgün, başka yerde bulamayacağınız imza yemekler var. Başvurun, ekibimiz değerlendirsin.</div>
+          <div style="font-size: 9px; color: #ccc; margin-top: 6px;">🔒 Başvuru yaparak kazanılabilir</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #f9f9f9; border: 0.5px solid #eee; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; filter: grayscale(1); opacity: 0.4;">🌿</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #aaa;">Yerel Lezzet Ustası</div>
+          <div style="font-size: 10px; color: #bbb; line-height: 1.5; margin-top: 4px;">Bölgesel mutfağı özgün ve otantik şekilde temsil ediyorsunuz. Kültürel miras koruyucusu.</div>
+          <div style="font-size: 9px; color: #ccc; margin-top: 6px;">🔒 Başvuru yaparak kazanılabilir</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #f9f9f9; border: 0.5px solid #eee; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; filter: grayscale(1); opacity: 0.4;">🥩</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #aaa;">Premium Lezzet</div>
+          <div style="font-size: 10px; color: #bbb; line-height: 1.5; margin-top: 4px;">Üst segment malzeme ve sunum kalitesi. Fiyat değil, değer sunan restoran.</div>
+          <div style="font-size: 9px; color: #ccc; margin-top: 6px;">🔒 Başvuru yaparak kazanılabilir</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GÜVEN ROZETLERİ -->
+<div style="background: white; border-radius: 14px; padding: 20px; border: 0.5px solid #eee;">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #1565C0, #0D47A1); display: flex; align-items: center; justify-content: center; font-size: 16px;">🛡️</div>
+    <div>
+      <div style="font-size: 15px; font-weight: 600;">Güven Rozetleri</div>
+      <div style="font-size: 10px; color: #888;">İstikrarınız ve güvenilirliğiniz zamana yayılmış kanıt</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+    <div style="background: linear-gradient(145deg, #F0F7FF, #E3F2FD); border: 1px solid #BBDEFB; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #1565C0, #0D47A1); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(21,101,192,0.25); flex-shrink: 0;">🛡️</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600;">Güvenilir İşletme</div>
+          <div style="font-size: 10px; color: #888; line-height: 1.5; margin-top: 4px;">6 aydır kesintisiz, istikrarlı hizmet veriyorsunuz. Müşteriler size güvenebilir.</div>
+          <div style="font-size: 9px; color: #1565C0; margin-top: 6px; font-weight: 500;">✓ Kazanıldı · Profile ekle →</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(145deg, #F0F7FF, #E3F2FD); border: 1px solid #BBDEFB; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #1565C0, #0D47A1); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(21,101,192,0.25); flex-shrink: 0;">🏅</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600;">Kimoo Onaylı</div>
+          <div style="font-size: 10px; color: #888; line-height: 1.5; margin-top: 4px;">Kimoo saha ekibi restoranınızı yerinde ziyaret etti ve standartları onayladı.</div>
+          <div style="font-size: 9px; color: #1565C0; margin-top: 6px; font-weight: 500;">✓ Kazanıldı · Profile ekle →</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #f9f9f9; border: 0.5px solid #eee; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; filter: grayscale(1); opacity: 0.4;">📅</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #aaa;">Kıdemli İş Ortağı</div>
+          <div style="font-size: 10px; color: #bbb; line-height: 1.5; margin-top: 4px;">1 yıldır Kimoo'dasınız. Uzun soluklu ortaklık, karşılıklı güvenin ispatı.</div>
+          <div style="height: 4px; background: #e8e8e8; border-radius: 2px; margin-top: 8px;"><div style="width: 54%; height: 100%; background: #1565C0; border-radius: 2px; opacity: 0.5;"></div></div>
+          <div style="font-size: 9px; color: #ccc; margin-top: 4px;">🔒 198/365 gün — yarıyı geçtiniz</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #f9f9f9; border: 0.5px solid #eee; border-radius: 12px; padding: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; filter: grayscale(1); opacity: 0.4;">🤝</div>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: #aaa;">Topluluk Destekçisi</div>
+          <div style="font-size: 10px; color: #bbb; line-height: 1.5; margin-top: 4px;">Kimoo kampanyalarına 5+ kez katıldınız. Platformun büyümesine katkı sağlıyorsunuz.</div>
+          <div style="height: 4px; background: #e8e8e8; border-radius: 2px; margin-top: 8px;"><div style="width: 60%; height: 100%; background: #1565C0; border-radius: 2px; opacity: 0.5;"></div></div>
+          <div style="font-size: 9px; color: #ccc; margin-top: 4px;">🔒 3/5 katılım — 2 kampanya daha</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>

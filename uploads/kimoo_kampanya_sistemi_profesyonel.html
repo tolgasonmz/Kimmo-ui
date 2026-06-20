@@ -1,0 +1,332 @@
+<div style="background: #f5f3f0; border-radius: 16px; padding: 1.5rem; font-family: system-ui, -apple-system, sans-serif; font-size: 13px; color: #2D3436;">
+
+<!-- Sistem açıklaması - geliştirici notu -->
+<div style="background: #E0F2F1; border: 1px solid #00897B; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px;">
+  <div style="font-size: 12px; font-weight: 600; color: #00897B; margin-bottom: 6px;">📐 SİSTEM MİMARİSİ NOTU</div>
+  <div style="font-size: 11px; color: #555; line-height: 1.6;">
+    Kimoo abonelik modeliyle çalışır, komisyon almaz → kampanya bütçesi Kimoo'ya ait değildir.<br>
+    Tüm kampanyalar <strong>restoran bütçesinden</strong> finanse edilir. Kimoo sadece altyapı sağlar.<br>
+    <strong>campaign.funded_by = "restaurant"</strong> · İndirim tutarı restoran hasılatından düşer, Kimoo'dan değil.<br>
+    Müşteri panelinde iki ayrı alan: <strong>restaurant_campaigns[]</strong> ve <strong>kimoo_campaigns[]</strong>
+  </div>
+</div>
+
+<!-- Header -->
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+  <div>
+    <div style="font-size: 18px; font-weight: 600;">Kampanya & Kupon Yönetimi</div>
+    <div style="font-size: 12px; color: #888; margin-top: 3px;">Kendi bütçenizle müşterilerinize özel teklifler oluşturun</div>
+  </div>
+  <div style="display: flex; gap: 8px;">
+    <button style="background: #00897B; color: white; border: none; font-size: 12px; padding: 9px 16px; border-radius: 8px; font-weight: 500;">+ Kampanya oluştur</button>
+    <button style="background: #F5A623; color: white; border: none; font-size: 12px; padding: 9px 16px; border-radius: 8px; font-weight: 500;">🤝 Kimoo kampanyalarına katıl</button>
+  </div>
+</div>
+
+<!-- İki sütun: Restoran kampanyaları + Kimoo kampanyaları -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+
+  <!-- SOL: Restoran kendi kampanyaları -->
+  <div>
+    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+      <div style="width: 8px; height: 8px; border-radius: 50%; background: #00897B;"></div>
+      <span style="font-size: 12px; font-weight: 600; color: #00897B;">Restoran kampanyalarım</span>
+      <span style="font-size: 10px; color: #aaa;">funded_by: restaurant</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <!-- Kampanya 1 -->
+      <div style="background: white; border-radius: 10px; padding: 12px 14px; border: 0.5px solid #eee;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 13px; font-weight: 600;">₺1500'e ₺300 İndirim</span>
+            <span style="font-size: 9px; background: #E8F5E9; color: #2E7D32; padding: 1px 6px; border-radius: 6px;">Aktif</span>
+          </div>
+          <div style="width: 30px; height: 17px; border-radius: 9px; background: #00897B; position: relative;"><div style="width: 13px; height: 13px; border-radius: 50%; background: white; position: absolute; top: 2px; right: 2px;"></div></div>
+        </div>
+        <div style="font-size: 11px; color: #888; margin-bottom: 6px;">Min ₺1500 sepet → sepette ₺300 indirim</div>
+        <div style="display: flex; gap: 8px; font-size: 10px; color: #aaa;">
+          <span>📅 20 Haz – 20 Tem</span>
+          <span>🛒 28 kullanım</span>
+        </div>
+        <div style="background: #FFF8E1; border-radius: 6px; padding: 6px 8px; margin-top: 6px;">
+          <div style="font-size: 10px; color: #F57F17;">💰 Toplam indirim maliyeti: ₺8.400 · Restoran bütçesinden</div>
+        </div>
+      </div>
+
+      <!-- Kampanya 2 -->
+      <div style="background: white; border-radius: 10px; padding: 12px 14px; border: 0.5px solid #eee;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 13px; font-weight: 600;">Pizzalarda %15</span>
+            <span style="font-size: 9px; background: #E8F5E9; color: #2E7D32; padding: 1px 6px; border-radius: 6px;">Aktif</span>
+          </div>
+          <div style="width: 30px; height: 17px; border-radius: 9px; background: #00897B; position: relative;"><div style="width: 13px; height: 13px; border-radius: 50%; background: white; position: absolute; top: 2px; right: 2px;"></div></div>
+        </div>
+        <div style="font-size: 11px; color: #888; margin-bottom: 6px;">Pizza kategorisi · Max %15</div>
+        <div style="display: flex; gap: 8px; font-size: 10px; color: #aaa;">
+          <span>📅 Süresiz</span>
+          <span>🛒 134 kullanım</span>
+        </div>
+        <div style="background: #FFF8E1; border-radius: 6px; padding: 6px 8px; margin-top: 6px;">
+          <div style="font-size: 10px; color: #F57F17;">💰 Tahmini aylık maliyet: ₺4.020 · Restoran bütçesinden</div>
+        </div>
+      </div>
+
+      <!-- Kupon -->
+      <div style="background: white; border-radius: 10px; padding: 12px 14px; border: 0.5px solid #eee;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 13px; font-weight: 600; font-family: monospace;">KOSE50</span>
+            <span style="font-size: 9px; background: #E8F5E9; color: #2E7D32; padding: 1px 6px; border-radius: 6px;">Aktif</span>
+            <span style="font-size: 9px; background: #ECEFF1; color: #546E7A; padding: 1px 6px; border-radius: 6px;">Kupon</span>
+          </div>
+          <div style="width: 30px; height: 17px; border-radius: 9px; background: #00897B; position: relative;"><div style="width: 13px; height: 13px; border-radius: 50%; background: white; position: absolute; top: 2px; right: 2px;"></div></div>
+        </div>
+        <div style="font-size: 11px; color: #888;">₺50 indirim · Min ₺250 · 100 adet · Tek kullanım</div>
+        <div style="display: flex; gap: 8px; font-size: 10px; color: #aaa; margin-top: 4px;">
+          <span>🛒 34/100 kullanıldı</span>
+          <span>📋 Kodu paylaş</span>
+        </div>
+        <div style="background: #FFF8E1; border-radius: 6px; padding: 6px 8px; margin-top: 6px;">
+          <div style="font-size: 10px; color: #F57F17;">💰 Harcanan: ₺1.700 / Max: ₺5.000 · Restoran bütçesinden</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAĞ: Kimoo kampanyalarına katılım -->
+  <div>
+    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+      <div style="width: 8px; height: 8px; border-radius: 50%; background: #F5A623;"></div>
+      <span style="font-size: 12px; font-weight: 600; color: #E8950E;">Kimoo kampanyaları</span>
+      <span style="font-size: 10px; color: #aaa;">funded_by: restaurant · created_by: kimoo</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <!-- Kimoo kampanyası 1: İlk sipariş -->
+      <div style="background: white; border-radius: 10px; padding: 12px 14px; border: 0.5px solid #F5A623;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 13px; font-weight: 600;">İlk Siparişe ₺100 İndirim</span>
+            <span style="font-size: 9px; background: #FFF3E0; color: #E65100; padding: 1px 6px; border-radius: 6px;">Kimoo</span>
+            <span style="font-size: 9px; background: #E8F5E9; color: #2E7D32; padding: 1px 6px; border-radius: 6px;">Katıldınız</span>
+          </div>
+        </div>
+        <div style="font-size: 11px; color: #888; margin-bottom: 6px;">Müşterinin bu restorandan ilk siparişinde ₺100 indirim</div>
+        <div style="background: #FFF3E0; border-radius: 6px; padding: 8px; margin-bottom: 6px;">
+          <div style="font-size: 10px; color: #E65100; line-height: 1.5;">
+            <strong>Nasıl çalışır:</strong> Kimoo bu kampanyayı tüm katılan restoranlar için müşteri uygulamasında gösterir. İndirim tutarı sipariş hasılatından düşer. Kimoo'nun payı yoktur.
+          </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; gap: 8px; font-size: 10px; color: #aaa;">
+            <span>🛒 12 yeni müşteri kazandınız</span>
+            <span>💰 ₺1.200 maliyet</span>
+          </div>
+          <button style="font-size: 10px; padding: 4px 10px; border: 0.5px solid #c0392b; background: white; border-radius: 6px; color: #c0392b;">Ayrıl</button>
+        </div>
+      </div>
+
+      <!-- Kimoo kampanyası 2: Hafta sonu -->
+      <div style="background: white; border-radius: 10px; padding: 12px 14px; border: 0.5px solid #eee;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 13px; font-weight: 600;">Hafta Sonu Fırsatı</span>
+            <span style="font-size: 9px; background: #FFF3E0; color: #E65100; padding: 1px 6px; border-radius: 6px;">Kimoo</span>
+            <span style="font-size: 9px; background: #ECEFF1; color: #546E7A; padding: 1px 6px; border-radius: 6px;">Katılmadınız</span>
+          </div>
+        </div>
+        <div style="font-size: 11px; color: #888; margin-bottom: 6px;">Cumartesi-Pazar siparişlerde %10 indirim</div>
+        <div style="background: #f9f9f9; border-radius: 6px; padding: 8px; margin-bottom: 6px;">
+          <div style="font-size: 10px; color: #888; line-height: 1.5;">
+            <strong>Tahmini maliyet:</strong> Haftalık ortalama sipariş sayınıza göre ~₺800/hafta. İndirim restoran hasılatından karşılanır.
+          </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <button style="font-size: 11px; padding: 6px 14px; background: #F5A623; color: white; border: none; border-radius: 6px; font-weight: 500;">🤝 Bu kampanyaya katıl</button>
+        </div>
+      </div>
+
+      <!-- Kimoo kampanyası 3: Yeni müşteri -->
+      <div style="background: white; border-radius: 10px; padding: 12px 14px; border: 0.5px solid #eee;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 13px; font-weight: 600;">₺500'e ₺75 İndirim</span>
+            <span style="font-size: 9px; background: #FFF3E0; color: #E65100; padding: 1px 6px; border-radius: 6px;">Kimoo</span>
+            <span style="font-size: 9px; background: #ECEFF1; color: #546E7A; padding: 1px 6px; border-radius: 6px;">Katılmadınız</span>
+          </div>
+        </div>
+        <div style="font-size: 11px; color: #888; margin-bottom: 6px;">Tüm kullanıcılar · ₺500+ sepetlerde · Platform geneli</div>
+        <div style="background: #f9f9f9; border-radius: 6px; padding: 8px; margin-bottom: 6px;">
+          <div style="font-size: 10px; color: #888; line-height: 1.5;">
+            <strong>Tahmini maliyet:</strong> ~₺1.200/ay. Platformdaki tüm katılan restoranlar aynı kampanyada görünür.
+          </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <button style="font-size: 11px; padding: 6px 14px; background: #F5A623; color: white; border: none; border-radius: 6px; font-weight: 500;">🤝 Bu kampanyaya katıl</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Oluşturma formu -->
+<div style="background: white; border-radius: 12px; padding: 20px; border: 0.5px solid #eee; margin-bottom: 12px;">
+  <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">+ Yeni Restoran Kampanyası Oluştur</div>
+  <div style="font-size: 11px; color: #888; margin-bottom: 16px;">Bu kampanyanın maliyeti tamamen size aittir. Kimoo komisyon veya pay almaz.</div>
+  
+  <!-- Tip seçimi -->
+  <div style="font-size: 11px; font-weight: 500; color: #666; margin-bottom: 6px;">Kampanya tipi</div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+    <div style="background: #E0F2F1; border: 1.5px solid #00897B; border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer;">
+      <div style="font-size: 16px;">🛒</div>
+      <div style="font-size: 10px; font-weight: 600; color: #00897B; margin-top: 2px;">Sepet indirimi</div>
+      <div style="font-size: 9px; color: #888;">₺X al, ₺Y indirim</div>
+    </div>
+    <div style="background: #FFFCF5; border: 0.5px solid #ddd; border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer;">
+      <div style="font-size: 16px;">🏷️</div>
+      <div style="font-size: 10px; font-weight: 500; margin-top: 2px;">Kategori %</div>
+      <div style="font-size: 9px; color: #888;">Kategoriye % indirim</div>
+    </div>
+    <div style="background: #FFFCF5; border: 0.5px solid #ddd; border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer;">
+      <div style="font-size: 16px;">🎟️</div>
+      <div style="font-size: 10px; font-weight: 500; margin-top: 2px;">Kupon kodu</div>
+      <div style="font-size: 9px; color: #888;">Kod ile indirim</div>
+    </div>
+    <div style="background: #FFFCF5; border: 0.5px solid #ddd; border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer;">
+      <div style="font-size: 16px;">👋</div>
+      <div style="font-size: 10px; font-weight: 500; margin-top: 2px;">İlk sipariş</div>
+      <div style="font-size: 9px; color: #888;">Yeni müşteriye özel</div>
+    </div>
+  </div>
+
+  <!-- Sepet indirimi formu -->
+  <div style="background: #f9faf9; border: 0.5px solid #e8ede8; border-radius: 10px; padding: 16px; margin-bottom: 14px;">
+    <div style="font-size: 12px; font-weight: 600; color: #00897B; margin-bottom: 12px;">🛒 Sepet İndirimi</div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+      <div>
+        <div style="font-size: 10px; font-weight: 500; color: #888; margin-bottom: 3px;">Min sepet tutarı</div>
+        <div style="background: white; border: 0.5px solid #e0e0e0; border-radius: 7px; padding: 9px 10px; font-size: 13px;">₺1.500</div>
+      </div>
+      <div>
+        <div style="font-size: 10px; font-weight: 500; color: #888; margin-bottom: 3px;">İndirim tutarı</div>
+        <div style="background: white; border: 0.5px solid #e0e0e0; border-radius: 7px; padding: 9px 10px; font-size: 13px;">₺300</div>
+      </div>
+      <div>
+        <div style="font-size: 10px; font-weight: 500; color: #888; margin-bottom: 3px;">Bütçe limiti (opsiyonel)</div>
+        <div style="background: white; border: 0.5px solid #e0e0e0; border-radius: 7px; padding: 9px 10px; font-size: 13px; color: #bbb;">ör. ₺15.000</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+      <div>
+        <div style="font-size: 10px; font-weight: 500; color: #888; margin-bottom: 3px;">Başlangıç</div>
+        <div style="background: white; border: 0.5px solid #e0e0e0; border-radius: 7px; padding: 9px 10px; font-size: 12px;">📅 20 Haziran 2026</div>
+      </div>
+      <div>
+        <div style="font-size: 10px; font-weight: 500; color: #888; margin-bottom: 3px;">Bitiş</div>
+        <div style="background: white; border: 0.5px solid #e0e0e0; border-radius: 7px; padding: 9px 10px; font-size: 12px;">📅 20 Temmuz 2026</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div>
+        <div style="font-size: 10px; font-weight: 500; color: #888; margin-bottom: 3px;">Kişi başı kullanım</div>
+        <div style="display: flex; gap: 4px;">
+          <div style="flex: 1; background: #E0F2F1; border: 1px solid #00897B; border-radius: 7px; padding: 8px; font-size: 11px; text-align: center; font-weight: 500; color: #00897B;">1 kez</div>
+          <div style="flex: 1; background: white; border: 0.5px solid #e0e0e0; border-radius: 7px; padding: 8px; font-size: 11px; text-align: center;">3 kez</div>
+          <div style="flex: 1; background: white; border: 0.5px solid #e0e0e0; border-radius: 7px; padding: 8px; font-size: 11px; text-align: center;">Sınırsız</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 10px; font-weight: 500; color: #888; margin-bottom: 3px;">Geçerli ürünler</div>
+        <div style="display: flex; gap: 4px;">
+          <div style="flex: 1; background: #E0F2F1; border: 1px solid #00897B; border-radius: 7px; padding: 8px; font-size: 11px; text-align: center; font-weight: 500; color: #00897B;">Tüm menü</div>
+          <div style="flex: 1; background: white; border: 0.5px solid #e0e0e0; border-radius: 7px; padding: 8px; font-size: 11px; text-align: center;">Kategori seç</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Açıklama + görsel -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+    <div>
+      <div style="font-size: 10px; font-weight: 500; color: #888; margin-bottom: 3px;">Kampanya açıklaması</div>
+      <div style="background: #f9f9f9; border: 0.5px solid #e0e0e0; border-radius: 7px; padding: 10px; min-height: 70px; font-size: 12px; color: #2D3436; line-height: 1.5;">₺1.500 ve üzeri siparişlerinizde sepette ₺300 indirim! Kebap çeşitlerimiz dahil tüm menüde geçerli.</div>
+      <div style="text-align: right; font-size: 10px; color: #aaa; margin-top: 3px;">92/300</div>
+    </div>
+    <div>
+      <div style="font-size: 10px; font-weight: 500; color: #888; margin-bottom: 3px;">Kampanya görseli</div>
+      <div style="background: #f9f9f9; border: 1.5px dashed #d0d0d0; border-radius: 7px; padding: 16px; text-align: center; min-height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div style="font-size: 20px; opacity: 0.3;">📷</div>
+        <div style="font-size: 10px; color: #888;">Yükle veya şablon seç</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Maliyet tahmini -->
+  <div style="background: #FFF8E1; border: 0.5px solid #FFE082; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;">
+    <div style="font-size: 11px; font-weight: 600; color: #F57F17; margin-bottom: 6px;">💰 Tahmini maliyet</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; font-size: 11px;">
+      <div>
+        <div style="color: #888;">Kullanım başı</div>
+        <div style="font-weight: 600; color: #2D3436;">₺300</div>
+      </div>
+      <div>
+        <div style="color: #888;">Günlük ort. sipariş (son 30g)</div>
+        <div style="font-weight: 600; color: #2D3436;">8 sipariş</div>
+      </div>
+      <div>
+        <div style="color: #888;">Tahmini aylık maliyet</div>
+        <div style="font-weight: 600; color: #c0392b;">~₺12.000</div>
+        <div style="font-size: 9px; color: #aaa;">bütçe limitiniz: ₺15.000</div>
+      </div>
+    </div>
+    <div style="font-size: 10px; color: #F57F17; margin-top: 8px;">Bu tutar restoranınızın hasılatından düşer. Kimoo bu tutardan pay almaz.</div>
+  </div>
+
+  <!-- Müşteri görünümü -->
+  <div style="margin-bottom: 14px;">
+    <div style="font-size: 10px; font-weight: 500; color: #888; margin-bottom: 6px;">📱 Müşteri uygulamasında görünüm</div>
+    <div style="background: #FFFCF5; border-radius: 10px; padding: 12px; border: 0.5px solid #f0ebe0;">
+      <div style="font-size: 9px; color: #aaa; font-weight: 500; margin-bottom: 6px;">RESTORAN KAMPANYALARI</div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <div style="width: 56px; height: 56px; border-radius: 8px; background: linear-gradient(135deg, #00897B, #00695C); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <div style="text-align: center;"><div style="font-size: 6px; color: rgba(255,255,255,0.7);">SEPETTE</div><div style="font-size: 14px; color: #F5A623; font-weight: 700;">₺300</div></div>
+        </div>
+        <div>
+          <div style="font-size: 12px; font-weight: 600;">₺1.500'e ₺300 İndirim</div>
+          <div style="font-size: 10px; color: #888; margin-top: 2px;">Köşe Ocakbaşı · Tüm menü · 20 gün kaldı</div>
+        </div>
+      </div>
+      <div style="border-top: 0.5px solid #f0ebe0; margin: 8px 0;"></div>
+      <div style="font-size: 9px; color: #E8950E; font-weight: 500; margin-bottom: 6px;">KİMOO KAMPANYALARI</div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <div style="width: 56px; height: 56px; border-radius: 8px; background: linear-gradient(135deg, #F5A623, #E8950E); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <div style="text-align: center;"><div style="font-size: 6px; color: rgba(255,255,255,0.7);">İLK SİPARİŞ</div><div style="font-size: 14px; color: white; font-weight: 700;">₺100</div></div>
+        </div>
+        <div>
+          <div style="font-size: 12px; font-weight: 600;">İlk Siparişe ₺100 İndirim</div>
+          <div style="font-size: 10px; color: #888; margin-top: 2px;">Köşe Ocakbaşı · İlk siparişinize özel</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Uyarı -->
+  <div style="background: #E0F2F1; border-radius: 7px; padding: 10px 12px; margin-bottom: 14px;">
+    <div style="font-size: 10px; color: #00897B; line-height: 1.5;">
+      <strong>Sistem notu:</strong> campaign.discount_source = "restaurant_revenue" · Sipariş tamamlandığında indirim tutarı restoran hakediş ödemesinden düşülür. Bütçe limitine ulaşıldığında kampanya otomatik duraklatılır ve restoran bilgilendirilir.
+    </div>
+  </div>
+
+  <!-- Butonlar -->
+  <div style="display: flex; justify-content: flex-end; gap: 8px;">
+    <button style="font-size: 12px; padding: 9px 16px; border: 0.5px solid #ddd; background: white; border-radius: 8px;">Taslak kaydet</button>
+    <button style="font-size: 12px; padding: 9px 16px; background: #00897B; color: white; border: none; border-radius: 8px; font-weight: 500;">Kampanyayı başlat</button>
+  </div>
+</div>
+
+</div>

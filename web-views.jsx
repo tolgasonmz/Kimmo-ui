@@ -49,6 +49,7 @@ function WebHeader({ cartCount, onCartClick, onLogoClick }) {
           <button className="hide-mobile" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', fontFamily: 'var(--font-sans)' }}>
             <Icon name="bag" size={18} color="var(--text-secondary)" />Siparişlerim
           </button>
+          {window.ThemeIconButton && <window.ThemeIconButton />}
           <button onClick={onCartClick} style={{ position: 'relative', width: 44, height: 44, borderRadius: 999, border: '1.5px solid var(--border-default)', background: 'var(--bg-surface)', display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
             <Icon name="bag" size={20} color="var(--text-primary)" />
             {cartCount > 0 && <span style={{ position: 'absolute', top: -4, right: -4, width: 20, height: 20, borderRadius: 999, background: 'var(--brand-500)', color: '#fff', fontSize: 11, fontWeight: 800, display: 'grid', placeItems: 'center' }}>{cartCount}</span>}

@@ -1,0 +1,197 @@
+<div style="background: #f5f3f0; border-radius: 16px; padding: 1.5rem; font-family: system-ui, -apple-system, sans-serif; font-size: 13px; color: #2D3436;">
+
+<!-- Header -->
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+  <div>
+    <div style="font-size: 20px; font-weight: 500;">Kurye Bul</div>
+    <div style="font-size: 12px; color: #888; margin-top: 2px;">Havuz kuryelerinden çağır veya kayıtlı kuryelerine ata</div>
+  </div>
+</div>
+
+<!-- Üst: Paket + Bölge durumu -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+
+  <!-- Paket durumu -->
+  <div style="background: white; border-radius: 12px; padding: 16px; border: 0.5px solid #eee;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span style="font-size: 14px; font-weight: 600;">Havuz kurye paketi</span>
+      <span style="font-size: 11px; background: #E0F2F1; color: #00897B; padding: 2px 8px; border-radius: 8px; font-weight: 500;">64/100 adet</span>
+    </div>
+    <div style="font-size: 32px; font-weight: 700; color: #00897B;">64 <span style="font-size: 14px; font-weight: 400; color: #888;">çağrı kaldı</span></div>
+    <div style="height: 6px; background: #e8e8e8; border-radius: 3px; margin: 10px 0 8px;">
+      <div style="width: 64%; height: 100%; background: #00897B; border-radius: 3px;"></div>
+    </div>
+    <div style="font-size: 10px; color: #888; line-height: 1.6;">Standart teslimat 1 hak · 5 km üzeri mesafe 1.5 hak düşer · Maks hizmet alanı 7.5 km</div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 0.5px solid #f0f0f0;">
+      <span style="font-size: 12px;">Otomatik kurye çağır</span>
+      <div style="width: 34px; height: 20px; border-radius: 10px; background: #ccc; position: relative; margin-left: auto;"><div style="width: 16px; height: 16px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px;"></div></div>
+    </div>
+    <div style="font-size: 10px; color: #aaa; margin-top: 4px;">Açıldığında sipariş onayında en yakın kurye otomatik atanır</div>
+  </div>
+
+  <!-- Bölge durumu -->
+  <div style="background: white; border-radius: 12px; padding: 16px; border: 0.5px solid #eee;">
+    <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">Bölge kurye durumu</div>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+      <div style="width: 48px; height: 48px; border-radius: 50%; background: #E8F5E9; display: flex; align-items: center; justify-content: center;">
+        <div style="font-size: 20px;">🟢</div>
+      </div>
+      <div>
+        <div style="font-size: 16px; font-weight: 600; color: #2E7D32;">Müsait</div>
+        <div style="font-size: 11px; color: #888;">Bölgenizde yeterli kurye var</div>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+      <div style="background: #f9f9f9; border-radius: 8px; padding: 10px; text-align: center;">
+        <div style="font-size: 10px; color: #aaa;">Ort. varış süresi</div>
+        <div style="font-size: 16px; font-weight: 600; color: #2D3436;">4 dk</div>
+      </div>
+      <div style="background: #f9f9f9; border-radius: 8px; padding: 10px; text-align: center;">
+        <div style="font-size: 10px; color: #aaa;">Aktif kurye sayısı</div>
+        <div style="font-size: 16px; font-weight: 600; color: #2D3436;">7</div>
+      </div>
+    </div>
+    <div style="font-size: 10px; color: #ccc; margin-top: 8px;">Kurye bilgileri gizlidir, sipariş atandığında gösterilir</div>
+  </div>
+</div>
+
+<!-- Paket satın al -->
+<div style="background: white; border-radius: 12px; padding: 16px; border: 0.5px solid #eee; margin-bottom: 16px;">
+  <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">Paket satın al</div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;">
+    <div style="border: 0.5px solid #e0e0e0; border-radius: 10px; padding: 12px; text-align: center;">
+      <div style="font-size: 18px; font-weight: 700; color: #2D3436;">25</div>
+      <div style="font-size: 10px; color: #888;">çağrı</div>
+      <div style="font-size: 10px; color: #aaa; margin-top: 2px;">birim ₺125</div>
+      <div style="font-size: 14px; font-weight: 600; color: #2D3436; margin-top: 6px;">₺3.125</div>
+      <div style="font-size: 9px; color: #aaa;">+KDV</div>
+      <button style="font-size: 10px; padding: 5px 12px; margin-top: 8px; border: 0.5px solid #ddd; background: white; border-radius: 6px;">Satın al</button>
+    </div>
+    <div style="border: 1.5px solid #00897B; border-radius: 10px; padding: 12px; text-align: center; background: #f0faf8; position: relative;">
+      <div style="position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: #F5A623; color: white; font-size: 9px; padding: 1px 8px; border-radius: 4px; font-weight: 500;">Popüler</div>
+      <div style="font-size: 18px; font-weight: 700; color: #00897B;">100</div>
+      <div style="font-size: 10px; color: #888;">çağrı</div>
+      <div style="font-size: 10px; color: #aaa; margin-top: 2px;">birim ₺120</div>
+      <div style="font-size: 14px; font-weight: 600; color: #00897B; margin-top: 6px;">₺12.000</div>
+      <div style="font-size: 9px; color: #aaa;">+KDV</div>
+      <button style="font-size: 10px; padding: 5px 12px; margin-top: 8px; background: #00897B; color: white; border: none; border-radius: 6px; font-weight: 500;">Satın al</button>
+    </div>
+    <div style="border: 0.5px solid #e0e0e0; border-radius: 10px; padding: 12px; text-align: center;">
+      <div style="font-size: 18px; font-weight: 700; color: #2D3436;">500</div>
+      <div style="font-size: 10px; color: #888;">çağrı</div>
+      <div style="font-size: 10px; color: #aaa; margin-top: 2px;">birim ₺110</div>
+      <div style="font-size: 14px; font-weight: 600; color: #2D3436; margin-top: 6px;">₺55.000</div>
+      <div style="font-size: 9px; color: #aaa;">+KDV</div>
+      <button style="font-size: 10px; padding: 5px 12px; margin-top: 8px; border: 0.5px solid #ddd; background: white; border-radius: 6px;">Satın al</button>
+    </div>
+    <div style="border: 0.5px solid #e0e0e0; border-radius: 10px; padding: 12px; text-align: center;">
+      <div style="font-size: 18px; font-weight: 700; color: #2D3436;">1000</div>
+      <div style="font-size: 10px; color: #888;">çağrı</div>
+      <div style="font-size: 10px; color: #aaa; margin-top: 2px;">birim ₺100</div>
+      <div style="font-size: 14px; font-weight: 600; color: #2D3436; margin-top: 6px;">₺100.000</div>
+      <div style="font-size: 9px; color: #aaa;">+KDV</div>
+      <button style="font-size: 10px; padding: 5px 12px; margin-top: 8px; border: 0.5px solid #ddd; background: white; border-radius: 6px;">Satın al</button>
+    </div>
+  </div>
+</div>
+
+<!-- Kurye bekleyen siparişler -->
+<div style="background: white; border-radius: 12px; padding: 16px; border: 0.5px solid #eee; margin-bottom: 16px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <div>
+      <span style="font-size: 14px; font-weight: 600;">Kurye bekleyen siparişler</span>
+      <span style="font-size: 11px; background: #FFF3E0; color: #E65100; padding: 2px 8px; border-radius: 8px; font-weight: 500; margin-left: 6px;">3 sipariş</span>
+    </div>
+    <button style="font-size: 11px; padding: 6px 14px; background: #00897B; color: white; border: none; border-radius: 7px; font-weight: 500;">Tümüne kurye çağır</button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <div style="display: grid; grid-template-columns: 70px 1fr 80px 70px 90px; gap: 8px; padding: 6px 8px; font-size: 10px; color: #aaa; font-weight: 500;">
+      <div>SİPARİŞ</div><div>ÜRÜNLER</div><div>TUTAR</div><div>BEKLİYOR</div><div>İŞLEM</div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 70px 1fr 80px 70px 90px; gap: 8px; padding: 10px 8px; background: #FFF8E1; border-radius: 8px; align-items: center;">
+      <div style="font-size: 12px; font-weight: 500;">KM-4833</div>
+      <div style="font-size: 11px; color: #888;">Adana Dürüm x2, Ayran x2</div>
+      <div style="font-size: 12px; font-weight: 500;">₺360</div>
+      <div style="font-size: 11px; color: #E65100; font-weight: 500;">4 dk</div>
+      <button style="font-size: 10px; padding: 5px 10px; background: #F5A623; color: white; border: none; border-radius: 6px; font-weight: 500;">Kurye çağır</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 70px 1fr 80px 70px 90px; gap: 8px; padding: 10px 8px; background: #f9f9f9; border-radius: 8px; align-items: center;">
+      <div style="font-size: 12px; font-weight: 500;">KM-4832</div>
+      <div style="font-size: 11px; color: #888;">Karışık Izgara, İçli Köfte x3</div>
+      <div style="font-size: 12px; font-weight: 500;">₺765</div>
+      <div style="font-size: 11px; color: #888;">1 dk</div>
+      <button style="font-size: 10px; padding: 5px 10px; background: #F5A623; color: white; border: none; border-radius: 6px; font-weight: 500;">Kurye çağır</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 70px 1fr 80px 70px 90px; gap: 8px; padding: 10px 8px; background: #f9f9f9; border-radius: 8px; align-items: center;">
+      <div style="font-size: 12px; font-weight: 500;">YS-2104</div>
+      <div style="font-size: 11px; color: #888;">Karışık Pide, Ayran</div>
+      <div style="font-size: 12px; font-weight: 500;">₺245</div>
+      <div style="font-size: 11px; color: #888;">yeni</div>
+      <button style="font-size: 10px; padding: 5px 10px; background: #F5A623; color: white; border: none; border-radius: 6px; font-weight: 500;">Kurye çağır</button>
+    </div>
+  </div>
+</div>
+
+<!-- Aktif teslimatlar -->
+<div style="background: white; border-radius: 12px; padding: 16px; border: 0.5px solid #eee; margin-bottom: 16px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <span style="font-size: 14px; font-weight: 600;">Aktif teslimatlar</span>
+    <span style="font-size: 11px; background: #E0F2F1; color: #00897B; padding: 2px 8px; border-radius: 8px; font-weight: 500;">2 yolda</span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <div style="display: grid; grid-template-columns: 70px 100px 1fr 80px 80px 80px; gap: 8px; padding: 10px 8px; background: #f0faf8; border-radius: 8px; align-items: center;">
+      <div style="font-size: 12px; font-weight: 500;">KM-4831</div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <div style="width: 22px; height: 22px; border-radius: 50%; background: #00897B; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; font-weight: 500;">MA</div>
+        <div style="font-size: 11px;">Mehmet A.</div>
+      </div>
+      <div style="font-size: 11px; color: #888;">Zeynep A. · Urfa Kebap, Künefe</div>
+      <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #00897B; font-weight: 500;"><span style="width: 5px; height: 5px; border-radius: 50%; background: #00897B;"></span>Yolda</div>
+      <div style="font-size: 11px; color: #888;">~6 dk</div>
+      <button style="font-size: 10px; padding: 4px 8px; border: 0.5px solid #ddd; background: white; border-radius: 6px;">Takip et</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 70px 100px 1fr 80px 80px 80px; gap: 8px; padding: 10px 8px; background: #f9f9f9; border-radius: 8px; align-items: center;">
+      <div style="font-size: 12px; font-weight: 500;">MY-3321</div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <div style="width: 22px; height: 22px; border-radius: 50%; background: #F5A623; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; font-weight: 500;">AY</div>
+        <div style="font-size: 11px;">Ali Y.</div>
+      </div>
+      <div style="font-size: 11px; color: #888;">Hakan T. · Lahmacun x4</div>
+      <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #F5A623; font-weight: 500;"><span style="width: 5px; height: 5px; border-radius: 50%; background: #F5A623;"></span>Teslimde</div>
+      <div style="font-size: 11px; color: #888;">~1 dk</div>
+      <button style="font-size: 10px; padding: 4px 8px; border: 0.5px solid #ddd; background: white; border-radius: 6px;">Takip et</button>
+    </div>
+  </div>
+</div>
+
+<!-- Haftalık performans -->
+<div style="background: white; border-radius: 12px; padding: 16px; border: 0.5px solid #eee;">
+  <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Bu hafta kurye performansı</div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
+    <div style="background: #f9f9f9; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 10px; color: #aaa;">Toplam teslimat</div>
+      <div style="font-size: 20px; font-weight: 700; color: #2D3436;">48</div>
+    </div>
+    <div style="background: #f9f9f9; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 10px; color: #aaa;">Ort. varış süresi</div>
+      <div style="font-size: 20px; font-weight: 700; color: #00897B;">3.8 dk</div>
+    </div>
+    <div style="background: #f9f9f9; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 10px; color: #aaa;">Ort. teslimat süresi</div>
+      <div style="font-size: 20px; font-weight: 700; color: #2D3436;">18 dk</div>
+    </div>
+    <div style="background: #f9f9f9; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="font-size: 10px; color: #aaa;">Kalan paket</div>
+      <div style="font-size: 20px; font-weight: 700; color: #F5A623;">64</div>
+      <div style="font-size: 9px; color: #aaa;">~8 günlük</div>
+    </div>
+  </div>
+</div>
+
+</div>

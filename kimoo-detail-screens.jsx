@@ -297,6 +297,12 @@ function AccountSettingsScreen({ go }) {
           <button style={{ fontSize: 14, fontWeight: 700, color: 'var(--brand-600)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>Fotoğraf değiştir</button>
         </div>
 
+        {/* Görünüm (v8: koyu mod) */}
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>Görünüm</div>
+        <div style={{ marginBottom: 20 }}>
+          <window.ThemeRow subtitle="Açık veya koyu tema arasında geç" />
+        </div>
+
         {/* Personal info */}
         <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>Kişisel Bilgiler</div>
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: 20 }}>

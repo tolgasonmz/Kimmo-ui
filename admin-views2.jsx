@@ -258,6 +258,9 @@ function AdminAudit() {
 // ============ SYSTEM CONFIG ============
 function AdminConfig() {
   const groups = [
+    { title: 'Görünüm', items: [
+      { label: 'Tema', value: '__theme__', desc: 'Açık veya koyu mod arasında geç' },
+    ]},
     { title: 'Abonelik & Seçili Restoran', items: [
       { label: 'Aylık abonelik', value: '4.400 TL/ay', desc: 'İlk ay ücretsiz · taahhütsüz' },
       { label: 'Yıllık abonelik', value: '3.900 TL/ay', desc: '10 ay öde, 12 ay kullan · 2 ay ücretsiz' },
@@ -303,8 +306,10 @@ function AdminConfig() {
                     <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{c.label}</div>
                     <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>{c.desc}</div>
                   </div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--brand-600)', minWidth: 120, textAlign: 'right' }}>{c.value}</div>
-                  <MiniBtn icon="chevR" title="Düzenle" />
+                  <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--brand-600)', minWidth: 120, textAlign: 'right' }}>
+                    {c.value === '__theme__' ? <window.ThemeSelector size="sm" /> : c.value}
+                  </div>
+                  {c.value !== '__theme__' && <MiniBtn icon="chevR" title="Düzenle" />}
                 </div>
               ))}
             </div>

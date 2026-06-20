@@ -38,6 +38,7 @@
 
 <script type="text/babel" src="ios-frame.jsx"></script>
 <script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="kimoo-theme.jsx"></script>
 <script type="text/babel" src="kimoo-shared.jsx"></script>
 <script type="text/babel" src="courier-shared.jsx"></script>
 <script type="text/babel" src="courier-screens.jsx"></script>
@@ -98,6 +99,7 @@ function TabBar({ tab, setTab }) {
 
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  useKimooTheme(t.dark, (v) => setTweak('dark', v));
   const [screen, setScreen] = useState('home');
   const [tab, setTabState] = useState('home');
   const [online, setOnline] = useState(true);
@@ -119,9 +121,10 @@ function App() {
 
   const ramp = ACCENT_RAMPS[t.accent] || ACCENT_RAMPS['#FF5A3C'];
   const rootVars = {
-    '--brand-500': ramp[500], '--brand-600': ramp[600], '--brand-700': ramp[700],
-    '--brand-50': t.dark ? hexA(ramp[500], 0.16) : ramp[50],
-    '--brand-100': t.dark ? hexA(ramp[500], 0.26) : ramp[100],
+    '--brand-500': ramp[500], '--brand-600': ramp[600],
+    '--brand-700': t.dark ? ramp[500] : ramp[700],
+    '--brand-50':  t.dark ? hexA(ramp[500], 0.14) : ramp[50],
+    '--brand-100': t.dark ? hexA(ramp[500], 0.22) : ramp[100],
     '--radius-scale': t.radius,
     width: '100%',
   };

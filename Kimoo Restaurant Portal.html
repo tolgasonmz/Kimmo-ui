@@ -37,6 +37,7 @@
 
 <script type="text/babel" src="browser-window.jsx"></script>
 <script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="kimoo-theme.jsx"></script>
 <script type="text/babel" src="kimoo-shared.jsx"></script>
 <script type="text/babel" src="resto-data.jsx"></script>
 <script type="text/babel" src="resto-views.jsx"></script>
@@ -51,7 +52,7 @@ const { useState } = React;
 const {
   ChromeWindow, Icon, SideNav,
   DashboardView, OrdersView, MenuView,
-  AnalyticsView, ReviewsView, SettingsView,
+  AnalyticsView, ReviewsView, SettingsView, CampaignsView,
   CourierFindView, MyCouriersView, ComplaintsView,
   MessagesView, IntegrationsView,
   useTweaks, TweaksPanel, TweakSection, TweakToggle, TweakSlider,
@@ -66,6 +67,7 @@ const URL_MAP = {
   'courier-find': 'panel.kimoo.com/kurye-bul',
   'my-couriers':  'panel.kimoo.com/kuryelerim',
   messages:     'panel.kimoo.com/mesajlar',
+  campaigns:    'panel.kimoo.com/kampanyalar',
   reviews:      'panel.kimoo.com/yorumlar',
   complaints:   'panel.kimoo.com/sikayetler',
   analytics:    'panel.kimoo.com/raporlar',
@@ -80,6 +82,7 @@ const NAV_PAGES = [
   ['courier-find',  'Kurye Bul'],
   ['my-couriers',   'Kuryelerim'],
   ['messages',      'Mesajlar'],
+  ['campaigns',     'Kampanyalar'],
   ['reviews',       'Yorumlar'],
   ['complaints',    'Şikayet & İadeler'],
   ['analytics',     'Raporlar'],
@@ -95,6 +98,7 @@ function TopBar({ page }) {
     'courier-find':'Kurye Bul',
     'my-couriers': 'Kuryelerim',
     messages:      'Müşteri Mesajları',
+    campaigns:     'Kampanyalar & Kuponlar',
     reviews:       'Yorumlar',
     complaints:    'Şikayet & İadeler',
     analytics:     'Raporlar & Analitik',
@@ -130,6 +134,8 @@ function App() {
   const [page, setPage] = useState('dashboard');
   const [collapsed, setCollapsed] = useState(false);
 
+  useKimooTheme(t.dark, (v) => setTweak('dark', v));
+
   const rootVars = { '--radius-scale': t.radius, width: '100%' };
 
   let view;
@@ -140,6 +146,7 @@ function App() {
     case 'courier-find':  view = <CourierFindView />;     break;
     case 'my-couriers':   view = <MyCouriersView />;      break;
     case 'messages':      view = <MessagesView />;        break;
+    case 'campaigns':     view = <CampaignsView />;       break;
     case 'reviews':       view = <ReviewsView />;         break;
     case 'complaints':    view = <ComplaintsView />;      break;
     case 'analytics':     view = <AnalyticsView />;       break;
